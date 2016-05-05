@@ -75,6 +75,7 @@ dependencies:
 - picard=1.141=1
 - pip=8.1.1=py35_1
 - pixman=0.32.6=0
+- proj4=4.9.1=0
 - python=3.5.1=0
 - python-dateutil=2.5.1=py35_0
 - pytz=2016.2=py35_0
@@ -82,6 +83,7 @@ dependencies:
 - r=3.2.2=0
 - r-acepack=1.3_3.3=r3.2.2_1a
 - r-assertthat=0.1=r3.2.2_1a
+- r-ash=1.0_15=r3.2.2_0
 - r-base=3.2.2=0
 - r-bh=1.58.0_1=r3.2.2_0a
 - r-bitops=1.0_6=r3.2.2_1a
@@ -104,6 +106,7 @@ dependencies:
 - r-futile.options=1.0.0=r3.2.2_0
 - r-gdata=2.17.0=r3.2.2_0a
 - r-getoptlong=0.1.0=r3.2.2_0
+- r-ggalt=0.1.1=r3.2.2_0
 - r-ggplot2=2.1.0=r3.2.2_0
 - r-globaloptions=0.0.8=r3.2.2_0
 - r-gplots=2.17.0=r3.2.2_0a
@@ -119,6 +122,7 @@ dependencies:
 - r-lazyeval=0.1.10=r3.2.2_2a
 - r-locfit=1.5_9.1=r3.2.2_0
 - r-magrittr=1.5=r3.2.2_1a
+- r-maps=3.0.0_2=r3.2.2_0
 - r-mass=7.3_45=r3.2.2_0a
 - r-matrix=1.2_2=r3.2.2_0a
 - r-mgcv=1.8_9=r3.2.2_0a
@@ -127,6 +131,7 @@ dependencies:
 - r-nnet=7.3_11=r3.2.2_0a
 - r-plyr=1.8.3=r3.2.2_0a
 - r-proto=0.3_10=r3.2.2_1a
+- r-proj4=1.0_8=r3.2.2_0
 - r-r6=2.1.1=r3.2.2_0a
 - r-rcolorbrewer=1.1_2=r3.2.2_2a
 - r-rcpp=0.12.2=r3.2.2_0a

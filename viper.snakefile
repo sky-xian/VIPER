@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import os
+import sys
 import subprocess
 from collections import defaultdict
 import pandas as pd
@@ -66,6 +67,13 @@ metacols = [c for c in metadata.columns if c.lower()[:4] != 'comp']
 file_info = { sampleName : config["samples"][sampleName] for sampleName in metadata.index }
 ordered_sample_list = metadata.index
 run_fusion= True if len(config["samples"][metadata.index[0]]) == 2 else False
+gz_command="--readFilesCommand zcat" if config["samples"][metadata.index[0]][0][-3:] == '.gz' else ""
+
+#make sure the input is not a mixture of SE and PE
+for cur_index in range(1,len(metadata.index)):
+    if len(config["samples"][metadata.index[cur_index]]) != len(config["samples"][metadata.index[0]]):
+        sys.stderr.write("Input is a mixture of SE and PE. This feature is not currently supported by VIPER. Exiting .... \n")
+        sys.exit(1)
 
 if( run_fusion ):
     if( config["stranded"] ):
@@ -171,6 +179,7 @@ rule run_STAR:
         log_file="analysis/STAR/{sample}/{sample}.Log.final.out"
     params:
         stranded=strand_command,
+        gz_support=gz_command,
         prefix=lambda wildcards: "analysis/STAR/{sample}/{sample}".format(sample=wildcards.sample),
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
     threads: 8
@@ -178,7 +187,7 @@ rule run_STAR:
     shell:
         "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_index]}"
 	" --sjdbGTFfile {config[gtf_file]}"
-        " --readFilesIn {input} --readFilesCommand zcat --outFileNamePrefix {params.prefix}."
+        " --readFilesIn {input} {params.gz_support} --outFileNamePrefix {params.prefix}."
 	"  --outSAMstrandField intronMotif"
         "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
         "  --limitBAMsortRAM 45000000000 --quantMode GeneCounts"

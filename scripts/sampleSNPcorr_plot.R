@@ -1,8 +1,3 @@
-#Script to generate a Sample-Sample snp correlation heatmaps
-#Input:
-#Output:
-#BASED on makeclustering_all_samples_HWL.R by Henry Long
-
 # load required packages
 suppressMessages(library("gplots"))
 suppressMessages(library("ComplexHeatmap"))

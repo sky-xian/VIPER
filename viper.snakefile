@@ -130,12 +130,14 @@ rule target:
         fusion_output,
         insert_size_output,
         rRNA_metrics,
-        expand("analysis/diffexp/{comparison}/{comparison}.goterm.csv", comparison=comparisons),
-        expand("analysis/diffexp/{comparison}/{comparison}.goterm.pdf", comparison=comparisons),
-        expand("analysis/plots/images/{comparison}_goterm.png", comparison=comparisons),
-        expand("analysis/diffexp/{comparison}/{comparison}.kegg.txt", comparison=comparisons),
-        expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
-        expand("analysis/diffexp/{comparison}/{comparison}.gsea.pdf", comparison=comparisons),
+        #expand("analysis/diffexp/{comparison}/{comparison}.goterm.csv", comparison=comparisons),
+        #expand("analysis/diffexp/{comparison}/{comparison}.goterm.pdf", comparison=comparisons),
+        #expand("analysis/plots/images/{comparison}_goterm.png", comparison=comparisons),
+        expand("analysis/diffexp/{comparison}/{comparison}.goterm.done", comparison=comparisons),
+        #expand("analysis/diffexp/{comparison}/{comparison}.kegg.txt", comparison=comparisons),
+        #expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
+        #expand("analysis/diffexp/{comparison}/{comparison}.gsea.pdf", comparison=comparisons),
+        expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
         "report.html"
     message: "Compiling all output"
         
@@ -506,29 +508,34 @@ rule goterm_analysis:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
         force_run_upon_meta_change = config['metasheet']
     output:
+        out_file = "analysis/diffexp/{comparison}/{comparison}.goterm.done"
+    params:
         csv = "analysis/diffexp/{comparison}/{comparison}.goterm.csv",
         plot = "analysis/diffexp/{comparison}/{comparison}.goterm.pdf",
         png = "analysis/plots/images/{comparison}_goterm.png"
     message: "Creating Goterm Analysis plots for Differential Expressions for {wildcards.comparison}"
     run:
-        shell("Rscript viper/scripts/goterm_analysis.R {input.deseq} {output.csv} {output.plot} {output.png}")
+        shell("Rscript viper/scripts/goterm_analysis.R {input.deseq} {params.csv} {params.plot} {params.png} ")
+        shell("touch {output.out_file}")
 
 rule kegg_analysis:
     input:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
         force_run_upon_meta_change = config['metasheet']
     output:
+        out_file = "analysis/diffexp/{comparison}/{comparison}.kegg.done"
+    params:
         kegg_table = "analysis/diffexp/{comparison}/{comparison}.kegg.txt",
         gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.txt",
-        gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf"
-    params:
+        gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf",
         kegg_dir = "analysis/diffexp/{comparison}/kegg_pathways/",
         reference = "hg19",
         temp_dir = "analysis/diffexp/{comparison}/temp/"
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     run:
         shell( "mkdir {params.temp_dir} ")
-        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.kegg_dir} {params.reference} {params.temp_dir} {output.kegg_table} {output.gsea_table} {output.gsea_pdf} ")
+        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table} {params.gsea_table} {params.gsea_pdf} ")
+        shell("touch {output.out_file}")
         shell( " rm -rf {params.temp_dir} ")
 
 #call snps from the samples

@@ -8,6 +8,7 @@ suppressMessages(library("stringr"))
 suppressMessages(library("ggalt"))
 suppressMessages(library("scales"))
 
+options(error = function() traceback(2))
 
 goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
 
@@ -23,7 +24,7 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
     ## Append ENSEMBL and ENTREZ IDs from loaded in db
     if (reference == "hg19") {IDdb = org.Hs.eg.db}
     #if (reference == "mm9") {IDdb = ##########}
-
+    
     detable$ensembl <- mapIds(IDdb,
                          keys=rownames(detable),
                          column="ENSEMBL",
@@ -35,13 +36,14 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
                          keytype="SYMBOL",
                          multiVals="first")
 
-    adjpvalcutoff = 0.05
-
     ## Select genes that pass the adjPval cutoff and select those entrez IDs as pop, set rest as universe.
     topgenes <- subset(detable, detable$padj < adjpvalcutoff)
+
+    if(ncol(topgenes) < 50) {stop("Not enough significant genes")}
+    
     selectedIDs = topgenes$entrez
     universeIDs = detable$entrez
-
+    
     ## Run GOstats
     goParams <- new("GOHyperGParams",
                     geneIds = selectedIDs,

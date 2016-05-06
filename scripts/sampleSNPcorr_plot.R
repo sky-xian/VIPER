@@ -95,7 +95,7 @@ snp_corr_plot_out=args[3]
 snp_corr_plot_pdf=args[4]
 
 #READ in corr. file
-snpCorrMat <- read.table(snpCorrFile, header=TRUE, sep="\t", row.names=1)
+snpCorrMat <- read.table(snpCorrFile, header=TRUE, sep="\t", row.names=1, check.names=FALSE)
 
 #NOTE: in the snpCorrMatrix, sample i.e. column and row names are in the
 #form SAMPLEXXX.snp.chr6 or SAMPLEXXX.snp.[something]

@@ -18,28 +18,28 @@ suppressMessages(source('viper/scripts/supp_fns.R'))
 
 #enable stack trace
 #LEN:
-#options(error = function() traceback(2))
+options(error = function() traceback(2))
 
 pca_plot <- function(rpkmTable,annotation, RPKM_threshold,min_num_samples_expressing_at_threshold,filter_mirna,SSnumgenes, pca_plot_out) {
     
     #readin and process newdata
     newdata <- rpkmTable
-
+    
     ## We want to only work with the samples that are in the meta file, so we are only selecting the count columns that are in the meta file
-    newdata = newdata[,colnames(newdata) %in% rownames(tmp_ann)]    
+    newdata = newdata[,colnames(newdata) %in% rownames(tmp_ann)]
     
     #remove genes with no RPKM values or
     newdata<-newdata[apply(newdata, 1, function(x) length(x[x>=RPKM_threshold])>min_num_samples_expressing_at_threshold),]
 
     #log transform of data
     newdata <- log2(newdata+1)
-
+    
     ## Removing Sno and Mir mrna, parameterized
     if (filter_mirna == TRUE) {
         newdata <- newdata[ !grepl("MIR",rownames(newdata)), ]
         newdata <- newdata[ !grepl("SNO",rownames(newdata)), ]
     }
-
+    
     ## Fail safe to take all genes if numgenes param is greater than what passes filters
     if (as.numeric(SSnumgenes) > nrow(newdata)) {SSnumgenes = nrow(newdata)}
 
@@ -50,7 +50,7 @@ pca_plot <- function(rpkmTable,annotation, RPKM_threshold,min_num_samples_expres
 
     #Select out the most highly variable genes into the dataframe 'Exp_data'
     Exp_data <- newdata[order(cv_rpkm_nolym,decreasing=T)[1:SSnumgenes],]
-
+    
     #SAVE plot
     pdf(file = pca_plot_out)
     png_counter <- 1
@@ -99,7 +99,7 @@ pca_plot_out=args[7]
 
 #process RPKM file
 # Mahesh adding check.names=F so that if there is any - or _ characters, they won't be turned to default '.'
-rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".")
+rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".", check.names=FALSE)
 for (n in names(rpkmTable)) {
     rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
 }

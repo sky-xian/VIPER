@@ -1,6 +1,6 @@
-library(limma)
-library(DESeq2)
-library(edgeR)
+suppressMessages(library(limma))
+suppressMessages(library(DESeq2))
+suppressMessages(library(edgeR))
 
 limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_annot, deseqSum_out, gene_annotation) {
     #READ in gene_annotation table--even though gene descriptions are quoted
@@ -22,7 +22,7 @@ limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_an
     
     treatlist = strsplit(s2,',')[[1]]
     ctrllist = strsplit(s1,',')[[1]]
-    countmat <- read.table(counts, header=TRUE, sep=",", row.names=1)
+    countmat <- read.table(counts, header=TRUE, sep=",", row.names=1, check.names=FALSE)
 
     ctrllist = as.data.frame(countmat[ ,colnames(countmat) %in% ctrllist])
     treatlist = as.data.frame(countmat[ ,colnames(countmat) %in% treatlist])

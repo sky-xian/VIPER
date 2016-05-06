@@ -150,8 +150,8 @@ rule generate_report:
         rRNA_metrics, "analysis/plots/pca_plot.pdf", "analysis/plots/heatmapSS_plot.pdf", "analysis/plots/heatmapSF_plot.pdf",
         expand("analysis/diffexp/{comparison}/{comparison}_volcano.pdf", comparison=comparisons),
         expand( "analysis/plots/sampleSNPcorr_plot.{region}.png", region=snp_regions),
-        expand("analysis/plots/images/{comparison}_goterm.png", comparison=comparisons),
-        expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
+        expand("analysis/diffexp/{comparison}/{comparison}.goterm.done", comparison=comparisons),
+        expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:

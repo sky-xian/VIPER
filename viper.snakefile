@@ -19,7 +19,7 @@ for k,v in ref_info.items():
     config[k] = v
 
 config["samples"] = config["the_samples"]
-
+config["config_file"] = "config.yaml" # trick to force rules on config change
 for k in ["RPKM_threshold","min_num_samples_expressing_at_threshold","SSnumgenes","SFnumgenes","num_kmeans_clust","filter_mirna","snp_scan_genome"]:
     config[k] = str(config[k])
 
@@ -152,7 +152,8 @@ rule generate_report:
         expand( "analysis/plots/sampleSNPcorr_plot.{region}.png", region=snp_regions),
         expand("analysis/plots/images/{comparison}_goterm.png", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         "report.html"
     message: "Generating VIPER report"
@@ -190,7 +191,8 @@ rule generate_STAR_report:
     input:
         star_log_files=expand( "analysis/STAR/{sample}/{sample}.Log.final.out", sample=ordered_sample_list ),
         star_gene_count_files=expand( "analysis/STAR/{sample}/{sample}.counts.tab", sample=ordered_sample_list ),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         csv="analysis/STAR/STAR_Align_Report.csv",
         png="analysis/STAR/STAR_Align_Report.png",
@@ -220,7 +222,8 @@ rule run_cufflinks:
 rule generate_cuff_matrix:
     input:
         cuff_gene_fpkms=expand( "analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking", sample=ordered_sample_list ),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         "analysis/cufflinks/Cuff_Gene_Counts.csv"
     message: "Generating expression matrix using cufflinks counts"
@@ -261,7 +264,8 @@ rule read_distrib_qc:
 rule read_distrib_qc_matrix:
     input:
         read_distrib_files=expand( "analysis/RSeQC/read_distrib/{sample}.txt", sample=ordered_sample_list ),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         matrix="analysis/RSeQC/read_distrib/read_distrib.matrix.tab",
         png="analysis/RSeQC/read_distrib/read_distrib.png"
@@ -298,7 +302,8 @@ rule gene_body_cvg_qc:
 rule plot_gene_body_cvg:
     input:
         samples_list=expand("analysis/RSeQC/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r", sample=ordered_sample_list ),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         rscript="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.r",
         png="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
@@ -355,7 +360,8 @@ rule run_rRNA_STAR:
 rule generate_rRNA_STAR_report:
     input:
         star_log_files=expand( "analysis/STAR_rRNA/{sample}/{sample}.Log.final.out", sample=ordered_sample_list ),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         csv="analysis/STAR_rRNA/STAR_rRNA_Align_Report.csv",
         png="analysis/STAR_rRNA/STAR_rRNA_Align_Report.png"
@@ -393,7 +399,8 @@ rule bam_to_bigwig:
 rule pca_plot:
     input:
         rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
-        annotFile=config['metasheet']
+        annotFile=config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=metacols),
         pca_plot_out="analysis/plots/pca_plot.pdf"
@@ -411,7 +418,8 @@ rule pca_plot:
 rule heatmapSS_plot:
     input:
         rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
-        annotFile=config['metasheet']
+        annotFile=config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         ss_plot_out="analysis/plots/heatmapSS_plot.pdf",
         ss_txt_out="analysis/plots/heatmapSS.txt"
@@ -427,7 +435,8 @@ rule heatmapSS_plot:
 rule heatmapSF_plot:
     input:
         rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
-        annotFile=config['metasheet']
+        annotFile=config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         sf_plot_out="analysis/plots/heatmapSF_plot.pdf",
         sf_txt_out="analysis/plots/heatmapSF.txt"
@@ -481,7 +490,8 @@ rule limma_and_deseq:
 rule fetch_DE_gene_list:
     input:
         deseq_file_list=expand("analysis/diffexp/{comparison}/{comparison}.deseq.csv",comparison=comparisons),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         csv="analysis/diffexp/de_summary.csv",
         png="analysis/diffexp/de_summary.png"
@@ -495,7 +505,8 @@ rule fetch_DE_gene_list:
 rule volcano_plot:
     input:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         plot = "analysis/diffexp/{comparison}/{comparison}_volcano.pdf",
         png = "analysis/plots/images/{comparison}_volcano.png"
@@ -506,7 +517,8 @@ rule volcano_plot:
 rule goterm_analysis:
     input:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         out_file = "analysis/diffexp/{comparison}/{comparison}.goterm.done"
     params:
@@ -521,7 +533,8 @@ rule goterm_analysis:
 rule kegg_analysis:
     input:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         out_file = "analysis/diffexp/{comparison}/{comparison}.kegg.done"
     params:
@@ -561,7 +574,8 @@ rule call_snps_chr6:
 rule sample_snps_corr_chr6:
     input:
         snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.chr6.txt", sample=ordered_sample_list),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         "analysis/snp/snp_corr.chr6.txt"
     message: "Running snp correlations for chr6 fingerprint region"
@@ -573,6 +587,7 @@ rule snps_corr_plot_chr6:
     input:
         snp_corr="analysis/snp/snp_corr.chr6.txt",
         annotFile=config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         snp_plot_out="analysis/plots/sampleSNPcorr_plot.chr6.png",
         snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.chr6.pdf"
@@ -600,7 +615,8 @@ rule call_snps_genome:
 rule sample_snps_corr_genome:
     input:
         snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.genome.txt", sample=ordered_sample_list),
-        force_run_upon_meta_change = config['metasheet']
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         "analysis/snp/snp_corr.genome.txt"
     message: "Running snp analysis genome wide"
@@ -612,6 +628,7 @@ rule snps_corr_plot_genome:
     input:
         snp_corr="analysis/snp/snp_corr.genome.txt",
         annotFile=config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
         snp_plot_out="analysis/plots/sampleSNPcorr_plot.genome.png",
         snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.genome.pdf"

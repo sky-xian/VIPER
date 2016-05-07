@@ -28,7 +28,8 @@ conda_root = subprocess.check_output('conda info --root',shell=True).decode('utf
 #NEED to append 'pkgs' to the conda_root path to get to the bins
 conda_path = os.path.join(conda_root, 'pkgs')
 #NEED the following when invoking python2 (to set proper PYTHONPATH)
-python2_pythonpath = os.path.join(conda_root, 'envs', 'python2', 'lib', 'python2.7', 'site-packages')
+#MOVING from conda env named "python2" to "viper_py2"
+python2_pythonpath = os.path.join(conda_root, 'envs', 'viper_py2', 'lib', 'python2.7', 'site-packages')
 
 if not "python2" in config or not config["python2"]:
     config["python2"] = conda_path + '/python-2.7.9-3/bin/python2.7'

@@ -90,12 +90,11 @@ def get_fastq(wildcards):
 
 
 def fusion_output(wildcards):
-    fusion_out_files = []
+    fusion_out = []
     if run_fusion:
-        for sample in file_info.keys():
-            fusion_out_files.append( "analysis/STAR_Fusion/" + sample + "/" + sample + ".fusion_candidates.final" )
-    return fusion_out_files
-2
+        fusion_out.append("analysis/STAR_Fusion/STAR_Fusion_Report.png")
+    return fusion_out
+
 def insert_size_output(wildcards):
     insert_size_out_files = []
     if run_fusion:
@@ -161,6 +160,7 @@ rule generate_report:
         expand( "analysis/plots/sampleSNPcorr_plot.{region}.png", region=snp_regions),
         expand("analysis/diffexp/{comparison}/{comparison}.goterm.done", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
+        fusion_output,
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -258,6 +258,18 @@ rule run_STAR_fusion:
         " analysis/STAR_Fusion/{wildcards.sample}/{wildcards.sample}.fusion_candidates.final.abridged"
         " && touch {output}" # For some sample, final.abridged is created but not .final file; temp hack before further investigate into this
 
+
+rule run_STAR_fusion_report:
+    input:
+        sf_list = expand("analysis/STAR_Fusion/{sample}/{sample}.fusion_candidates.final.abridged", sample=ordered_sample_list),
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
+    output:
+        csv="analysis/STAR_Fusion/STAR_Fusion_Report.csv",
+        png="analysis/STAR_Fusion/STAR_Fusion_Report.png"
+    shell:
+        "python viper/scripts/STAR_Fusion_report.py -f {input.sf_list} 1>{output.csv} "
+        "&& Rscript viper/scripts/STAR_Fusion_report.R {output.csv} {output.png}"
 
 rule read_distrib_qc:
     input:

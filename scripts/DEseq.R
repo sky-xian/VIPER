@@ -20,9 +20,9 @@ limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_an
                                               function(x){paste0("\"",x,"\"")},
                                               simplify="vector")
     
-    treatlist = strsplit(s2,',')[[1]]
-    ctrllist = strsplit(s1,',')[[1]]
-    countmat <- read.table(counts, header=TRUE, sep=",", row.names=1, check.names=FALSE)
+    treatlist = strsplit(arg_s2,',')[[1]]
+    ctrllist = strsplit(arg_s1,',')[[1]]
+    countmat <- read.table(arg_counts, header=TRUE, sep=",", row.names=1)
 
     ctrllist = as.data.frame(countmat[ ,colnames(countmat) %in% ctrllist])
     treatlist = as.data.frame(countmat[ ,colnames(countmat) %in% treatlist])
@@ -31,42 +31,19 @@ limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_an
     nctrl = ncol(ctrllist)
 
     data = cbind(treatlist,ctrllist)
-    ##remove duplicate rownames
-    #data = data[!duplicated(data),]
-    
-    condition = c(rep('treat',ntreat),rep('control',nctrl))
-    colnames(data)=seq(ntreat+nctrl)
-    preparationD <- function (countTable ,ntreat,nctrl){
-        #countTable <- read.table(table, header= FALSE, row.names= 1)
-        #dataPack<- data.frame(row.names= colnames(countTable), condition = c(rep('treat',ntreat),rep('control',nctrl)))
-        conds <- factor(c(rep('treat',ntreat),rep('control',nctrl)))
-        rownames(countTable) = make.names(rownames(countTable), unique=TRUE)
-        cds <- DESeqDataSetFromMatrix(countTable, DataFrame(conds), ~ conds)
-        #newCountDataSet() default:
-        #newCountDataSet(countData, conditions, sizeFactors = NULL, phenoData = NULL, featureData = NULL)
-        cds <- estimateSizeFactors (cds)
 
-        #estimateSizeFactors() default:
-        #estimateSizeFactors( object, locfunc=c("median", "shorth") )
-        #print (sizeFactors(cds))
-        #print (head(counts(cds, normalized = TRUE)))
-  
-        if (ntreat<=2 && nctrl<=2){
-            cds = estimateDispersions( cds)#, method="blind", sharingMode="fit-only" )
-        }else{
-            cds = estimateDispersions (cds)}
-        
-        #estimateDispersions() default:
-        #estimateDispersions( object,method = c( "pooled", "pooled-CR", "per-condition", "blind" ),
-        #sharingMode = c( "maximum", "fit-only", "gene-est-only" ),
-        #fitType = c("parametric", "local"),
-        #locfit_extra_args=list(), lp_extra_args=list(),
-        #modelFrame = NULL, modelFormula = count ~ condition, ... )
-        #print(str(fitInfo(cds)))
-        #################### swapped control and treat, now it gives consistent results as limma
-        cds <- DESeq(cds)
-        res <- results(cds)
-        
+    condition = c(rep('treat',ntreat),rep('control',nctrl))
+
+    colData <- as.data.frame(cbind(colnames(data),condition))
+    
+    preparationD <- function (countData, colData){
+       
+	dds <- DESeqDataSetFromMatrix(countData=data, colData=colData, design= ~ condition)
+
+        dds <- dds[rowSums(counts(dds)) > 0, ]
+        dds <- DESeq(dds)
+        res <- results(dds)
+	 
         #ORDER results by XXX
         #res <- results[order(res$padj)]
         #summarize data
@@ -88,7 +65,7 @@ limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_an
         #nbinomTest(cds, condA, condB, pvals_only = FALSE)
         return (res)
     }
-    deseq_result= preparationD(data,ntreat,nctrl)
+    deseq_result= preparationD(data,colData)
 
     preparationL <- function(counts,ntreat,nctrl){
         #counts <- read.delim(table, header = FALSE, row.names = 1)

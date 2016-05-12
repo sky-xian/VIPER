@@ -7,6 +7,7 @@ suppressMessages(library("ggplot2"))
 suppressMessages(library("stringr"))
 suppressMessages(library("ggalt"))
 suppressMessages(library("scales"))
+suppressMessages(library("mutoss"))
 
 options(error = function() traceback(2))
 
@@ -42,7 +43,7 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, go
     ## Select genes that pass the adjPval cutoff and select those entrez IDs as pop, set rest as universe.
     topgenes <- subset(detable, detable$padj < adjpvalcutoff)
 
-    if(nrow(topgenes) < 50) {stop("Not enough significant genes")}
+    if(nrow(topgenes) < 20) {stop("Not enough significant genes")}
     
     selectedIDs = topgenes$entrez
     universeIDs = detable$entrez
@@ -61,7 +62,10 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, go
 
     ## Summary table has columns: GOBPID, Pvalue, OddsRatio, ExpCount, Count, Size, Term.
     df = summary(goResults)
-    #df$percent = df$Count/length(selectedIDs)
+
+    by <- BY(df$Pvalue, 0.05)
+    df$adjPvalue <- by[["adjPValues"]]
+    
     df$logpval = -log(df$Pvalue)
 
     ## Write out Results

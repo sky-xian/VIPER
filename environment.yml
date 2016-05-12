@@ -139,6 +139,7 @@ dependencies:
 - r-matrix=1.2_2=r3.2.2_0a
 - r-mgcv=1.8_9=r3.2.2_0a
 - r-munsell=0.4.2=r3.2.2_1a
+- r-mutoss=0.1_10=r3.2.2_0
 - r-nlme=3.1_122=r3.2.2_0a
 - r-nnet=7.3_11=r3.2.2_0a
 - r-plyr=1.8.3=r3.2.2_0a

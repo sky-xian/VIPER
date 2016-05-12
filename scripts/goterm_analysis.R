@@ -10,13 +10,16 @@ suppressMessages(library("scales"))
 
 options(error = function() traceback(2))
 
-goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
+goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, goterm_csv,goterm_pdf,goterm_png) {
 
     ### PARAMS:
-    adjpvalcutoff = 0.05 ## for genes that will go into gostats for goterm analysis
-    numgoterms = 20 ## number of go terms to bar chart
-    reference = "hg19"
+    #adjpvalcutoff = 0.05 ## for genes that will go into gostats for goterm analysis
+    #numgoterms = 20 ## number of go terms to bar chart
+    #reference = "hg19"
 
+    adjpvalcutoff = as.numeric(adjpvalcutoff)
+    numgoterms = as.numeric(numgoterms)
+    
     ## Read in detable
     detable = read.table(deseq_file, header=TRUE, sep=",", fill=TRUE)
     rownames(detable) <- detable[,1]
@@ -39,7 +42,7 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
     ## Select genes that pass the adjPval cutoff and select those entrez IDs as pop, set rest as universe.
     topgenes <- subset(detable, detable$padj < adjpvalcutoff)
 
-    if(ncol(topgenes) < 50) {stop("Not enough significant genes")}
+    if(nrow(topgenes) < 50) {stop("Not enough significant genes")}
     
     selectedIDs = topgenes$entrez
     universeIDs = detable$entrez
@@ -62,6 +65,8 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
     df$logpval = -log(df$Pvalue)
 
     ## Write out Results
+    xx = gsub(",","", as.matrix(df[,7]))
+    df[,7] = xx    
     write.table(df, file = goterm_csv, col.names=T, row.names=F, quote=F, sep=",")
     
     numgoterms = 20
@@ -118,11 +123,14 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
 
 args <- commandArgs( trailingOnly = TRUE )
 deseq_file = args[1]
-goterm_csv = args[2]
-goterm_pdf = args[3]
-goterm_png = args[4]
+adjpvalcutoff = args[2]
+numgoterms = args[3]
+reference = args[4]
+goterm_csv = args[5]
+goterm_pdf = args[6]
+goterm_png = args[7]
 
-goterm_analysis_f(deseq_file, goterm_csv,goterm_pdf,goterm_png)
+goterm_analysis_f(deseq_file, adjpvalcutoff,numgoterms,reference, goterm_csv,goterm_pdf,goterm_png)
 
 
 

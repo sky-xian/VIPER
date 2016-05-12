@@ -18,7 +18,7 @@ suppressMessages(source('viper/scripts/supp_fns.R'))
 
 #enable stack trace
 #LEN:
-options(error = function() traceback(2))
+#options(error = function() traceback(2))
 
 pca_plot <- function(rpkmTable,annotation, RPKM_threshold,min_num_samples_expressing_at_threshold,filter_mirna,SSnumgenes, pca_plot_out) {
     
@@ -54,6 +54,9 @@ pca_plot <- function(rpkmTable,annotation, RPKM_threshold,min_num_samples_expres
     #SAVE plot
     pdf(file = pca_plot_out)
     png_counter <- 1
+
+    #print(head(newdata))
+    #print(annotation)
     
     #Standard PCA analysis using all possible annotations
     for(c in colnames(annotation)) {
@@ -62,13 +65,11 @@ pca_plot <- function(rpkmTable,annotation, RPKM_threshold,min_num_samples_expres
             ClassColors <- cmap(ann)
             myColors = ClassColors[ann]
             myColors[which(is.na(myColors))] <- "black"
-            #png(file=paste(png_dir,"/pca_plot_",c,".png",sep=""), width = 8, height = 8, unit="in",res=300)
             png(file=paste("analysis/plots/images/pca_plot_", c, ".png", sep=""), width = 8, height = 8, unit="in",res=300) 
             png_counter <- png_counter + 1
             pca_output <- make_pca_plots(t(Exp_data), threeD = FALSE, ClassColorings = myColors, pca_title = c, legend_title =  c)
 	    dev.off()
-	    pca_output <- make_pca_plots(t(Exp_data), threeD = FALSE, ClassColorings = myColors, pca_title = c, legend_title =  c)
-		
+	    pca_output <- make_pca_plots(t(Exp_data), threeD = FALSE, ClassColorings = myColors, pca_title = c, legend_title =  c)		
         #}
     }
 
@@ -99,7 +100,7 @@ pca_plot_out=args[7]
 
 #process RPKM file
 # Mahesh adding check.names=F so that if there is any - or _ characters, they won't be turned to default '.'
-rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".", check.names=FALSE)
+rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".")
 for (n in names(rpkmTable)) {
     rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
 }

@@ -9,20 +9,21 @@ suppressMessages(library("XML"))
 data(kegg.sets.hs)
 data(sigmet.idx.hs)
 
-## "cleans up the gene sets
-#kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+## "cleans up the gene sets"
+kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
 
-#deseq_file = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.deseq.csv"
-#reference = "hg19"
+deseq_file = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.deseq.csv"
+keggpvalcutoff = "0.05"
+numkeggpathways = "10"
 
-#kegg_table = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.kegg.txt"
-#kegg_dir= "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/kegg_pathways/"
-#gsea_table = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.gsea.txt"
-#gsea_pdf = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.gsea.pdf"
-#temp_dir = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/temp/"
 
-kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gsea_table,gsea_pdf) {
+kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table,gsea_table,gsea_pdf) {
 
+    ## These are here until we update snakemake
+    numkeggpathways = as.numeric(numkeggpathways)
+    keggpvalcutoff = as.numeric(keggpvalcutoff)
+
+    ## Will need this path stuff for later as kegg output is very messy
     mainDir = substr(kegg_dir, 1, nchar(kegg_dir)-14)
     dir.create(file.path(mainDir, "kegg_pathways/"), showWarnings = FALSE)
 
@@ -61,32 +62,30 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
     
     kegg_output = keggres$greater
     kegg_output = cbind(rownames(kegg_output), kegg_output)
+    
     colnames(kegg_output)[1] = "Kegg_pathway"
-    write.table(kegg_output, file = kegg_table, quote=F, col.names=TRUE, row.names=FALSE, sep="\t")
+    #write.table(kegg_output, file = kegg_table, quote=F, col.names=TRUE, row.names=FALSE, sep="\t")
+
+    xx = gsub(",","", as.matrix(kegg_output[,1]))
+    kegg_output[,1] = xx
+    write.table(kegg_output, file = kegg_table, quote=F, col.names=TRUE, row.names=FALSE, sep=",")
+
+    kegg_output_filter = subset(kegg_output, kegg_output[,4] < keggpvalcutoff)
+    if(nrow(kegg_output_filter) < numkeggpathways) {stop(paste("Only ",nrow(kegg_output_filter), " pathways pass the current keggpvalcutoff of ", keggpvalcutoff, ", please run again with increased pval. Check comp.kegg.txt for details", sep="")) }
     
     ## Get the pathways
-    numpathways = 5
-
     keggrespathways = keggres$stats
     keggrespathways = keggrespathways[order(-abs(keggrespathways[,1])),]
-    keggrespathways = rownames(keggrespathways)[1:numpathways]
+    keggrespathways = rownames(keggrespathways)[1:numkeggpathways]
     
-    #keggrespathways = data.frame(id=rownames(keggres$greater), keggres$greater) %>%
-    #  tbl_df() %>%
-    #  filter(row_number()<=numpathways) %>%
-    #  .$id %>%
-    #  as.character()
-
     keggresids = substr(keggrespathways, start=1, stop=8)
 
     ## Plot using pathview
-    #plot_pathway = function(pid) pathview(gene.data=gageinput, pathway.id=pid, species="hsa", new.signature=FALSE, kegg.dir=temp_dir)
-    #tmp = sapply(keggresids, function(pid) pathview(gene.data=gageinput, pathway.id=pid, species="hsa", kegg.dir=temp_dir))
-
+    
     normwd = getwd()
     setwd(temp_dir)
     
-    for ( i in 1:numpathways) {
+    for ( i in 1:numkeggpathways) {
         pvout <- pathview(gene.data=gageinput,              ## Gene list
                           pathway.id=keggresids[i],         ## Which pathway
                           species = "hsa",                  ## Species
@@ -135,7 +134,10 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
 
     gsea_data = summary(fullgsea)
     gsea_data = gsea_data[order(-abs(gsea_data$NES)),]
-    write.table(gsea_data, file = gsea_table, quote=FALSE, sep= "\t", row.names=FALSE, col.names=TRUE)
+
+    xx = gsub(",","", as.matrix(gsea_data[,2]))
+    gsea_data[,2] = xx
+    write.table(gsea_data, file = gsea_table, quote=FALSE, sep= ",", row.names=FALSE, col.names=TRUE)
 
     pdf(gsea_pdf)
     plot.new()
@@ -150,17 +152,17 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
 
 args <- commandArgs( trailingOnly = TRUE )
 deseq_file = args[1]
-kegg_dir = args[2]
-reference = args[3]
-temp_dir = args[4]
-kegg_table = args[5]
-gsea_table = args[6]
-gsea_pdf = args[7]
+keggpvalcutoff = args[2]
+numkeggpathways = args[3]
+kegg_dir = args[4]
+reference = args[5]
+temp_dir = args[6]
+kegg_table = args[7]
+gsea_table = args[8]
+gsea_pdf = args[9]
 
 
-kegg_pathway_f(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gsea_table,gsea_pdf)
-
-
+kegg_pathway_f(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table,gsea_table,gsea_pdf)
 
 
 

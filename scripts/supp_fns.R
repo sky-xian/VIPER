@@ -54,8 +54,9 @@ make_pca_plots <- function(data_matrix, threeD = TRUE, labels = TRUE, pca_title 
 
     #Standard PCA analysis
     pca_out <- prcomp(data_matrix, scale. = TRUE, tol = 0.05)
-    pc_var <- signif(100.0 * summary(pca_out)[[6]][2,1:3], digits = 3)
-
+    pc_var <- signif(100.0 * summary(pca_out)[[6]][2,], digits = 3)
+    #pc_var <- signif(100.0 * summary(pca_out)[[6]][2,1:3], digits = 3)
+        
     #### NEW
     par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
 

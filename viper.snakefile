@@ -119,6 +119,7 @@ rule target:
         "analysis/STAR/STAR_Align_Report.png",
         "analysis/STAR/STAR_Gene_Counts.csv",
         "analysis/cufflinks/Cuff_Gene_Counts.csv",
+	["analysis/STAR/star_combat_qc.pdf", "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[],	
         "analysis/plots/pca_plot.pdf",
         expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=metacols),
         "analysis/plots/heatmapSS_plot.pdf",
@@ -208,6 +209,7 @@ rule generate_STAR_report:
         png="analysis/STAR/STAR_Align_Report.png",
         gene_counts="analysis/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
+    priority: 3
     run:
         log_files = " -l ".join( input.star_log_files )
         count_files = " -f ".join( input.star_gene_count_files )
@@ -237,6 +239,7 @@ rule generate_cuff_matrix:
     output:
         "analysis/cufflinks/Cuff_Gene_Counts.csv"
     message: "Generating expression matrix using cufflinks counts"
+    priority: 3
     run:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
         shell( "perl viper/scripts/raw_and_fpkm_count_matrix.pl -c -f {fpkm_files} 1>{output}" )
@@ -403,7 +406,7 @@ rule get_chrom_size:
         "fetchChromSizes {params} 1>{output}"
         " && if [ -e /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/ERCC/input/ERCC92.chromInfo ]; then cat /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/ERCC/input/ERCC92.chromInfo 1>>{output}; fi"
 
-#MAHESH's
+
 rule bam_to_bigwig:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
@@ -417,6 +420,42 @@ rule bam_to_bigwig:
         "bedtools genomecov -bg -split -ibam {input.bam} -g {input.chrom_size} 1> {params}.bg"
         " && bedSort {params}.bg {params}.sorted.bg"
         " && bedGraphToBigWig {params}.sorted.bg {input.chrom_size} {output}"
+
+rule batch_effect_removal_cufflinks:
+    input:
+        cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        annotFile = config["metasheet"]
+    output:
+        cuffcsvoutput="analysis/cufflinks/batch_correct_Cuff_Gene_Counts.csv",
+        cuffpdfoutput="analysis/cufflinks/cuff_combat_qc.pdf"
+    params:
+        batch_column="batch",
+        datatype = "cufflinks"
+    message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
+    priority: 2
+    run:
+        shell( " cp {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv " )
+        shell( "Rscript viper/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} {params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput}" )
+        shell( " rm {input.cuffmat} ")
+        shell( " cp {output.cuffcsvoutput} {input.cuffmat} " )
+
+rule batch_effect_removal_star:
+    input:
+        starmat = "analysis/STAR/STAR_Gene_Counts.csv",
+        annotFile = config["metasheet"]
+    output:
+        starcsvoutput="analysis/STAR/batch_correct_STAR_Gene_Counts.csv",
+        starpdfoutput="analysis/STAR/star_combat_qc.pdf"
+    params:
+        batch_column="batch",
+        datatype = "star"
+    message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
+    priority: 2
+    run:
+        shell( " cp {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv " )
+        shell( "Rscript viper/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} {params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput}" )
+        shell( " rm {input.starmat} ")
+        shell( " cp {output.starcsvoutput} {input.starmat} " )
 
 rule pca_plot:
     input:
@@ -546,10 +585,13 @@ rule goterm_analysis:
     params:
         csv = "analysis/diffexp/{comparison}/{comparison}.goterm.csv",
         plot = "analysis/diffexp/{comparison}/{comparison}.goterm.pdf",
-        png = "analysis/plots/images/{comparison}_goterm.png"
+        png = "analysis/plots/images/{comparison}_goterm.png",
+        gotermadjpvalcutoff = config["goterm_adjpval_cutoff"],
+        numgoterms = config["numgoterms"],
+        reference = config["reference"]
     message: "Creating Goterm Analysis plots for Differential Expressions for {wildcards.comparison}"
     run:
-        shell("Rscript viper/scripts/goterm_analysis.R {input.deseq} {params.csv} {params.plot} {params.png} ")
+        shell("Rscript viper/scripts/goterm_analysis.R {input.deseq} {params.gotermadjpvalcutoff} {params.numgoterms} {params.reference} {params.csv} {params.plot} {params.png} ")
         shell("touch {output.out_file}")
 
 rule kegg_analysis:
@@ -560,8 +602,10 @@ rule kegg_analysis:
     output:
         out_file = "analysis/diffexp/{comparison}/{comparison}.kegg.done"
     params:
-        kegg_table = "analysis/diffexp/{comparison}/{comparison}.kegg.txt",
-        gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.txt",
+        keggpvalcutoff = config["kegg_pval_cutoff"],
+        numkeggpathways = config["numkeggpathways"],
+        kegg_table = "analysis/diffexp/{comparison}/{comparison}.kegg.csv",
+        gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.csv",
         gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf",
         kegg_dir = "analysis/diffexp/{comparison}/kegg_pathways/",
         reference = "hg19",
@@ -569,7 +613,7 @@ rule kegg_analysis:
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     run:
         shell( "mkdir {params.temp_dir} ")
-        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table} {params.gsea_table} {params.gsea_pdf} ")
+        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} {params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table} {params.gsea_table} {params.gsea_pdf} ")
         shell("touch {output.out_file}")
         shell( " rm -rf {params.temp_dir} ")
 

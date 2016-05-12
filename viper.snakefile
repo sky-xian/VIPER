@@ -604,7 +604,8 @@ rule kegg_analysis:
     params:
         keggpvalcutoff = config["kegg_pval_cutoff"],
         numkeggpathways = config["numkeggpathways"],
-        kegg_table = "analysis/diffexp/{comparison}/{comparison}.kegg.csv",
+        kegg_table_up = "analysis/diffexp/{comparison}/{comparison}.kegg.up.csv",
+        kegg_table_down = "analysis/diffexp/{comparison}/{comparison}.kegg.down.csv",
         gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.csv",
         gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf",
         kegg_dir = "analysis/diffexp/{comparison}/kegg_pathways/",
@@ -613,7 +614,7 @@ rule kegg_analysis:
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     run:
         shell( "mkdir {params.temp_dir} ")
-        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} {params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table} {params.gsea_table} {params.gsea_pdf} ")
+        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} {params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table_up} {params.kegg_table_down} {params.gsea_table} {params.gsea_pdf} ")
         shell("touch {output.out_file}")
         shell( " rm -rf {params.temp_dir} ")
 

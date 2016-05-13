@@ -2,7 +2,7 @@ suppressMessages(library(limma))
 suppressMessages(library(DESeq2))
 suppressMessages(library(edgeR))
 
-limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_annot, deseqSum_out, gene_annotation) {
+limma_and_deseq_f <- function(arg_counts, arg_s1, arg_s2, limma, deseq, limma_annot, deseq_annot, deseqSum_out, gene_annotation) {
     #READ in gene_annotation table--even though gene descriptions are quoted
     #in the annotations, we have to quote it again!
     if( grepl(".bz2$",gene_annotation) ) {
@@ -22,8 +22,8 @@ limma_and_deseq_f <- function(counts, s1,s2, limma, deseq, limma_annot, deseq_an
     
     treatlist = strsplit(arg_s2,',')[[1]]
     ctrllist = strsplit(arg_s1,',')[[1]]
-    countmat <- read.table(arg_counts, header=TRUE, sep=",", row.names=1)
-
+    countmat <- read.table(arg_counts, header=TRUE, sep=",", row.names=1, check.names=FALSE)
+    
     ctrllist = as.data.frame(countmat[ ,colnames(countmat) %in% ctrllist])
     treatlist = as.data.frame(countmat[ ,colnames(countmat) %in% treatlist])
    

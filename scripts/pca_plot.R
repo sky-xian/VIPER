@@ -99,14 +99,14 @@ pca_plot_out=args[7]
 
 #process RPKM file
 # Mahesh adding check.names=F so that if there is any - or _ characters, they won't be turned to default '.'
-rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".", check.names=FALSE)
+rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".")
 for (n in names(rpkmTable)) {
     rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
 }
 rpkmTable = na.omit(rpkmTable)
 
 #PROCESS ANNOTATIONS
-tmp_ann <- read.delim(annotFile, sep=",", stringsAsFactors=FALSE)
+tmp_ann <- read.delim(annotFile, sep=",", stringsAsFactors=FALSE, check.names=F)
 #REMOVE comp_ columns
 tmp_ann <- tmp_ann[ , !grepl('comp_*', names(tmp_ann))]
 

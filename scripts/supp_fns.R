@@ -9,12 +9,11 @@ zscore = function(x){
 cmap <- function(x, colorstart=NULL, use_viridis=FALSE) {
     colors = c("#3182bd", "#e6550d", "#31a354", "#756bb1", "#636363", "#BD4931", "#6baed6", "#fd8d3c", "#74c476", "#9e9ac8", "#969696", "#D67D6B", "#9ecae1", "#fdae6b", "#a1d99b", "#bcbddc", "#bdbdbd", "#E0A89D", "#c6dbef", "#fdd0a2", "#c7e9c0", "#dadaeb", "#d9d9d9", "#F0CEC7")
     x <- sort(unique(na.omit(as.vector(x))))
-    if(is.null(colorstart)) { colorstart = 0 }
-    col <- colors[(colorstart+1):(colorstart+length(x))]
     if(use_viridis) {
         col <- viridis(length(x))
-    }
-    
+    } else {
+        col <- colors[(colorstart+1):(colorstart+length(x))]
+    }    
     names(col) <- x
     return(col)
 }
@@ -29,21 +28,15 @@ make_complexHeatmap_annotation <- function(annotation){
     nn<-length(annotation)
     for (i in 1:nn) {
         ann <- as.matrix(annotation[,i])
-        #NEED a better way to distinguish between discrete and continuous
-        #something like:
-        #if(! is.numeric(ann[1]) or (is.integer and ! is.double #and less)) {
-        #if(length(sort(unique(na.omit(as.vector(ann))))) < MIN_UNIQUE) {
         if(length(sort(unique(na.omit(as.vector(ann))))) < MIN_UNIQUE | is.numeric(ann)==FALSE) {
             colorlist[[i]] <- cmap(ann, colorstart=colorcount)
             colorcount = colorcount + length(unique(ann))
         } else {
-            #colorlist[[i]] <- colorRamp2(seq(min(ann, na.rm = TRUE), max(ann, na.rm = TRUE), length = 3), c("blue","white","orange"))
             colorlist[[i]] <- colorRamp2(seq(min(ann, na.rm = TRUE), max(ann, na.rm = TRUE), length = 3), c("white","yellow", "red"))
         }
     }
     names(colorlist) <- c(colnames(annotation)[1:nn])
     
-    #ha1 = HeatmapAnnotation(df = annotation[,1:nn,drop=FALSE], gap=unit(0.5,"mm"), col = colorlist)
     ha1 = HeatmapAnnotation(df = annotation[,1:nn,drop=FALSE], gap=unit(0.5,"mm"), col = colorlist, annotation_legend_param = list(title_gp=gpar(fontsize=8), grid_height = unit(3,"mm"), labels_gp=gpar(fontsize=8)))
 
     return(ha1)
@@ -56,7 +49,6 @@ make_pca_plots <- function(data_matrix, threeD = TRUE, labels = TRUE, pca_title 
     pca_out <- prcomp(data_matrix, scale. = TRUE, tol = 0.05)
     pc_var <- signif(100.0 * summary(pca_out)[[6]][2,1:3], digits = 3)
 
-    #### NEW
     par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
 
     plot(pca_out$x[,"PC1"], pca_out$x[,"PC2"],  col=ClassColorings, pch=16, xlab=paste0("PC1 (", pc_var[1], "% of variance)"), ylab=paste0("PC2 (", pc_var[2], "% of variance)"), main = paste0('PCA analysis of ',pca_title))
@@ -64,8 +56,9 @@ make_pca_plots <- function(data_matrix, threeD = TRUE, labels = TRUE, pca_title 
     if(legend_title != "") {
         mycols = unique(ClassColorings)
         mynames = unique(names(ClassColorings))
-        #legend("bottomright", legend = mynames, col=mycols, pch = 16, title = legend_title)
-        legend("topright", inset=c(-0.23,0), legend = mynames, col=mycols, pch = 16, title = legend_title)
+        t = sort(mynames)
+        tt = ClassColorings[t]
+        legend("topright", inset=c(-0.23,0), legend = unique(t), col=unique(tt), pch = 16, title = legend_title)
     }
 
 #    if(threeD==TRUE){

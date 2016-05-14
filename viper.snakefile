@@ -83,7 +83,11 @@ if( run_fusion ):
         strand_command = " --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif"
 
 #GENERATE snp regions list:
-snp_regions = ['chr6', 'genome'] if ('snp_scan_genome' in config) and config['snp_scan_genome'] == 'true' else ['chr6']
+snp_regions = ['hla', 'genome'] if ('snp_scan_genome' in config) and config['snp_scan_genome'] == 'true' else ['hla']
+#NOTE: chr6 scans should be limited to JUST the HLA region, not the whole chr
+#NOTE: in mice, HLA region is actually on chr17!
+#HENCE the renaming of snp.chr6.txt to snp.hla.txt
+_HLA_regions = {'hg19':"chr6:28477797-33448354", 'mm9':'chr17:34111604-36221194'}
 
 def get_fastq(wildcards):
     return file_info[wildcards.sample]
@@ -579,41 +583,42 @@ rule kegg_analysis:
 #------------------------------------------------------------------------------
 # snp calling for chr6 (default)
 #------------------------------------------------------------------------------
-rule call_snps_chr6:
+rule call_snps_hla:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
         ref_fa=config["ref_fasta"],
     output:
-        protected("analysis/snp/{sample}/{sample}.snp.chr6.txt")
+        protected("analysis/snp/{sample}/{sample}.snp.hla.txt")
     params:
-        varscan_path=config["varscan_path"]
+        varscan_path = config["varscan_path"],
+        region = _HLA_regions[config['reference']]
     message: "Running varscan for snp analysis for ch6 fingerprint region"
     shell:
-        "samtools mpileup -r \"chr6\" -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
+        "samtools mpileup -r \"{params.region}\" -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
         "{params.varscan_path} pileup2snp - --min-coverage 20 --min-reads2 4 > {output}"
 
 #calculate sample snps correlation using all samples
-rule sample_snps_corr_chr6:
+rule sample_snps_corr_hla:
     input:
-        snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.chr6.txt", sample=ordered_sample_list),
+        snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.hla.txt", sample=ordered_sample_list),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        "analysis/snp/snp_corr.chr6.txt"
-    message: "Running snp correlations for chr6 fingerprint region"
+        "analysis/snp/snp_corr.hla.txt"
+    message: "Running snp correlations for HLA fingerprint region"
     run:
         snps = " ".join(input.snps)
         shell("{config[python2]} viper/scripts/sampleSNPcorr.py {snps}> {output}")
 
-rule snps_corr_plot_chr6:
+rule snps_corr_plot_hla:
     input:
-        snp_corr="analysis/snp/snp_corr.chr6.txt",
+        snp_corr="analysis/snp/snp_corr.hla.txt",
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        snp_plot_out="analysis/plots/sampleSNPcorr_plot.chr6.png",
-        snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.chr6.pdf"
-    message: "Running snp analysis for chr6 fingerprint region"
+        snp_plot_out="analysis/plots/sampleSNPcorr_plot.hla.png",
+        snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.hla.pdf"
+    message: "Running snp analysis for HLA fingerprint region"
     run:
         shell("Rscript viper/scripts/sampleSNPcorr_plot.R {input.snp_corr} {input.annotFile} {output.snp_plot_out} {output.snp_plot_pdf}")
 

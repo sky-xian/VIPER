@@ -150,6 +150,7 @@ rule target:
         #expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
         #expand("analysis/diffexp/{comparison}/{comparison}.gsea.pdf", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
+        expand("analysis/diffexp/{comparison}/deseq_limma_fc.png", comparison=comparisons),
         "report.html"
     message: "Compiling all output"
         
@@ -512,6 +513,17 @@ rule limma_and_deseq:
 
     run:
         shell("Rscript viper/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" {output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} {output.deseqSum} {params.gene_annotation}")
+
+rule deseq_limma_fc_plot:
+    input:
+        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
+        limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv"
+    output:
+        out_csv = "analysis/diffexp/{comparison}/deseq_limma_fc.csv",
+        out_png = "analysis/diffexp/{comparison}/deseq_limma_fc.png"
+    shell:
+        "Rscript viper/scripts/deseq_limma_fc_corr.R {input.deseq} {input.limma} {output.out_csv} {output.out_png}"
+
 
 rule fetch_DE_gene_list:
     input:

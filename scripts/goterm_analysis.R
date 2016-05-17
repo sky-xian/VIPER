@@ -13,11 +13,6 @@ options(error = function() traceback(2))
 
 goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, goterm_csv,goterm_pdf,goterm_png) {
 
-    ### PARAMS:
-    #adjpvalcutoff = 0.05 ## for genes that will go into gostats for goterm analysis
-    #numgoterms = 20 ## number of go terms to bar chart
-    #reference = "hg19"
-
     adjpvalcutoff = as.numeric(adjpvalcutoff)
     numgoterms = as.numeric(numgoterms)
     
@@ -65,15 +60,12 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, go
 
     by <- BY(df$Pvalue, 0.05)
     df$adjPvalue <- by[["adjPValues"]]
-    
     df$logpval = -log(df$Pvalue)
 
     ## Write out Results
     xx = gsub(",","", as.matrix(df[,7]))
     df[,7] = xx    
     write.table(df, file = goterm_csv, col.names=T, row.names=F, quote=F, sep=",")
-    
-    numgoterms = 20
 
     ##### LOLLIPOP, AWAITING ggalt 0.3.0.0
 
@@ -109,7 +101,6 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, go
     #dev.off()
 
     
-
     ## Create title for plot
     temptitle = tail(unlist(strsplit(goterm_pdf, split="/")), n=1)
     temptitle = head(unlist(strsplit(temptitle, split="[.]")), n=1)

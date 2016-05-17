@@ -85,6 +85,21 @@ if( run_fusion ):
 #GENERATE snp regions list:
 snp_regions = ['chr6', 'genome'] if ('snp_scan_genome' in config) and config['snp_scan_genome'] == 'true' else ['chr6']
 
+
+## Returns proper count files for with and without batch effect correction
+def get_STAR_counts(config, normalized=False):
+    if config["batch_effect_removal"] == "true":
+        return "analysis/STAR/batch_corrected_STAR_Gene_Counts.csv"
+    else:
+        return "analysis/STAR/STAR_Gene_Counts.csv"
+
+def get_cuff_counts(config, normalized=False):
+    if config["batch_effect_removal"] == "true":
+        return "analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv"
+    else:
+        return "analysis/cufflinks/Cuff_Gene_Counts.csv"
+
+
 def get_fastq(wildcards):
     return file_info[wildcards.sample]
 
@@ -421,45 +436,48 @@ rule bam_to_bigwig:
         " && bedSort {params}.bg {params}.sorted.bg"
         " && bedGraphToBigWig {params}.sorted.bg {input.chrom_size} {output}"
 
-rule batch_effect_removal_cufflinks:
-    input:
-        cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
-        annotFile = config["metasheet"]
-    output:
-        cuffcsvoutput="analysis/cufflinks/batch_correct_Cuff_Gene_Counts.csv",
-        cuffpdfoutput="analysis/cufflinks/cuff_combat_qc.pdf"
-    params:
-        batch_column="batch",
-        datatype = "cufflinks"
-    message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
-    priority: 2
-    run:
-        shell( " cp {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv " )
-        shell( "Rscript viper/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} {params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput}" )
-        shell( " rm {input.cuffmat} ")
-        shell( " cp {output.cuffcsvoutput} {input.cuffmat} " )
+if config["batch_effect_removal"] == "true":
+    rule batch_effect_removal_cufflinks:
+        input:
+            cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+            annotFile = config["metasheet"]
+        output:
+            cuffcsvoutput="analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv",
+            cuffpdfoutput="analysis/cufflinks/cuff_combat_qc.pdf"
+        params:
+            batch_column="batch",
+            datatype = "cufflinks"
+        message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
+        priority: 2
+        run:
+            shell( " cp {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv " )
+            shell( "Rscript viper/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} {params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput}" )
+            #shell( " rm {input.cuffmat} ")
+            #shell( " cp {output.cuffcsvoutput} {input.cuffmat} " )
 
-rule batch_effect_removal_star:
-    input:
-        starmat = "analysis/STAR/STAR_Gene_Counts.csv",
-        annotFile = config["metasheet"]
-    output:
-        starcsvoutput="analysis/STAR/batch_correct_STAR_Gene_Counts.csv",
-        starpdfoutput="analysis/STAR/star_combat_qc.pdf"
-    params:
-        batch_column="batch",
-        datatype = "star"
-    message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
-    priority: 2
-    run:
-        shell( " cp {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv " )
-        shell( "Rscript viper/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} {params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput}" )
-        shell( " rm {input.starmat} ")
-        shell( " cp {output.starcsvoutput} {input.starmat} " )
+if config["batch_effect_removal"] == "true":
+    rule batch_effect_removal_star:
+        input:
+            starmat = "analysis/STAR/STAR_Gene_Counts.csv",
+            annotFile = config["metasheet"]
+        output:
+            starcsvoutput="analysis/STAR/batch_corrected_STAR_Gene_Counts.csv",
+            starpdfoutput="analysis/STAR/star_combat_qc.pdf"
+        params:
+            batch_column="batch",
+            datatype = "star"
+        message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
+        priority: 2
+        run:
+            shell( " cp {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv " )
+            shell( "Rscript viper/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} {params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput}" )
+            #shell( " rm {input.starmat} ")
+            #shell( " cp {output.starcsvoutput} {input.starmat} " )
 
 rule pca_plot:
     input:
-        rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
+        #rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
+        rpkmFile = get_cuff_counts(config),
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -478,7 +496,8 @@ rule pca_plot:
 
 rule heatmapSS_plot:
     input:
-        rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
+        #rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
+        rpkmFile = get_cuff_counts(config),
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -495,7 +514,8 @@ rule heatmapSS_plot:
 
 rule heatmapSF_plot:
     input:
-        rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
+        #rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
+        rpkmFile = get_cuff_counts(config),
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -529,7 +549,8 @@ def get_samples(wildcards):
 ## Perform Limma and DEseq on comparisons
 rule limma_and_deseq:
     input:
-        counts = "analysis/STAR/STAR_Gene_Counts.csv"
+        #counts = "analysis/STAR/STAR_Gene_Counts.csv"
+        counts = get_STAR_counts(config)
     output:
         limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv",
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",

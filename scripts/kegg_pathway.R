@@ -6,13 +6,6 @@ suppressMessages(library("gageData"))
 suppressMessages(library("pathview"))
 suppressMessages(library("clusterProfiler"))
 suppressMessages(library("XML"))
-#data(kegg.sets.hs)
-#data(sigmet.idx.hs)
-
-## "cleans up the gene sets"
-#kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
-kegg.sets.hs = kegg.gsets()
-kegg.sets.hs = kegg.sets.hs$kg.sets
 
 kegg.set = kegg.gsets()
 ks = kegg.set$kg.sets
@@ -20,7 +13,8 @@ kss = kegg.set$kg.sets[kegg.set$sigmet.idx]
 names(kss) = gsub("/","",names(kss))
 
 ## Removing pathways that I know don't load properly... no idea why
-kss[which(names(kss) %in% c("hsa01200 Carbon metabolism"))] <- NULL
+pathway_errors = c("hsa01200 Carbon metabolism", "hsa01230 Biosynthesis of amino acids", "hsa01212 Fatty acid metabolism", "hsa01210 2-Oxocarboxylic acid metabolism", "hsa01100 Metabolic pathways", "hsa00533 Glycosaminoglycan biosynthesis - keratan sulfate", "hsa00514 Other types of O-glycan biosynthesis", "hsa00511 Other glycan degradation")
+kss[which(names(kss) %in% pathway_errors)] <- NULL
 
 kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,gsea_table,gsea_pdf) {
 

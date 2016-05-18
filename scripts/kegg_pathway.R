@@ -6,6 +6,8 @@ suppressMessages(library("gageData"))
 suppressMessages(library("pathview"))
 suppressMessages(library("clusterProfiler"))
 suppressMessages(library("XML"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("stringr"))
 
 kegg.set = kegg.gsets()
 ks = kegg.set$kg.sets
@@ -16,7 +18,7 @@ names(kss) = gsub("/","",names(kss))
 pathway_errors = c("hsa01200 Carbon metabolism", "hsa01230 Biosynthesis of amino acids", "hsa01212 Fatty acid metabolism", "hsa01210 2-Oxocarboxylic acid metabolism", "hsa01100 Metabolic pathways", "hsa00533 Glycosaminoglycan biosynthesis - keratan sulfate", "hsa00514 Other types of O-glycan biosynthesis", "hsa00511 Other glycan degradation")
 kss[which(names(kss) %in% pathway_errors)] <- NULL
 
-kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,gsea_table,gsea_pdf) {
+kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,keggsumary_pdf,keggsummary_png,gsea_table,gsea_pdf) {
 
     ## These are here until we update snakemake
     numkeggpathways = as.numeric(numkeggpathways)
@@ -61,6 +63,7 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     ## Run gage
     keggres = gage(gageinput, gsets = kss, same.dir=TRUE)
 
+    ## Output kegg results with respect to  upregulation
     kegg_up = keggres$greater
     kegg_up = cbind(rownames(kegg_up), kegg_up)
     colnames(kegg_up)[1] = "Kegg_pathway"
@@ -68,6 +71,7 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     kegg_up[,1] = xx
     write.table(kegg_up, file = kegg_table_up, quote=F, col.names=TRUE, row.names=FALSE, sep=",")
 
+    ## Output kegg results with respect to  downregulation
     kegg_down= keggres$less
     kegg_down= cbind(rownames(kegg_down), kegg_down)
     colnames(kegg_down)[1] = "Kegg_pathway"
@@ -75,12 +79,15 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     kegg_down[,1] = xx
     write.table(kegg_down, file = kegg_table_down, quote=F, col.names=TRUE, row.names=FALSE, sep=",")
 
-    
+    ## Concat tables for filtering and testing
+    full = rbind(kegg_up, kegg_down)
+    fullorder = full[order(full[,4]),]
+    fullkegg = fullorder[!duplicated(fullorder[,1]),]
+        
     ## Stop run if the params don't match for output
-    kegg_output_filter = subset(kegg_up, kegg_up[,4] < keggpvalcutoff)
+    kegg_output_filter = subset(fullkegg, fullkegg[,4] < keggpvalcutoff)
     if(nrow(kegg_output_filter) < numkeggpathways) {stop(paste("Only ",nrow(kegg_output_filter), " pathways pass the current keggpvalcutoff of ", keggpvalcutoff, ", please run again with increased pval. Check comp.kegg.txt for details", sep="")) }
 
-    
     ## Get the pathways
     keggrespathways = keggres$stats
     keggrespathways = keggrespathways[order(-abs(keggrespathways[,1])),]
@@ -121,6 +128,24 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     file.rename(paste0(temp_dir,xml_files), paste0(kegg_dir, newnames, ".xml"))
 
     
+    ## Create Kegg Summary Table
+    values = sapply(fullkegg[,4], as.numeric)
+    logpval = -log(values)
+    keggsummary = cbind(names(logpval), logpval)
+    keggsummary = data.frame(keggsummary)
+    colnames(keggsummary) = c("Keggpathway","logpval")
+
+    ## Create title for plot
+    temptitle = tail(unlist(strsplit(keggsummary_pdf, split="/")), n=1)
+    temptitle = head(unlist(strsplit(temptitle, split="[.]")), n=1)
+    title = paste(temptitle, "_Top_", numkeggpathways, "_Kegg_Pathways", sep="")
+
+    kegg_bar_plot <- ggplot(keggsummary[numkeggpathways:1,], aes(factor(Keggpathway, levels=unique(Keggpathway)), logpval)) + ylab("-log(Pvalue)") + xlab("Kegg Pathway") + geom_bar(stat = "identity", fill="palegreen3") + theme_bw(base_size = 12) + scale_x_discrete(labels = function(x) str_wrap(x, width = 40, indent = 2),"\n") + coord_flip() + ggtitle(title)
+
+    ggsave(keggsummary_pdf, width=11, height=8.5, unit="in")
+    ggsave(keggsummary_png, width=10, height=8, unit="in")
+
+    
     ## GSEA Analysis
     gseainput = sort(gageinput, decreasing=TRUE)
     gseainput = gseainput[is.finite(gseainput)]
@@ -159,11 +184,13 @@ reference = args[5]
 temp_dir = args[6]
 kegg_table_up = args[7]
 kegg_table_down = args[8]
-gsea_table = args[9]
-gsea_pdf = args[10]
+keggsummary_pdf = args[9]
+keggsummary_png = args[10]
+gsea_table = args[11]
+gsea_pdf = args[12]
 
 
-kegg_pathway_f(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,gsea_table,gsea_pdf)
+kegg_pathway_f(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,keggsumary_pdf,keggsummary_png,gsea_table,gsea_pdf)
 
 
 

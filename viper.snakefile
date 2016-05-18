@@ -99,10 +99,9 @@ def get_cuff_counts(config, normalized=False):
     else:
         return "analysis/cufflinks/Cuff_Gene_Counts.csv"
 
-
+## Other functions for snakefile
 def get_fastq(wildcards):
     return file_info[wildcards.sample]
-
 
 def fusion_output(wildcards):
     fusion_out = []
@@ -132,8 +131,8 @@ rule target:
         expand( "analysis/cufflinks/{K}/{K}.genes.fpkm_tracking", K=ordered_sample_list ),
         "analysis/STAR/STAR_Align_Report.csv",
         "analysis/STAR/STAR_Align_Report.png",
-        "analysis/STAR/STAR_Gene_Counts.csv",
-        "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        get_STAR_counts(config),
+        get_cuff_counts(config),
 	["analysis/STAR/star_combat_qc.pdf", "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[],	
         "analysis/plots/pca_plot.pdf",
         expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=metacols),
@@ -449,12 +448,12 @@ if config["batch_effect_removal"] == "true":
             datatype = "cufflinks"
         message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
         priority: 2
-        run:
-            shell( " cp {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv " )
-            shell( "Rscript viper/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} {params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput}" )
-            #shell( " rm {input.cuffmat} ")
-            #shell( " cp {output.cuffcsvoutput} {input.cuffmat} " )
-
+        shell:
+            """
+            Rscript viper/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} {params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput}
+            mv {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv
+            """
+            
 if config["batch_effect_removal"] == "true":
     rule batch_effect_removal_star:
         input:
@@ -468,12 +467,12 @@ if config["batch_effect_removal"] == "true":
             datatype = "star"
         message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
         priority: 2
-        run:
-            shell( " cp {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv " )
-            shell( "Rscript viper/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} {params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput}" )
-            #shell( " rm {input.starmat} ")
-            #shell( " cp {output.starcsvoutput} {input.starmat} " )
-
+        shell:
+            """
+            Rscript viper/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} {params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput}
+            mv {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv
+            """
+            
 rule pca_plot:
     input:
         #rpkmFile="analysis/cufflinks/Cuff_Gene_Counts.csv",
@@ -627,6 +626,8 @@ rule kegg_analysis:
         numkeggpathways = config["numkeggpathways"],
         kegg_table_up = "analysis/diffexp/{comparison}/{comparison}.kegg.up.csv",
         kegg_table_down = "analysis/diffexp/{comparison}/{comparison}.kegg.down.csv",
+        keggsummary_pdf = "analysis/diffexp/{comparison}/{comparison}.keggsummary.pdf",
+        keggsummary_png = "analysis/plots/images/{comparison}.keggsummary.png",
         gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.csv",
         gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf",
         kegg_dir = "analysis/diffexp/{comparison}/kegg_pathways/",
@@ -635,7 +636,7 @@ rule kegg_analysis:
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     run:
         shell( "mkdir {params.temp_dir} ")
-        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} {params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table_up} {params.kegg_table_down} {params.gsea_table} {params.gsea_pdf} ")
+        shell("Rscript viper/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} {params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} {params.kegg_table_up} {params.kegg_table_down} {params.keggsummary_pdf} {params.keggsummary_png} {params.gsea_table} {params.gsea_pdf} ")
         shell("touch {output.out_file}")
         shell( " rm -rf {params.temp_dir} ")
 

@@ -133,7 +133,7 @@ rule target:
         "analysis/STAR/STAR_Align_Report.png",
         get_STAR_counts(config),
         get_cuff_counts(config),
-	["analysis/STAR/star_combat_qc.pdf", "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[],	
+	["analysis/STAR/star_combat_qc.pdf", "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[],
         "analysis/plots/pca_plot.pdf",
         expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=metacols),
         "analysis/plots/heatmapSS_plot.pdf",
@@ -284,6 +284,7 @@ rule run_STAR_fusion_report:
     output:
         csv="analysis/STAR_Fusion/STAR_Fusion_Report.csv",
         png="analysis/STAR_Fusion/STAR_Fusion_Report.png"
+    message: "Generating STAR fusion report"
     shell:
         "python viper/scripts/STAR_Fusion_report.py -f {input.sf_list} 1>{output.csv} "
         "&& Rscript viper/scripts/STAR_Fusion_report.R {output.csv} {output.png}"

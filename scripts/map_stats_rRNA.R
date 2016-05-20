@@ -4,7 +4,7 @@ library(scales)
 
 args <- commandArgs( trailingOnly = TRUE )
 
-data <- read.csv( args[1], sep=",", header=TRUE )
+data <- read.csv( args[1], sep=",", header=TRUE, check.names=F )
 
 rownames(data) <- data[,1]
 data[,1] <- NULL

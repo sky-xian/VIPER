@@ -58,6 +58,26 @@ else:
     strand_command="--outSAMstrandField intronMotif"
     rRNA_strand_command="--outSAMstrandField intronMotif"
 
+#------------------------------------------------------------------------------
+#metasheet pre-parser: converts dos2unix, catches invalid chars
+_invalid_map = {'\r':'\n', '-':'.', '(':'.', ')':'.', ' ':'_', '/':'.', '$':''}
+_meta_f = open(config['metasheet'])
+_meta = _meta_f.read()
+_meta_f.close()
+
+_tmp = _meta.replace('\r\n','\n')
+#check other invalids
+for k in _invalid_map.keys():
+    if k in _tmp:
+        _tmp = _tmp.replace(k, _invalid_map[k])
+
+#did the contents change?--rewrite the metafile
+if _meta != _tmp:
+    #print('converting')
+    _meta_f = open(config['metasheet'], 'w')
+    _meta_f.write(_tmp)
+    _meta_f.close()
+#------------------------------------------------------------------------------
 
 metadata = pd.read_table(config['metasheet'], index_col=0, sep=',')
 comparisons = comparison=[c[5:] for c in metadata.columns if c.startswith("comp_")]

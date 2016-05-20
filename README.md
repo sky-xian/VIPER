@@ -291,7 +291,9 @@ Make the *__metasheet__* file in excel, and save it as a .txt or .csv, It doesn�
 
 - Again, make this in excel so that all of the spacing is done correctly and save it out as a .txt or .csv file. This is the most common bug, so please follow this.
 - Common Problems with *__metasheet__*
-- To avoid bugs, the only punctuation that should be used is the underscore “_”. Dashes, periods, etc, could cause a bug because there is a lot of table formatting and manipulation
+- Characters to avoid: ("-", "(", ")", " ", "/", "$")
+To avoid bugs, the only punctuation that should be used is the underscore “_”. Dashes, periods, etc, could cause a bug because there is a lot of table formatting and manipulation, or they are invalid characters in R.
+NOTE: viper parses the meta file and will convert MOST of these invalid characters into '.'--dollarsigns will just be dropped.  The viper parser will also convert between dos/mac files to unix format.
 	- It is very important that you know that samples A is what you mark with 1, and samples B is what you mark with a 2. You should name your output following this format as well "comp\_cond\_AvB” This will let the reader know what the output DE files refer to. 
 	   -  Deseq: ”baseMeanA” refers to samples A, which follows condition 1 and “baseMeanB” refers to samples B which follows condition 2. logfc is B/A
 	   -  Limma: Logfc refers to B/A

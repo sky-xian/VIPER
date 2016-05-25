@@ -1,4 +1,4 @@
-#!/usr/bin/env R
+#!/usr/bin/env Rscript
 #-------------------
 # @author: Mahesh Vangala
 # @email: vangalamaheshh@gmail.com

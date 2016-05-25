@@ -58,6 +58,26 @@ else:
     strand_command="--outSAMstrandField intronMotif"
     rRNA_strand_command="--outSAMstrandField intronMotif"
 
+#------------------------------------------------------------------------------
+#metasheet pre-parser: converts dos2unix, catches invalid chars
+_invalid_map = {'\r':'\n', '-':'.', '(':'.', ')':'.', ' ':'_', '/':'.', '$':''}
+_meta_f = open(config['metasheet'])
+_meta = _meta_f.read()
+_meta_f.close()
+
+_tmp = _meta.replace('\r\n','\n')
+#check other invalids
+for k in _invalid_map.keys():
+    if k in _tmp:
+        _tmp = _tmp.replace(k, _invalid_map[k])
+
+#did the contents change?--rewrite the metafile
+if _meta != _tmp:
+    #print('converting')
+    _meta_f = open(config['metasheet'], 'w')
+    _meta_f.write(_tmp)
+    _meta_f.close()
+#------------------------------------------------------------------------------
 
 metadata = pd.read_table(config['metasheet'], index_col=0, sep=',')
 comparisons = comparison=[c[5:] for c in metadata.columns if c.startswith("comp_")]
@@ -83,7 +103,13 @@ if( run_fusion ):
         strand_command = " --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif"
 
 #GENERATE snp regions list:
-snp_regions = ['chr6', 'genome'] if ('snp_scan_genome' in config) and config['snp_scan_genome'] == 'true' else ['chr6']
+#DEPRECATED-snp_regions- with genome wide scans we are only outputting vcf file
+#snp_regions = ['hla', 'genome'] if ('snp_scan_genome' in config) and config['snp_scan_genome'] == 'true' else ['hla']
+
+#NOTE: chr6 scans should be limited to JUST the HLA region, not the whole chr
+#NOTE: in mice, HLA region is actually on chr17!
+#HENCE the renaming of snp.chr6.txt to snp.hla.txt
+_HLA_regions = {'hg19':"chr6:28477797-33448354", 'mm9':'chr17:34111604-36221194'}
 
 
 ## Returns proper count files for with and without batch effect correction
@@ -126,6 +152,15 @@ def de_summary_out_png(wildcards):
         file_list.append("analysis/diffexp/de_summary.png")
     return file_list
 
+def run_snp_genome(wildcards):
+    ls = []
+    if ('snp_scan_genome' in config) and (config['snp_scan_genome'].upper() == 'TRUE'):
+        for sample in ordered_sample_list:
+            #ls.append("analysis/snp/%s/%s.snp.genome.vcf" % sample)
+            #NOTE: LINE BELOW IS VERY ugly, but it's the only way it will work!
+            ls.append("analysis/snp/"+sample+"/"+sample+".snp.genome.vcf")
+    return ls
+
 rule target:
     input:
         expand( "analysis/cufflinks/{K}/{K}.genes.fpkm_tracking", K=ordered_sample_list ),
@@ -147,9 +182,11 @@ rule target:
         expand("analysis/diffexp/{comparison}/{comparison}.deseq.csv", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}_volcano.pdf", comparison=comparisons),
         de_summary_out_png,
-        expand( "analysis/snp/{sample}/{sample}.snp.{region}.txt", sample=ordered_sample_list, region=snp_regions ),
-        expand( "analysis/snp/snp_corr.{region}.txt", region=snp_regions ),
-        expand( "analysis/plots/sampleSNPcorr_plot.{region}.png", region=snp_regions),
+        expand("analysis/snp/{sample}/{sample}.snp.hla.txt", sample=ordered_sample_list),
+        "analysis/snp/snp_corr.hla.txt",
+        "analysis/plots/sampleSNPcorr_plot.hla.png",
+        #run_snp_genome(wildcards=ordered_sample_list),
+        run_snp_genome,
         fusion_output,
         insert_size_output,
         rRNA_metrics,
@@ -161,6 +198,7 @@ rule target:
         #expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
         #expand("analysis/diffexp/{comparison}/{comparison}.gsea.pdf", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
+        expand("analysis/diffexp/{comparison}/deseq_limma_fc.png", comparison=comparisons),
         "report.html"
     message: "Compiling all output"
         
@@ -172,7 +210,7 @@ rule generate_report:
         "analysis/RSeQC/read_distrib/read_distrib.png","analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
         rRNA_metrics, "analysis/plots/pca_plot.pdf", "analysis/plots/heatmapSS_plot.pdf", "analysis/plots/heatmapSF_plot.pdf",
         expand("analysis/diffexp/{comparison}/{comparison}_volcano.pdf", comparison=comparisons),
-        expand( "analysis/plots/sampleSNPcorr_plot.{region}.png", region=snp_regions),
+        expand( "analysis/plots/sampleSNPcorr_plot.hla.png"),
         expand("analysis/diffexp/{comparison}/{comparison}.goterm.done", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
         fusion_output,
@@ -569,6 +607,17 @@ rule limma_and_deseq:
     run:
         shell("Rscript viper/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" {output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} {output.deseqSum} {params.gene_annotation}")
 
+rule deseq_limma_fc_plot:
+    input:
+        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
+        limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv"
+    output:
+        out_csv = "analysis/diffexp/{comparison}/deseq_limma_fc.csv",
+        out_png = "analysis/diffexp/{comparison}/deseq_limma_fc.png"
+    shell:
+        "Rscript viper/scripts/deseq_limma_fc_corr.R {input.deseq} {input.limma} {output.out_csv} {output.out_png}"
+
+
 rule fetch_DE_gene_list:
     input:
         deseq_file_list=expand("analysis/diffexp/{comparison}/{comparison}.deseq.csv",comparison=comparisons),
@@ -647,41 +696,42 @@ rule kegg_analysis:
 #------------------------------------------------------------------------------
 # snp calling for chr6 (default)
 #------------------------------------------------------------------------------
-rule call_snps_chr6:
+rule call_snps_hla:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
         ref_fa=config["ref_fasta"],
     output:
-        protected("analysis/snp/{sample}/{sample}.snp.chr6.txt")
+        protected("analysis/snp/{sample}/{sample}.snp.hla.txt")
     params:
-        varscan_path=config["varscan_path"]
+        varscan_path = config["varscan_path"],
+        region = _HLA_regions[config['reference']]
     message: "Running varscan for snp analysis for ch6 fingerprint region"
     shell:
-        "samtools mpileup -r \"chr6\" -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
+        "samtools mpileup -r \"{params.region}\" -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
         "{params.varscan_path} pileup2snp - --min-coverage 20 --min-reads2 4 > {output}"
 
 #calculate sample snps correlation using all samples
-rule sample_snps_corr_chr6:
+rule sample_snps_corr_hla:
     input:
-        snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.chr6.txt", sample=ordered_sample_list),
+        snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.hla.txt", sample=ordered_sample_list),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        "analysis/snp/snp_corr.chr6.txt"
-    message: "Running snp correlations for chr6 fingerprint region"
+        "analysis/snp/snp_corr.hla.txt"
+    message: "Running snp correlations for HLA fingerprint region"
     run:
         snps = " ".join(input.snps)
         shell("{config[python2]} viper/scripts/sampleSNPcorr.py {snps}> {output}")
 
-rule snps_corr_plot_chr6:
+rule snps_corr_plot_hla:
     input:
-        snp_corr="analysis/snp/snp_corr.chr6.txt",
+        snp_corr="analysis/snp/snp_corr.hla.txt",
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        snp_plot_out="analysis/plots/sampleSNPcorr_plot.chr6.png",
-        snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.chr6.pdf"
-    message: "Running snp analysis for chr6 fingerprint region"
+        snp_plot_out="analysis/plots/sampleSNPcorr_plot.hla.png",
+        snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.hla.pdf"
+    message: "Running snp analysis for HLA fingerprint region"
     run:
         shell("Rscript viper/scripts/sampleSNPcorr_plot.R {input.snp_corr} {input.annotFile} {output.snp_plot_out} {output.snp_plot_pdf}")
 
@@ -694,37 +744,38 @@ rule call_snps_genome:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
         ref_fa=config["ref_fasta"],
     output:
-        protected("analysis/snp/{sample}/{sample}.snp.genome.txt")
+        protected("analysis/snp/{sample}/{sample}.snp.genome.vcf")
     params:
         varscan_path=config["varscan_path"]
     message: "Running varscan for snp analysis genome wide"
     shell:
         "samtools mpileup -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
-        "{params.varscan_path} pileup2snp - --min-coverage 20 --min-reads2 4 > {output}"
+        "{params.varscan_path} mpileup2snp - --min-coverage 20 --min-reads2 4 --output-vcf > {output}"
 
-rule sample_snps_corr_genome:
-    input:
-        snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.genome.txt", sample=ordered_sample_list),
-        force_run_upon_meta_change = config['metasheet'],
-        force_run_upon_config_change = config['config_file']
-    output:
-        "analysis/snp/snp_corr.genome.txt"
-    message: "Running snp analysis genome wide"
-    run:
-        snps = " ".join(input.snps)
-        shell("{config[python2]} viper/scripts/sampleSNPcorr.py {snps}> {output}")
+#DROPPED--we only do snps corr on hla regions
+# rule sample_snps_corr_genome:
+#     input:
+#         snps = lambda wildcards: expand("analysis/snp/{sample}/{sample}.snp.genome.txt", sample=ordered_sample_list),
+#         force_run_upon_meta_change = config['metasheet'],
+#         force_run_upon_config_change = config['config_file']
+#     output:
+#         "analysis/snp/snp_corr.genome.txt"
+#     message: "Running snp analysis genome wide"
+#     run:
+#         snps = " ".join(input.snps)
+#         shell("{config[python2]} viper/scripts/sampleSNPcorr.py {snps}> {output}")
 
-rule snps_corr_plot_genome:
-    input:
-        snp_corr="analysis/snp/snp_corr.genome.txt",
-        annotFile=config['metasheet'],
-        force_run_upon_config_change = config['config_file']
-    output:
-        snp_plot_out="analysis/plots/sampleSNPcorr_plot.genome.png",
-        snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.genome.pdf"
-    message: "Creating snp plot genome wide"
-    run:
-        shell("Rscript viper/scripts/sampleSNPcorr_plot.R {input.snp_corr} {input.annotFile} {output.snp_plot_out} {output.snp_plot_pdf}")
+# rule snps_corr_plot_genome:
+#     input:
+#         snp_corr="analysis/snp/snp_corr.genome.txt",
+#         annotFile=config['metasheet'],
+#         force_run_upon_config_change = config['config_file']
+#     output:
+#         snp_plot_out="analysis/plots/sampleSNPcorr_plot.genome.png",
+#         snp_plot_pdf="analysis/plots/sampleSNPcorr_plot.genome.pdf"
+#     message: "Creating snp plot genome wide"
+#     run:
+#         shell("Rscript viper/scripts/sampleSNPcorr_plot.R {input.snp_corr} {input.annotFile} {output.snp_plot_out} {output.snp_plot_pdf}")
 
 
 

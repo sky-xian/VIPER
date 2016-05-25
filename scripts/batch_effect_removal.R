@@ -1,12 +1,3 @@
-#countmatfile = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/cufflinks/Cuff_Gene_Counts.csv"
-#metafile = "/mnt/cfce-stor1/home/mgc31/code/viperproject/PvTAMR_metasheet.csv"
-#batch_column = "batch"
-#countmatfile = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/STAR/STAR_Gene_Counts.csv"
-#datatype = "star"
-#pdfoutput = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/STAR/star_combat_qc.pdf"
-#csvoutput = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/STAR/STAR_Gene_Counts.csv"
-
-
 suppressMessages(library(sva))
 
 remove_batch_effect_f <- function(countmatfile,metafile, batch_column,datatype, csvoutput,pdfoutput) {

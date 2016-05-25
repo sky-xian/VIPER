@@ -18,6 +18,9 @@ names(kss) = gsub("/","",names(kss))
 pathway_errors = c("hsa01200 Carbon metabolism", "hsa01230 Biosynthesis of amino acids", "hsa01212 Fatty acid metabolism", "hsa01210 2-Oxocarboxylic acid metabolism", "hsa01100 Metabolic pathways", "hsa00533 Glycosaminoglycan biosynthesis - keratan sulfate", "hsa00514 Other types of O-glycan biosynthesis", "hsa00511 Other glycan degradation")
 kss[which(names(kss) %in% pathway_errors)] <- NULL
 
+## The traceback is actually necessary to not break pipe at the stop step, so leave on
+options(error = function() traceback(2))
+
 kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,keggsumary_pdf,keggsummary_png,gsea_table,gsea_pdf) {
 
     ## These are here until we update snakemake

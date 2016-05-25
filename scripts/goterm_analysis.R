@@ -9,6 +9,7 @@ suppressMessages(library("ggalt"))
 suppressMessages(library("scales"))
 suppressMessages(library("mutoss"))
 
+## The traceback is actually necessary to not break pipe at the stop step, so leave on  
 options(error = function() traceback(2))
 
 goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, goterm_csv,goterm_pdf,goterm_png) {
@@ -38,7 +39,7 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, go
     ## Select genes that pass the adjPval cutoff and select those entrez IDs as pop, set rest as universe.
     topgenes <- subset(detable, detable$padj < adjpvalcutoff)
 
-    if(nrow(topgenes) < 20) {stop("Not enough significant genes")}
+    if(nrow(topgenes) < numgoterms) {stop(paste("Not enough significant genes, there are only ", nrow(topgenes)," genes at the current pval of ", adjpvalcutoff, sep=""))}
     
     selectedIDs = topgenes$entrez
     universeIDs = detable$entrez

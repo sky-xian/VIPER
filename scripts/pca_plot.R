@@ -18,14 +18,14 @@ options(error = function() traceback(2))
 
 preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE, 
                        min_genes=250, min_samples=4, rpkm_cutoff=2.0) {
-  rpkmTable <- read.csv(rpkm_file, header=T, check.names=F, 
+  rpkmTable <- read.csv(rpkm_file, header=T, check.names=T, 
                         row.names=1, stringsAsFactors=FALSE, dec='.')
   for (n in names(rpkmTable)) {
     rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
   }
   rpkmTable <- na.omit(rpkmTable)
   tmp_ann <- read.csv(metasheet, sep=",", header=T, row.names=1, 
-                      stringsAsFactors=FALSE, check.names=F)
+                      stringsAsFactors=FALSE, check.names=T)
   tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_")))
   df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))
   sub_df <- df[apply(df, 1, function(x) length(x[x>=rpkm_cutoff])>min_samples),]
@@ -45,7 +45,7 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE,
 
 pca_plot <- function(rpkmTable, annot, pca_plot_out) {
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
-  pc_var <- signif(100.0 * summary(rpkm.pca)[[6]][2,1:3], digits = 3)
+  pc_var <- signif(100.0 * summary(rpkm.pca)[[6]][2,1:9], digits = 3)
   pc_var <- data.frame(PCA=names(pc_var), Variance=pc_var)
   plot.var <- ggplot(pc_var, aes(x=PCA,y=Variance))
   plot.var <- plot.var + geom_bar(stat="identity") + theme_bw() 

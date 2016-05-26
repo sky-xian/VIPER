@@ -6,7 +6,7 @@ suppressMessages(library("edgeR"))
 suppressMessages(library("ggplot2"))
 suppressMessages(library("stringr"))
 suppressMessages(library("ggalt"))
-suppressMessages(library("scales"))
+#suppressMessages(library("scales"))
 suppressMessages(library("mutoss"))
 
 ## The traceback is actually necessary to not break pipe at the stop step, so leave on  

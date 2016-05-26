@@ -1,6 +1,6 @@
+library(scales)
 library(ggplot2)
 library(reshape2)
-library(scales)
 
 args <- commandArgs( trailingOnly = TRUE )
 

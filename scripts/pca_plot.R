@@ -53,7 +53,7 @@ pca_plot <- function(rpkmTable, annot, pca_plot_out) {
   ggsave("analysis/plots/images/pca_plot_scree.png")
   all_plots <- list()
   for (ann in colnames(annot)){
-    g <- ggbiplot(rpkm.pca, groups = annot[,ann], scale = 0, var.scale = 0,
+    g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 0, var.scale = 0,
                 labels=colnames(rpkmTable), ellipse = TRUE,
                 labels.size=3, circle = TRUE, var.axes = FALSE)
     g <- g + scale_color_discrete(name = '')

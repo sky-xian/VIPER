@@ -1,83 +1,114 @@
-#!/usr/bin/env Rscript
-#-------------------
-# @author: Mahesh Vangala
-# @email: vangalamaheshh@gmail.com
-# @date: May, 23, 2016
-#--------------------
-
-library(dplyr)
-if( is.element("ggbiplot", installed.packages())){
-  library(ggbiplot)
-} else {
-  require("devtools")
-  install_github("vqv/ggbiplot")
-  require(ggbiplot)
-}
+## load required packages
+suppressMessages(library("gplots"))
+suppressMessages(library("ComplexHeatmap"))
+suppressMessages(library("circlize"))
+suppressMessages(library("dendextend"))
+suppressMessages(library("viridis"))
+suppressMessages(library('dplyr'))
+suppressMessages(source('viper/scripts/supp_fns.R'))
 
 options(error = function() traceback(2))
 
-preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE, 
-                       min_genes=250, min_samples=4, rpkm_cutoff=2.0) {
-  rpkmTable <- read.csv(rpkm_file, header=T, check.names=T, 
-                        row.names=1, stringsAsFactors=FALSE, dec='.')
-  for (n in names(rpkmTable)) {
-    rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
-  }
-  rpkmTable <- na.omit(rpkmTable)
-  tmp_ann <- read.csv(metasheet, sep=",", header=T, row.names=1, 
-                      stringsAsFactors=FALSE, check.names=T)
-  tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_")))
-  df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))
-  sub_df <- df[apply(df, 1, function(x) length(x[x>=rpkm_cutoff])>min_samples),]
-  sub_df <- log2(sub_df + 1)
-  if (filter_miRNA == TRUE) {
-    sub_df <- sub_df[ !grepl("MIR|SNO",rownames(sub_df)), ]
-  }
-  min_genes = min(min_genes, nrow(sub_df))
-  ## Calculate CVs for all genes (rows)
-  mean_rpkm <- apply(sub_df,1,mean)
-  var_rpkm <- apply(sub_df,1,var)
-  cv_rpkm <- abs(var_rpkm/mean_rpkm)
-  ## Select out the most highly variable genes into the dataframe 'Exp_data'
-  exp_data <- sub_df[order(cv_rpkm,decreasing=T)[1:min_genes],]
-  return (list(exp_data=exp_data, tmp_ann=tmp_ann))
-}
+pca_plot <- function(rpkmTable,annotation, RPKM_threshold,min_num_samples_expressing_at_threshold,filter_mirna,SSnumgenes, pca_plot_out) {
+    
+    ## readin and process newdata
+    newdata <- rpkmTable
+    
+    ## We want to only work with the samples that are in the meta file, so we are only selecting the count columns that are in the meta file
+    newdata = newdata[,colnames(newdata) %in% rownames(tmp_ann)]
+    
+    ## remove genes with no RPKM values or
+    newdata<-newdata[apply(newdata, 1, function(x) length(x[x>=RPKM_threshold])>min_num_samples_expressing_at_threshold),]
 
-pca_plot <- function(rpkmTable, annot, pca_plot_out) {
-  rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
-  pc_var <- signif(100.0 * summary(rpkm.pca)[[6]][2,1:9], digits = 3)
-  pc_var <- data.frame(PCA=names(pc_var), Variance=pc_var)
-  plot.var <- ggplot(pc_var, aes(x=PCA,y=Variance))
-  plot.var <- plot.var + geom_bar(stat="identity") + theme_bw() 
-  plot.var <- plot.var + ylab("% Variance") + xlab("PCA")
-  ggsave("analysis/plots/images/pca_plot_scree.png")
-  all_plots <- list()
-  for (ann in colnames(annot)){
-    g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 0, var.scale = 0,
-                labels=colnames(rpkmTable), ellipse = TRUE,
-                labels.size=3, circle = TRUE, var.axes = FALSE)
-    g <- g + scale_color_discrete(name = '')
-    g <- g + theme(legend.direction = 'horizontal',
-                 legend.position = 'top')
-    all_plots <- c(all_plots, list(g))
-    ggsave(paste("analysis/plots/images/pca_plot_",ann,".png",sep=""))
-  }
-  pdf(pca_plot_out)
-  print(c(all_plots,list(plot.var)))
-  dev.off()
+    ## log transform of data
+    newdata <- log2(newdata+1)
+    
+    ## Removing Sno and Mir mrna, parameterized
+    if (filter_mirna == TRUE) {
+        newdata <- newdata[ !grepl("MIR",rownames(newdata)), ]
+        newdata <- newdata[ !grepl("SNO",rownames(newdata)), ]
+    }
+    
+    ## Fail safe to take all genes if numgenes param is greater than what passes filters
+    if (as.numeric(SSnumgenes) > nrow(newdata)) {SSnumgenes = nrow(newdata)}
+
+    ## Calculate CVs for all genes (rows)
+    mean_rpkm_nolym <- apply(newdata,1,mean)
+    var_rpkm_nolym <- apply(newdata,1,var)
+    cv_rpkm_nolym <- abs(var_rpkm_nolym/mean_rpkm_nolym)
+
+    ## Select out the most highly variable genes into the dataframe 'Exp_data'
+    Exp_data <- newdata[order(cv_rpkm_nolym,decreasing=T)[1:SSnumgenes],]
+    
+    ## SAVE plot
+    pdf(file = pca_plot_out)
+    png_counter <- 1
+    ## Standard PCA analysis using all possible annotations
+    for(c in colnames(annotation)) {
+        ann <- as.matrix(annotation[, c])
+        vir_param=FALSE
+        if (length(unique(ann)) > 6 && is.numeric(ann)) {vir_param=TRUE} else {vir_param=FALSE}
+            ClassColors <- cmap(as.character(ann), colorstart=0, use_viridis=vir_param)
+            myColors = ClassColors[as.character(ann)]
+            myColors[which(is.na(myColors))] <- "black"
+
+            png(file=paste("analysis/plots/images/pca_plot_", c, ".png", sep=""), width = 8, height = 8, unit="in",res=300) 
+            png_counter <- png_counter + 1
+            pca_output <- make_pca_plots(t(Exp_data), threeD = FALSE, ClassColorings = myColors, pca_title = c, legend_title =  c)
+	    dev.off()
+	    pca_output <- make_pca_plots(t(Exp_data), threeD = FALSE, ClassColorings = myColors, pca_title = c, legend_title =  c)
+    }
+
+    #GET percent variances
+    pc_var <- signif(100.0 * summary(pca_output)[[6]][2,], digits = 3)
+    #scree plot
+    png(file="analysis/plots/images/pca_plot_scree.png", width = 8, height = 8, unit="in",res=300)
+    barplot(pc_var, ylim=c(0,100),ylab="% variance")
+    dev.off()
+    barplot(pc_var, ylim=c(0,100),ylab="% variance")
+    dev.off()
 }
 
 
 args <- commandArgs( trailingOnly = TRUE )
-rpkmFile <- args[1]
-annotFile <- args[2]
-rpkm_cutoff <- args[3]
-min_samples <- args[4]
-filter_miRNA <- args[5]
-min_genes <- args[6]
-pca_plot_out <- args[7]
+rpkmFile=args[1]
+annotFile=args[2]
+RPKM_threshold=args[3]
+min_num_samples_expressing_at_threshold=args[4]
+filter_mirna = args[5]
+SSnumgenes=args[6]
+pca_plot_out=args[7]
+
+#process RPKM file
+# Mahesh adding check.names=F so that if there is any - or _ characters, they won't be turned to default '.'
+rpkmTable <- read.table(rpkmFile, header=T, check.names=F, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".")
+for (n in names(rpkmTable)) {
+    rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
+}
+rpkmTable = na.omit(rpkmTable)
+
+#PROCESS ANNOTATIONS
+tmp_ann <- read.delim(annotFile, sep=",", stringsAsFactors=FALSE, check.names=F)
+#REMOVE comp_ columns
+tmp_ann <- tmp_ann[ , !grepl('comp_*', names(tmp_ann))]
+
+## Convert numerical annotations to numbers/floats
+for (col in colnames(tmp_ann)) {
+    ## Test first value in col for validity
+    if(attr(regexpr("^\\-?\\d+\\.\\d+$",tmp_ann[1,col]), "match.length") > 0){
+        #print(apply(as.matrix(tmp_ann[,col]), 2, as.numeric))
+        tmp_ann[,col] <- as.vector(apply(as.matrix(tmp_ann[,col]), 2, as.numeric))
+    }
+}
+
+rownames(tmp_ann) <- tmp_ann[,1]
+rowNames <- tmp_ann[,1]
+colNames <- colnames(tmp_ann)
+samples <- intersect(colnames(rpkmTable), rownames(tmp_ann))
+tmp_ann <- as.data.frame(tmp_ann[samples,-1])
+rownames(tmp_ann) <- rowNames
+colnames(tmp_ann) <- colNames[2:length(colNames)]
 
 
-info <- preprocess(rpkmFile, annotFile, filter_miRNA, min_genes, 
-                       min_samples, rpkm_cutoff)
-pca_plot(info$exp_data, info$tmp_ann, pca_plot_out)
+pca_plot(rpkmTable,tmp_ann, RPKM_threshold,min_num_samples_expressing_at_threshold,filter_mirna,SSnumgenes, pca_plot_out)
+

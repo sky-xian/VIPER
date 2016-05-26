@@ -33,6 +33,7 @@ snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
 
     heatmap.2(as.matrix(dataset),
                      dendrogram="none",
+                     Rowv=FALSE, symm=TRUE,
                      trace = 'none',
                      breaks = my_breaks,
                      col = my_palette,

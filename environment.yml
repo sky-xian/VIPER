@@ -4,6 +4,7 @@ channels:
 - hcc
 - r
 - quasiben
+- ma-tongji
 dependencies:
 - bedtools=2.25.0=1
 - bioconductor-annotate=1.48.0=1
@@ -103,11 +104,13 @@ dependencies:
 - r-brew=1.0_6=r3.2.2_1a
 - r-calibrate=1.7.2=r3.2.2_0
 - r-catools=1.17.1=r3.2.2_2a
+- r-chron=2.3_47=r3.2.2_0a
 - r-circlize=0.3.3=r3.2.2_0
 - r-class=7.3_14=r3.2.2_0a
 - r-cluster=2.0.3=r3.2.2_0a
 - r-codetools=0.2_14=r3.2.2_0a
 - r-colorspace=1.2_6=r3.2.2_0a
+- r-crayon=1.3.1=r3.2.2_0a
 - r-curl=0.9.4=r3.2.2_0a
 - r-dbi=0.3.1=r3.2.2_2a
 - r-dendextend=1.1.2=r3.2.2_0
@@ -131,6 +134,7 @@ dependencies:
 - r-gplots=2.17.0=r3.2.2_0a
 - r-gridbase=0.4_7=r3.2.2_0a
 - r-gridextra=2.0.0=r3.2.2_0a
+- r-gsubfn=0.6_6=r3.2.2_0
 - r-gtable=0.1.2=r3.2.2_2a
 - r-gtools=3.5.0=r3.2.2_0a
 - r-hmisc=3.17_0=r3.2.2_0a
@@ -187,6 +191,7 @@ dependencies:
 - r-snow=0.4_1=r3.2.2_0
 - r-sparsem=1.7=r3.2.2_0
 - r-spatial=7.3_11=r3.2.2_0a
+- r-sqldf=0.4_10=r3.2.2_0
 - r-stringi=1.0_1=r3.2.2_0a
 - r-stringr=1.0.0=r3.2.2_0a
 - r-survival=2.38_3=r3.2.2_0a

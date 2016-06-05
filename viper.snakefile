@@ -161,6 +161,12 @@ def run_snp_genome(wildcards):
             ls.append("analysis/snp/"+sample+"/"+sample+".snp.genome.vcf")
     return ls
 
+def immunology(wildcards):
+    ls = []
+    if ('cancer_type' in config) and (config["cancer_type"].upper() != 'FALSE'):
+        ls = ["analysis/immunology/results/score_matrix.txt"]
+    return ls
+
 rule target:
     input:
         expand( "analysis/cufflinks/{K}/{K}.genes.fpkm_tracking", K=ordered_sample_list ),
@@ -190,6 +196,7 @@ rule target:
         fusion_output,
         insert_size_output,
         rRNA_metrics,
+        immunology,
         #expand("analysis/diffexp/{comparison}/{comparison}.goterm.csv", comparison=comparisons),
         #expand("analysis/diffexp/{comparison}/{comparison}.goterm.pdf", comparison=comparisons),
         #expand("analysis/plots/images/{comparison}_goterm.png", comparison=comparisons),
@@ -289,12 +296,16 @@ rule generate_cuff_matrix:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        "analysis/cufflinks/Cuff_Gene_Counts.csv"
+        gene_counts = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        fpkm_collected = "analysis/cufflinks/Cuff_FPKM_Collected.tsv"
     message: "Generating expression matrix using cufflinks counts"
     priority: 3
     run:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
-        shell( "perl viper/scripts/raw_and_fpkm_count_matrix.pl -c -f {fpkm_files} 1>{output}" )
+        shell( "perl viper/scripts/raw_and_fpkm_count_matrix.pl -c -f {fpkm_files} 1>{output.gene_counts}" )
+
+        fpkm_files= " ".join( input.cuff_gene_fpkms )
+        shell( "python viper/scripts/collect_fpkm.py {fpkm_files} 1>{output.fpkm_collected}" )
 
 
 rule run_STAR_fusion:
@@ -777,6 +788,13 @@ rule call_snps_genome:
 #     run:
 #         shell("Rscript viper/scripts/sampleSNPcorr_plot.R {input.snp_corr} {input.annotFile} {output.snp_plot_out} {output.snp_plot_pdf}")
 
-
-
-
+## estimate the abundance of tumor-infiltrating immune cell types by TIMER
+rule estimate_immune_abundance:
+    input:
+        fpkm_collected="analysis/cufflinks/Cuff_FPKM_Collected.tsv"
+    output:
+        "analysis/immunology/results/output.pdf",
+        "analysis/immunology/results/score_matrix.txt"
+    message: "Estimating immune cell abundance output"
+    run:
+        shell( "Rscript viper/scripts/immunology.R {input.fpkm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/immunology/", cancer_type=config["cancer_type"])

@@ -612,8 +612,8 @@ rule deseq_limma_fc_plot:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
         limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv"
     output:
-        out_csv = "analysis/diffexp/{comparison}/deseq_limma_fc.csv",
-        out_png = "analysis/diffexp/{comparison}/deseq_limma_fc.png"
+        out_csv = "analysis/diffexp/{comparison}/deseq_limma_fc_corr.csv",
+        out_png = "analysis/diffexp/{comparison}/deseq_limma_fc_corr.png"
     shell:
         "Rscript viper/scripts/deseq_limma_fc_corr.R {input.deseq} {input.limma} {output.out_csv} {output.out_png}"
 

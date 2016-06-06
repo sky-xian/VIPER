@@ -35,7 +35,7 @@ snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
                      dendrogram="none",
                      Rowv=FALSE, symm=TRUE,
                      trace = 'none',
-                     breaks = my_breaks,
+#                     breaks = my_breaks,
                      col = my_palette,
                      key = FALSE,
                      # block sepration

@@ -4,7 +4,7 @@ channels:
 - hcc
 - r
 - quasiben
-- ma-tongji
+#- ma-tongji #NOTE: was needed for r-gsubfn, but johannes added pkg to bioconda
 dependencies:
 - bedtools=2.25.0=1
 - bioconductor-annotate=1.48.0=1

@@ -130,7 +130,7 @@ ss_plot_out=args[7]
 ss_txt_out=args[8]
 
 ## process RPKM file
-rpkmTable <- read.table(rpkmFile, header=T, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".")
+rpkmTable <- read.table(rpkmFile, header=T, row.names=1, sep=",", stringsAsFactors=FALSE, dec=".", check.names=FALSE)
 for (n in names(rpkmTable)) {
     # CONVERT to numeric!
     rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)

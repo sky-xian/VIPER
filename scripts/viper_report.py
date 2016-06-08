@@ -243,7 +243,7 @@ Gene-Ontology Annotation
     for comp in comps:
         report += "\n" + comp + "\n"
         report += "^" * len(comp) + "\n"
-        go_png = "analysis/diffexp/" + comp + "/" + comp + ".goterm.png"
+        go_png = "analysis/plots/images/" + comp + "_goterm.png"
         if os.path.isfile(go_png):
             report += "\n\n\t.. image:: " + data_uri(go_png) + "\n"
         else:

@@ -1,8 +1,3 @@
-#Script to generate a Sample-Sample snp correlation heatmaps
-#Input:
-#Output:
-#BASED on makeclustering_all_samples_HWL.R by Henry Long
-
 # load required packages
 suppressMessages(library("gplots"))
 suppressMessages(library("ComplexHeatmap"))
@@ -38,8 +33,9 @@ snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
 
     heatmap.2(as.matrix(dataset),
                      dendrogram="none",
+                     Rowv=FALSE, symm=TRUE,
                      trace = 'none',
-                     breaks = my_breaks,
+#                     breaks = my_breaks,
                      col = my_palette,
                      key = FALSE,
                      # block sepration
@@ -95,7 +91,7 @@ snp_corr_plot_out=args[3]
 snp_corr_plot_pdf=args[4]
 
 #READ in corr. file
-snpCorrMat <- read.table(snpCorrFile, header=TRUE, sep="\t", row.names=1)
+snpCorrMat <- read.table(snpCorrFile, header=TRUE, sep="\t", row.names=1, check.names=FALSE)
 
 #NOTE: in the snpCorrMatrix, sample i.e. column and row names are in the
 #form SAMPLEXXX.snp.chr6 or SAMPLEXXX.snp.[something]

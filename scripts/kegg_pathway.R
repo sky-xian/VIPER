@@ -6,31 +6,34 @@ suppressMessages(library("gageData"))
 suppressMessages(library("pathview"))
 suppressMessages(library("clusterProfiler"))
 suppressMessages(library("XML"))
-data(kegg.sets.hs)
-data(sigmet.idx.hs)
+suppressMessages(library("ggplot2"))
+suppressMessages(library("stringr"))
 
-## "cleans up the gene sets
-#kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+kegg.set = kegg.gsets()
+ks = kegg.set$kg.sets
+kss = kegg.set$kg.sets[kegg.set$sigmet.idx]
+names(kss) = gsub("/","",names(kss))
 
-#deseq_file = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.deseq.csv"
-#reference = "hg19"
+## Removing pathways that I know don't load properly... no idea why
+pathway_errors = c("hsa01200 Carbon metabolism", "hsa01230 Biosynthesis of amino acids", "hsa01212 Fatty acid metabolism", "hsa01210 2-Oxocarboxylic acid metabolism", "hsa01100 Metabolic pathways", "hsa00533 Glycosaminoglycan biosynthesis - keratan sulfate", "hsa00514 Other types of O-glycan biosynthesis", "hsa00511 Other glycan degradation")
+kss[which(names(kss) %in% pathway_errors)] <- NULL
 
-#kegg_table = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.kegg.txt"
-#kegg_dir= "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/kegg_pathways/"
-#gsea_table = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.gsea.txt"
-#gsea_pdf = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/MCF7_PvTAMR.gsea.pdf"
-#temp_dir = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/diffexp/MCF7_PvTAMR/temp/"
+## The traceback is actually necessary to not break pipe at the stop step, so leave on
+options(error = function() traceback(2))
 
-kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gsea_table,gsea_pdf) {
+kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,keggsumary_pdf,keggsummary_png,gsea_table,gsea_pdf) {
 
+    ## These are here until we update snakemake
+    numkeggpathways = as.numeric(numkeggpathways)
+    keggpvalcutoff = as.numeric(keggpvalcutoff)
+
+    ## Will need this path stuff for later as kegg output is very messy
     mainDir = substr(kegg_dir, 1, nchar(kegg_dir)-14)
     dir.create(file.path(mainDir, "kegg_pathways/"), showWarnings = FALSE)
 
     ## Read in deseq table
     detable = read.table(deseq_file, header=TRUE, sep=",", fill=TRUE)
     rownames(detable) <- detable[,1]
-
-    #detable = subset(detable, abs(detable[,3]) > 1 & detable[,7] < 0.05)
 
     ## Append ENSEMBL and ENTREZ IDs from loaded in db
     if (reference == "hg19") {IDdb = org.Hs.eg.db}
@@ -52,41 +55,54 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
                         keytype="SYMBOL",
                         multiVals="first")
 
+    ## Couple failsafes
+    detable = na.omit(detable)
+    detable = detable[is.finite(detable$log2FoldChange),]
+    
     ## Setting up gage input, needs the log2fc with the entrez id
     gageinput = detable$log2FoldChange
     names(gageinput) = detable$entrez
 
     ## Run gage
-    keggres = gage(gageinput, gsets = kegg.sets.hs, same.dir=TRUE)
-    
-    kegg_output = keggres$greater
-    kegg_output = cbind(rownames(kegg_output), kegg_output)
-    colnames(kegg_output)[1] = "Kegg_pathway"
-    write.table(kegg_output, file = kegg_table, quote=F, col.names=TRUE, row.names=FALSE, sep="\t")
-    
-    ## Get the pathways
-    numpathways = 5
+    keggres = gage(gageinput, gsets = kss, same.dir=TRUE)
 
+    ## Output kegg results with respect to  upregulation
+    kegg_up = keggres$greater
+    kegg_up = cbind(rownames(kegg_up), kegg_up)
+    colnames(kegg_up)[1] = "Kegg_pathway"
+    xx = gsub(",","", as.matrix(kegg_up[,1]))
+    kegg_up[,1] = xx
+    write.table(kegg_up, file = kegg_table_up, quote=F, col.names=TRUE, row.names=FALSE, sep=",")
+
+    ## Output kegg results with respect to  downregulation
+    kegg_down= keggres$less
+    kegg_down= cbind(rownames(kegg_down), kegg_down)
+    colnames(kegg_down)[1] = "Kegg_pathway"
+    xx = gsub(",","", as.matrix(kegg_down[,1]))
+    kegg_down[,1] = xx
+    write.table(kegg_down, file = kegg_table_down, quote=F, col.names=TRUE, row.names=FALSE, sep=",")
+
+    ## Concat tables for filtering and testing
+    full = rbind(kegg_up, kegg_down)
+    fullorder = full[order(full[,4]),]
+    fullkegg = fullorder[!duplicated(fullorder[,1]),]
+        
+    ## Stop run if the params don't match for output
+    kegg_output_filter = subset(fullkegg, fullkegg[,4] < keggpvalcutoff)
+    if(nrow(kegg_output_filter) < numkeggpathways) {stop(paste("Only ",nrow(kegg_output_filter), " pathways pass the current keggpvalcutoff of ", keggpvalcutoff, ", please run again with increased pval. Check comp.kegg.txt for details", sep="")) }
+
+    ## Get the pathways
     keggrespathways = keggres$stats
     keggrespathways = keggrespathways[order(-abs(keggrespathways[,1])),]
-    keggrespathways = rownames(keggrespathways)[1:numpathways]
-    
-    #keggrespathways = data.frame(id=rownames(keggres$greater), keggres$greater) %>%
-    #  tbl_df() %>%
-    #  filter(row_number()<=numpathways) %>%
-    #  .$id %>%
-    #  as.character()
-
+    keggrespathways = rownames(keggrespathways)[1:numkeggpathways]
     keggresids = substr(keggrespathways, start=1, stop=8)
 
     ## Plot using pathview
-    #plot_pathway = function(pid) pathview(gene.data=gageinput, pathway.id=pid, species="hsa", new.signature=FALSE, kegg.dir=temp_dir)
-    #tmp = sapply(keggresids, function(pid) pathview(gene.data=gageinput, pathway.id=pid, species="hsa", kegg.dir=temp_dir))
-
+    
     normwd = getwd()
     setwd(temp_dir)
     
-    for ( i in 1:numpathways) {
+    for ( i in 1:numkeggpathways) {
         pvout <- pathview(gene.data=gageinput,              ## Gene list
                           pathway.id=keggresids[i],         ## Which pathway
                           species = "hsa",                  ## Species
@@ -104,25 +120,38 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
     sortkeggrespathways = sort(keggrespathways)
     newnames = substr(sortkeggrespathways, 10, nchar(sortkeggrespathways))
     newnames = gsub(" ", "_", newnames)
-
+    newnames = paste0(newnames, "_", match(sortkeggrespathways,keggrespathways))
+    
     # Read in the list of made png files
     png_files <- list.files(temp_dir, pattern=glob2rx("*.pathview.png"))
-
     file.rename(paste0(temp_dir,png_files), paste0(kegg_dir, newnames, ".png"))
 
     # Repeat for xml files
     xml_files <- list.files(temp_dir, pattern=glob2rx("*.xml"))
-
     file.rename(paste0(temp_dir,xml_files), paste0(kegg_dir, newnames, ".xml"))
 
-    ## GSEA Analysis
     
-    #upgenes = subset(gageinput, gageinput > 0)
-    #upgenes = sort(upgenes, decreasing = TRUE)
-    #downgenes = subset(gageinput, gageinput < 0)
-    #downgenes = -sort(downgenes)
+    ## Create Kegg Summary Table
+    values = sapply(fullkegg[,4], as.numeric)
+    logpval = -log(values)
+    keggsummary = cbind(names(logpval), logpval)
+    keggsummary = data.frame(keggsummary)
+    colnames(keggsummary) = c("Keggpathway","logpval")
 
+    ## Create title for plot
+    temptitle = tail(unlist(strsplit(keggsummary_pdf, split="/")), n=1)
+    temptitle = head(unlist(strsplit(temptitle, split="[.]")), n=1)
+    title = paste(temptitle, "_Top_", numkeggpathways, "_Kegg_Pathways", sep="")
+
+    kegg_bar_plot <- ggplot(keggsummary[numkeggpathways:1,], aes(factor(Keggpathway, levels=unique(Keggpathway)), logpval)) + ylab("-log(Pvalue)") + xlab("Kegg Pathway") + geom_bar(stat = "identity", fill="palegreen3") + theme_bw(base_size = 12) + scale_x_discrete(labels = function(x) str_wrap(x, width = 40, indent = 2),"\n") + coord_flip() + ggtitle(title)
+
+    ggsave(keggsummary_pdf, width=11, height=8.5, unit="in")
+    ggsave(keggsummary_png, width=10, height=8, unit="in")
+
+    
+    ## GSEA Analysis
     gseainput = sort(gageinput, decreasing=TRUE)
+    gseainput = gseainput[is.finite(gseainput)]
 
     fullgsea <- gseKEGG(geneList = gseainput,
                         organism     = "human",
@@ -132,10 +161,11 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
                         verbose      = FALSE,
                         use_internal_data = FALSE)
 
-
     gsea_data = summary(fullgsea)
     gsea_data = gsea_data[order(-abs(gsea_data$NES)),]
-    write.table(gsea_data, file = gsea_table, quote=FALSE, sep= "\t", row.names=FALSE, col.names=TRUE)
+    xx = gsub(",","", as.matrix(gsea_data[,2]))
+    gsea_data[,2] = xx
+    write.table(gsea_data, file = gsea_table, quote=FALSE, sep= ",", row.names=FALSE, col.names=TRUE)
 
     pdf(gsea_pdf)
     plot.new()
@@ -150,17 +180,20 @@ kegg_pathway_f<- function(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gs
 
 args <- commandArgs( trailingOnly = TRUE )
 deseq_file = args[1]
-kegg_dir = args[2]
-reference = args[3]
-temp_dir = args[4]
-kegg_table = args[5]
-gsea_table = args[6]
-gsea_pdf = args[7]
+keggpvalcutoff = args[2]
+numkeggpathways = args[3]
+kegg_dir = args[4]
+reference = args[5]
+temp_dir = args[6]
+kegg_table_up = args[7]
+kegg_table_down = args[8]
+keggsummary_pdf = args[9]
+keggsummary_png = args[10]
+gsea_table = args[11]
+gsea_pdf = args[12]
 
 
-kegg_pathway_f(deseq_file, kegg_dir,reference,temp_dir, kegg_table,gsea_table,gsea_pdf)
-
-
+kegg_pathway_f(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,keggsumary_pdf,keggsummary_png,gsea_table,gsea_pdf)
 
 
 

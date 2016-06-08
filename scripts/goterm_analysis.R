@@ -6,16 +6,17 @@ suppressMessages(library("edgeR"))
 suppressMessages(library("ggplot2"))
 suppressMessages(library("stringr"))
 suppressMessages(library("ggalt"))
-suppressMessages(library("scales"))
+#suppressMessages(library("scales"))
+suppressMessages(library("mutoss"))
 
+## The traceback is actually necessary to not break pipe at the stop step, so leave on  
+options(error = function() traceback(2))
 
-goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
+goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, goterm_csv,goterm_pdf,goterm_png) {
 
-    ### PARAMS:
-    adjpvalcutoff = 0.05 ## for genes that will go into gostats for goterm analysis
-    numgoterms = 20 ## number of go terms to bar chart
-    reference = "hg19"
-
+    adjpvalcutoff = as.numeric(adjpvalcutoff)
+    numgoterms = as.numeric(numgoterms)
+    
     ## Read in detable
     detable = read.table(deseq_file, header=TRUE, sep=",", fill=TRUE)
     rownames(detable) <- detable[,1]
@@ -23,7 +24,7 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
     ## Append ENSEMBL and ENTREZ IDs from loaded in db
     if (reference == "hg19") {IDdb = org.Hs.eg.db}
     #if (reference == "mm9") {IDdb = ##########}
-
+    
     detable$ensembl <- mapIds(IDdb,
                          keys=rownames(detable),
                          column="ENSEMBL",
@@ -35,13 +36,14 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
                          keytype="SYMBOL",
                          multiVals="first")
 
-    adjpvalcutoff = 0.05
-
     ## Select genes that pass the adjPval cutoff and select those entrez IDs as pop, set rest as universe.
     topgenes <- subset(detable, detable$padj < adjpvalcutoff)
+
+    if(nrow(topgenes) < numgoterms) {stop(paste("Not enough significant genes, there are only ", nrow(topgenes)," genes at the current pval of ", adjpvalcutoff, sep=""))}
+    
     selectedIDs = topgenes$entrez
     universeIDs = detable$entrez
-
+    
     ## Run GOstats
     goParams <- new("GOHyperGParams",
                     geneIds = selectedIDs,
@@ -56,13 +58,15 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
 
     ## Summary table has columns: GOBPID, Pvalue, OddsRatio, ExpCount, Count, Size, Term.
     df = summary(goResults)
-    #df$percent = df$Count/length(selectedIDs)
+
+    by <- BY(df$Pvalue, 0.05)
+    df$adjPvalue <- by[["adjPValues"]]
     df$logpval = -log(df$Pvalue)
 
     ## Write out Results
+    xx = gsub(",","", as.matrix(df[,7]))
+    df[,7] = xx    
     write.table(df, file = goterm_csv, col.names=T, row.names=F, quote=F, sep=",")
-    
-    numgoterms = 20
 
     ##### LOLLIPOP, AWAITING ggalt 0.3.0.0
 
@@ -98,7 +102,6 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
     #dev.off()
 
     
-
     ## Create title for plot
     temptitle = tail(unlist(strsplit(goterm_pdf, split="/")), n=1)
     temptitle = head(unlist(strsplit(temptitle, split="[.]")), n=1)
@@ -116,11 +119,14 @@ goterm_analysis_f <- function(deseq_file, goterm_csv,goterm_pdf,goterm_png) {
 
 args <- commandArgs( trailingOnly = TRUE )
 deseq_file = args[1]
-goterm_csv = args[2]
-goterm_pdf = args[3]
-goterm_png = args[4]
+adjpvalcutoff = args[2]
+numgoterms = args[3]
+reference = args[4]
+goterm_csv = args[5]
+goterm_pdf = args[6]
+goterm_png = args[7]
 
-goterm_analysis_f(deseq_file, goterm_csv,goterm_pdf,goterm_png)
+goterm_analysis_f(deseq_file, adjpvalcutoff,numgoterms,reference, goterm_csv,goterm_pdf,goterm_png)
 
 
 

@@ -25,3 +25,13 @@ filter_mirna: "TRUE"
 
 # Varscan - default turned off 
 snp_scan_genome: "false"
+
+# Pathway params
+numgoterms: 10
+goterm_adjpval_cutoff: 0.05
+kegg_pval_cutoff: 0.05
+numkeggpathways: 5
+
+# Batch params
+batch_effect_removal: "false"
+

@@ -143,7 +143,7 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     temptitle = head(unlist(strsplit(temptitle, split="[.]")), n=1)
     title = paste(temptitle, "_Top_", numkeggpathways, "_Kegg_Pathways", sep="")
 
-    kegg_bar_plot <- ggplot(keggsummary[numkeggpathways:1,], aes(factor(Keggpathway, levels=unique(Keggpathway)), logpval)) + ylab("-log(Pvalue)") + xlab("Kegg Pathway") + geom_bar(stat = "identity", fill="palegreen3") + theme_bw(base_size = 12) + scale_x_discrete(labels = function(x) str_wrap(x, width = 40, indent = 2),"\n") + coord_flip() + ggtitle(title)
+    kegg_bar_plot <- ggplot(keggsummary[numkeggpathways:1,], aes(factor(Keggpathway, levels=unique(Keggpathway)), logpval)) + ylab("-log(Pvalue)") + xlab("Kegg Pathway") + geom_bar(stat = "identity", fill="sienna2") + theme_bw(base_size = 12) + scale_x_discrete(labels = function(x) str_wrap(x, width = 40, indent = 2),"\n") + coord_flip() + ggtitle(title)
 
     ggsave(keggsummary_pdf, width=11, height=8.5, unit="in")
     ggsave(keggsummary_png, width=10, height=8, unit="in")

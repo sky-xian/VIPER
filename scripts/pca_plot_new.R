@@ -5,6 +5,7 @@
 # @date: May, 23, 2016
 #--------------------
 
+library(plyr)
 library(dplyr)
 if( is.element("ggbiplot", installed.packages())){
   library(ggbiplot)
@@ -26,7 +27,7 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE,
   rpkmTable <- na.omit(rpkmTable)
   tmp_ann <- read.csv(metasheet, sep=",", header=T, row.names=1, 
                       stringsAsFactors=FALSE, check.names=T)
-  tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_")))
+  if(any(grepl("comp_", colnames(tmp_ann)))) { tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_"))) }
   df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))
   sub_df <- df[apply(df, 1, function(x) length(x[x>=rpkm_cutoff])>min_samples),]
   sub_df <- log2(sub_df + 1)

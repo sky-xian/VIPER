@@ -13,11 +13,9 @@ source('viper/scripts/supp_fns.R')
 #NOTE: this fn is called twice, once to generate png and another to make pdf
 snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
     cordata <- snpCorrMatrix
-
     ## We want to only work with the samples that are in the meta file, so we are only selecting the count columns that are in the meta file
     cordata <- cordata[, rownames(annotation)]
     cordata <- cordata[rownames(annotation),]
-    
     #save the spearman correlation as txt; save plots
     if (isPNG) {
         png(file = plot_out)
@@ -30,7 +28,6 @@ snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
     breakpoint = 0.75
     my_breaks = c(seq(0,breakpoint,length=20),seq(breakpoint,1.0,length=180))
     my_palette <- colorRampPalette(c("white", "red"))(n = 199)
-
     heatmap.2(as.matrix(dataset),
                      dendrogram="none",
                      Rowv=FALSE, symm=TRUE,
@@ -104,7 +101,7 @@ rownames(snpCorrMat) <- sampleNames
 #PROCESS ANNOTATIONS
 tmp_ann <- read.delim(annotFile, sep=",", stringsAsFactors=FALSE)
 #REMOVE comp_ columns
-tmp_ann <- tmp_ann[ , !grepl('comp_*', names(tmp_ann))]
+if( any(grepl("comp_", colnames(tmp_ann)))) { tmp_ann <- tmp_ann[ , !grepl('comp_*', names(tmp_ann))] }
 
 #convert numerical annotations to numbers/floats
 for (col in colnames(tmp_ann)) {
@@ -115,9 +112,13 @@ for (col in colnames(tmp_ann)) {
     }
 }
 
-rownames(tmp_ann) <- tmp_ann[,1]
-samples <- intersect(colnames(snpCorrMat), rownames(tmp_ann))
-tmp_ann <- tmp_ann[samples,-1]
+rowNames <- tmp_ann[,1]
+colNames <- colnames(tmp_ann)
+samples <- intersect(colnames(snpCorrMat), rowNames)
+rownames(tmp_ann) <- rowNames
+tmp_ann <- as.data.frame(tmp_ann[samples,-1])
+rownames(tmp_ann) <- samples
+colnames(tmp_ann) <- colNames[2:length(colNames)]
 #print(str(tmp_ann))
 
 #GENERATE png

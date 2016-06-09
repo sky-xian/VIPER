@@ -190,13 +190,7 @@ rule target:
         fusion_output,
         insert_size_output,
         rRNA_metrics,
-        #expand("analysis/diffexp/{comparison}/{comparison}.goterm.csv", comparison=comparisons),
-        #expand("analysis/diffexp/{comparison}/{comparison}.goterm.pdf", comparison=comparisons),
-        #expand("analysis/plots/images/{comparison}_goterm.png", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.goterm.done", comparison=comparisons),
-        #expand("analysis/diffexp/{comparison}/{comparison}.kegg.txt", comparison=comparisons),
-        #expand("analysis/diffexp/{comparison}/{comparison}.gsea.txt", comparison=comparisons),
-        #expand("analysis/diffexp/{comparison}/{comparison}.gsea.pdf", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/{comparison}.kegg.done", comparison=comparisons),
         expand("analysis/diffexp/{comparison}/deseq_limma_fc_corr.png", comparison=comparisons),
         "report.html"
@@ -530,7 +524,7 @@ rule pca_plot:
 #    shell:
 #        "scripts/pca_plot.R"
     run:
-        shell("Rscript viper/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
+        shell("Rscript viper/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
 
 rule heatmapSS_plot:
     input:

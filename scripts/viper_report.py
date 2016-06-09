@@ -17,7 +17,9 @@ def get_sphinx_report(comps):
         'heatmapSS_cluster': "analysis/plots/images/heatmapSS_cluster.png",
         'DEsummary_plot': "analysis/diffexp/de_summary.png",
         'SNP_chr6' : "analysis/plots/sampleSNPcorr_plot.chr6.png",
-        'SNP_genome' : "analysis/plots/sampleSNPcorr_plot.genome.png"
+        'SNP_HLA': "analysis/plots/sampleSNPcorr_plot.hla.png",
+        'SNP_genome' : "analysis/plots/sampleSNPcorr_plot.genome.png",
+        'FUSION_OUT': "analysis/STAR_Fusion/STAR_Fusion_Report.png"
     }
     copy_file_dict = {}
     for key in file_dict.keys():
@@ -70,6 +72,15 @@ Alignment Summary
 """
     if 'align_report' in file_dict:
         report += "\n\t.. image:: " + file_dict['align_report'] + "\n";
+
+    report += "\n"
+
+    if 'FUSION_OUT' in file_dict:
+        report += """
+Fusion Summary
+==============
+"""
+        report += "\n\t.. image:: " + file_dict['FUSION_OUT'] + "\n";
 
     report += "\n"
     report += """
@@ -224,6 +235,15 @@ SNP - Chr6
 ^^^^^^^^^^^
 """  
         report += "\n\n\t.. image:: " + file_dict['SNP_chr6'] + "\n"
+
+    if 'SNP_HLA' in file_dict:
+        report += "\n"
+        report += """
+SNP - HLA
+^^^^^^^^^^^
+"""
+        report += "\n\n\t.. image:: " + file_dict['SNP_HLA'] + "\n"
+
 
     if 'SNP_genome' in file_dict:
         report += "\n" 

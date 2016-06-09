@@ -1,11 +1,18 @@
 Tue, June, 7, 2016:
 -------------------
-* Batch effect support 
-* Added p-val and number of go terms params to config
-* Added p-val and number of kegg pathway params to config
-* Added sanity checks to metasheet (including converting windows/mac format to
+- Batch effect support 
+- Added p-val and number of go terms params to config
+- Added p-val and number of kegg pathway params to config
+- Added sanity checks to metasheet (including converting windows/mac format to
 UNIX)
-* Refactored DEseq.R code as per DESeq2 vignette.
-* Added Limma - DESeq2 correlation plot.
-* Added STAR-FUSION plot generation rule
-* SNP-HLA
+- Refactored DEseq.R code as per DESeq2 vignette.
+- Added Limma - DESeq2 correlation plot.
+- Added STAR-FUSION plot generation rule
+- SNP-HLA
+
+Thu, June, 9, 2016:
+--------------------
+- Added Fusion and HLA images to Report
+- Added new PCA plot script - used ggbiplot instead of base plot function
+- Fixed bugs in handling of single column metasheet in SNP Corr Plot R script
+- Fixed GO and KEGG image file paths in report rule

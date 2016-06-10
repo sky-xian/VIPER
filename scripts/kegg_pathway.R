@@ -134,9 +134,7 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     ## Create Kegg Summary Table
     values = sapply(fullkegg[,4], as.numeric)
     logpval = -log(values)
-    keggsummary = cbind(names(logpval), logpval)
-    keggsummary = data.frame(keggsummary)
-    colnames(keggsummary) = c("Keggpathway","logpval")
+    keggsummary = data.frame(Keggpathway=names(logpval), logpval=logpval)
 
     ## Create title for plot
     temptitle = tail(unlist(strsplit(keggsummary_pdf, split="/")), n=1)

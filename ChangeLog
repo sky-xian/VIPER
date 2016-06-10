@@ -1,3 +1,14 @@
+Fri, June, 10, 2016:
+--------------------
+- Fixed x-axis p value display in KEGG barplot
+
+Thu, June, 9, 2016:
+--------------------
+- Added Fusion and HLA images to Report
+- Added new PCA plot script - used ggbiplot instead of base plot function
+- Fixed bugs in handling of single column metasheet in SNP Corr Plot R script
+- Fixed GO and KEGG image file paths in report rule
+
 Tue, June, 7, 2016:
 -------------------
 - Batch effect support 
@@ -10,9 +21,3 @@ UNIX)
 - Added STAR-FUSION plot generation rule
 - SNP-HLA
 
-Thu, June, 9, 2016:
---------------------
-- Added Fusion and HLA images to Report
-- Added new PCA plot script - used ggbiplot instead of base plot function
-- Fixed bugs in handling of single column metasheet in SNP Corr Plot R script
-- Fixed GO and KEGG image file paths in report rule

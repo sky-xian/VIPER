@@ -159,6 +159,7 @@ def run_snp_genome(wildcards):
             #ls.append("analysis/snp/%s/%s.snp.genome.vcf" % sample)
             #NOTE: LINE BELOW IS VERY ugly, but it's the only way it will work!
             ls.append("analysis/snp/"+sample+"/"+sample+".snp.genome.vcf")
+            ls.append("analysis/snp/"+sample+"/"+sample+".snpEff.annot.vcf")
     return ls
 
 rule target:
@@ -771,6 +772,14 @@ rule call_snps_genome:
 #     run:
 #         shell("Rscript viper/scripts/sampleSNPcorr_plot.R {input.snp_corr} {input.annotFile} {output.snp_plot_out} {output.snp_plot_pdf}")
 
-
-
-
+rule snpEff_annot:
+    input:
+        vcf="analysis/snp/{sample}/{sample}.snp.genome.vcf"
+    output:
+        protected("analysis/snp/{sample}/{sample}.snpEff.annot.vcf")
+    params:
+        snpEff_conf=config["snpEff_conf"],
+        snpEff_db=config['snpEff_db']
+    message: "Running varscan for snpEff annotation analysis"
+    shell:
+        "snpEff -Xmx2G -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output}"

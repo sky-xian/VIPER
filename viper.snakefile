@@ -168,7 +168,7 @@ rule target:
         "analysis/STAR/STAR_Align_Report.png",
         get_STAR_counts(config),
         get_cuff_counts(config),
-	    ["analysis/STAR/star_combat_qc.pdf", "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[],
+        ["analysis/STAR/star_combat_qc.pdf", "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[],
         "analysis/plots/pca_plot.pdf",
         expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=metacols),
         "analysis/plots/heatmapSS_plot.pdf",
@@ -196,8 +196,6 @@ rule target:
         "report.html"
     message: "Compiling all output"
         
-#["analysis/plots/correlation_plot.pdf", "analysis/plots/correlation_table.csv", "analysis/plots/upvenn_plot.pdf", "analysis/plots/downvenn_plot.pdf"] if len(comparisons) >= 2 else []
-
 
 rule generate_report:
     input:

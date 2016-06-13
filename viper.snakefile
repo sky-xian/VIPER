@@ -524,8 +524,10 @@ rule pca_plot:
     message: "Generating PCA plots"
 #    shell:
 #        "scripts/pca_plot.R"
+#    run:
+#        shell("Rscript viper/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
     run:
-        shell("Rscript viper/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
+        shell("Rscript viper/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
 
 rule heatmapSS_plot:
     input:

@@ -168,13 +168,8 @@ main <- function() {
   outlier.genes <- sort(GetOutlierGenes(cancers))
   print(paste("Outlier genes:", paste(outlier.genes, collapse=' ')))
 
-  dir.create(args.global$outdir, showWarnings = FALSE, recursive = TRUE)
-  if (!dir.exists(paste(args.global$outdir, '/results', sep=''))) {
-    dir.create(paste(args.global$outdir, '/results', sep=''))
-  }
-
   abundance.score.matrix <- c()
-  pdf(paste(args.global$outdir, '/results/output.pdf', sep=''))
+  pdf(paste(args.global$outdir, '/output.pdf', sep=''))
   for (i in 1:nrow(cancers)) {
     cancer.expFile <- cancers[i, 1]
     cancer.category <- cancers[i, 2]
@@ -224,7 +219,7 @@ main <- function() {
   }
 
   dev.off()
-  write.table(abundance.score.matrix, paste(args.global$outdir, '/results/score_matrix.txt', sep=''),
+  write.table(abundance.score.matrix, paste(args.global$outdir, '/score_matrix.txt', sep=''),
       sep="\t", quote=FALSE, row.names=TRUE, col.names=NA)
 
 

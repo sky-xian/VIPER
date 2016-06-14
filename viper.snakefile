@@ -164,7 +164,7 @@ def run_snp_genome(wildcards):
 def immunology(wildcards):
     ls = []
     if ('cancer_type' in config) and (config["cancer_type"].upper() != 'FALSE'):
-        ls = ["analysis/immunology/results/score_matrix.txt"]
+        ls = ["analysis/immunology/score_matrix.txt"]
     return ls
 
 rule target:
@@ -793,8 +793,8 @@ rule estimate_immune_abundance:
     input:
         fpkm_collected="analysis/cufflinks/Cuff_FPKM_Collected.tsv"
     output:
-        "analysis/immunology/results/output.pdf",
-        "analysis/immunology/results/score_matrix.txt"
+        "analysis/immunology/output.pdf",
+        "analysis/immunology/score_matrix.txt"
     message: "Estimating immune cell abundance output"
     run:
         shell( "Rscript viper/scripts/immunology.R {input.fpkm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/immunology/", cancer_type=config["cancer_type"])

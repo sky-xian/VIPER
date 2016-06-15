@@ -106,7 +106,8 @@ if( any(grepl("comp_", colnames(tmp_ann)))) { tmp_ann <- tmp_ann[ , !grepl('comp
 #convert numerical annotations to numbers/floats
 for (col in colnames(tmp_ann)) {
     #IS it a valid number?--test first value in col
-    if(attr(regexpr("^\\-?\\d+\\.\\d+$",tmp_ann[1,col]), "match.length") > 0){
+    isNumerical <- regexpr("^\\-?\\d+\\.\\d+$",tmp_ann[1,col])
+    if(!is.na(isNumerical) && attr(isNumerical, "match.length") > 0){
         #print(apply(as.matrix(tmp_ann[,col]), 2, as.numeric))
         tmp_ann[,col] <- as.vector(apply(as.matrix(tmp_ann[,col]), 2, as.numeric))
     }

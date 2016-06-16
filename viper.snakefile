@@ -60,7 +60,7 @@ else:
 
 #------------------------------------------------------------------------------
 #metasheet pre-parser: converts dos2unix, catches invalid chars
-_invalid_map = {'\r':'\n', '-':'.', '(':'.', ')':'.', ' ':'_', '/':'.', '$':''}
+_invalid_map = {'\r':'\n', '(':'.', ')':'.', ' ':'_', '/':'.', '$':''}
 _meta_f = open(config['metasheet'])
 _meta = _meta_f.read()
 _meta_f.close()
@@ -522,9 +522,9 @@ rule pca_plot:
 #    shell:
 #        "scripts/pca_plot.R"
 #    run:
-#        shell("Rscript viper/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
+#        shell("Rscript viper/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
     run:
-        shell("Rscript viper/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
+        shell("Rscript viper/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out}")
 
 
 rule heatmapSS_plot:

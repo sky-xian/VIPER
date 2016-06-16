@@ -5,32 +5,39 @@
 # @date: May, 23, 2016
 #--------------------
 
-library(plyr)
-library(dplyr)
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
 if( is.element("ggbiplot", installed.packages())){
-  library(ggbiplot)
+  suppressMessages(library(ggbiplot))
 } else {
-  require("devtools")
+  suppressMessages(require("devtools"))
   install_github("vqv/ggbiplot")
-  require(ggbiplot)
+  suppressMessages(require(ggbiplot))
 }
 
-options(error = function() traceback(2))
+#options(error = function() traceback(2))
 
 preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE, 
                        min_genes=250, min_samples=4, rpkm_cutoff=2.0) {
-  rpkmTable <- read.csv(rpkm_file, header=T, check.names=T, 
+
+    rpkmTable <- read.csv(rpkm_file, header=T, check.names=F, 
                         row.names=1, stringsAsFactors=FALSE, dec='.')
+
   for (n in names(rpkmTable)) {
     rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
   }
+
   rpkmTable <- na.omit(rpkmTable)
   tmp_ann <- read.csv(metasheet, sep=",", header=T, row.names=1, 
-                      stringsAsFactors=FALSE, check.names=T)
+                      stringsAsFactors=FALSE, check.names=F)
   if(any(grepl("comp_", colnames(tmp_ann)))) { tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_"))) }
-  df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))
+    
+  #df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))
+  df = rpkmTable[,colnames(rpkmTable) %in% rownames(tmp_ann)]
+
   sub_df <- df[apply(df, 1, function(x) length(x[x>=rpkm_cutoff])>min_samples),]
   sub_df <- log2(sub_df + 1)
+
   if (filter_miRNA == TRUE) {
     sub_df <- sub_df[ !grepl("MIR|SNO",rownames(sub_df)), ]
   }

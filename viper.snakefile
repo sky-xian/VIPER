@@ -676,7 +676,7 @@ rule kegg_analysis:
         gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.csv",
         gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf",
         kegg_dir = "analysis/diffexp/{comparison}/kegg_pathways/",
-        reference = "hg19",
+        reference = config["reference"],
         temp_dir = "analysis/diffexp/{comparison}/temp/"
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     run:

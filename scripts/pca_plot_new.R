@@ -15,7 +15,7 @@ if( is.element("ggbiplot", installed.packages())){
   suppressMessages(require(ggbiplot))
 }
 
-#options(error = function() traceback(2))
+options(error = function() traceback(2))
 
 preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE, 
                        min_genes=250, min_samples=4, rpkm_cutoff=2.0) {
@@ -38,6 +38,7 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE,
   sub_df <- df[apply(df, 1, function(x) length(x[x>=rpkm_cutoff])>min_samples),]
   sub_df <- log2(sub_df + 1)
 
+    
   if (filter_miRNA == TRUE) {
     sub_df <- sub_df[ !grepl("MIR|SNO",rownames(sub_df)), ]
   }
@@ -49,11 +50,23 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE,
   ## Select out the most highly variable genes into the dataframe 'Exp_data'
   exp_data <- sub_df[order(cv_rpkm,decreasing=T)[1:min_genes],]
   return (list(exp_data=exp_data, tmp_ann=tmp_ann))
+    
 }
 
 pca_plot <- function(rpkmTable, annot, pca_plot_out) {
+
+  ## Fail safe to remove rows
+  rpkmTable = t(rpkmTable)
+  rpkmTable = rpkmTable[,apply(rpkmTable, 2, var, na.rm=TRUE) != 0]
+  rpkmTable = t(rpkmTable)
+    
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
-  pc_var <- signif(100.0 * summary(rpkm.pca)[[6]][2,1:9], digits = 3)
+
+  ## Fail safe implemented if there aren't 9 PCs, now 9 is max, otherwise, take all
+  numpc = length(summary(rpkm.pca)[[6]][2,])
+  if (numpc > 9) {numpc=9}
+  
+  pc_var <- signif(100.0 * summary(rpkm.pca)[[6]][2,1:numpc], digits = 3)
   pc_var <- data.frame(PCA=names(pc_var), Variance=pc_var)
   plot.var <- ggplot(pc_var, aes(x=PCA,y=Variance))
   plot.var <- plot.var + geom_bar(stat="identity") + theme_bw() 
@@ -61,15 +74,18 @@ pca_plot <- function(rpkmTable, annot, pca_plot_out) {
   ggsave("analysis/plots/images/pca_plot_scree.png")
   all_plots <- list()
   for (ann in colnames(annot)){
+  
     g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 0, var.scale = 0,
-                labels=colnames(rpkmTable), ellipse = TRUE,
+                labels=colnames(rpkmTable),
                 labels.size=3, circle = TRUE, var.axes = FALSE)
-    g <- g + scale_color_discrete(name = '')
+    g <- g + scale_color_discrete(name = ann)
     g <- g + theme(legend.direction = 'horizontal',
-                 legend.position = 'top')
+                   legend.position = 'top',
+                   legend.title = element_text(face="bold"))
     all_plots <- c(all_plots, list(g))
     ggsave(paste("analysis/plots/images/pca_plot_",ann,".png",sep=""))
   }
+
   pdf(pca_plot_out)
   print(c(all_plots,list(plot.var)))
   dev.off()

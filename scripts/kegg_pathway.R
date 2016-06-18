@@ -37,7 +37,7 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
 
     ## Append ENSEMBL and ENTREZ IDs from loaded in db
     if (reference == "hg19") {IDdb = org.Hs.eg.db}
-    #if (reference == "mm9") {IDdb = ##########}
+    if (reference == "mm9") {IDdb = org.Mm.eg.db}
         
     detable$ensembl = mapIds(IDdb,
                         keys=row.names(detable),

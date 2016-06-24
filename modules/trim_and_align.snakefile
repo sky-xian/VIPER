@@ -25,3 +25,25 @@ rule run_STAR:
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
         " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
         " && /usr/bin/samtools index {output.bam}"
+
+
+rule generate_STAR_report:
+    input:
+        star_log_files=expand( "analysis/STAR/{sample}/{sample}.Log.final.out", sample=ordered_sample_list ),
+        star_gene_count_files=expand( "analysis/STAR/{sample}/{sample}.counts.tab", sample=ordered_sample_list ),
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
+    output:
+        csv="analysis/STAR/STAR_Align_Report.csv",
+        png="analysis/STAR/STAR_Align_Report.png",
+        gene_counts="analysis/STAR/STAR_Gene_Counts.csv"
+    message: "Generating STAR report"
+    priority: 3
+    run:
+        log_files = " -l ".join( input.star_log_files )
+        count_files = " -f ".join( input.star_gene_count_files )
+        shell( "perl viper/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
+        shell( "Rscript viper/scripts/map_stats.R {output.csv} {output.png}" )
+        shell( "perl viper/scripts/raw_and_fpkm_count_matrix.pl -f {count_files} 1>{output.gene_counts}" )
+
+

@@ -155,7 +155,7 @@ rownames(tmp_ann) <- tmp_ann[,1]
 rowNames <- tmp_ann[,1]
 colNames <- colnames(tmp_ann)
 samples <- intersect(colnames(rpkmTable), rownames(tmp_ann))
-tmp_ann <- as.data.frame(tmp_ann[samples,-1])
+tmp_ann <- as.data.frame(tmp_ann[samples,-1,drop=FALSE])
 #rownames(tmp_ann) <- rowNames
 #colnames(tmp_ann) <- colNames[2:length(colNames)]
 

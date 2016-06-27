@@ -583,7 +583,8 @@ def get_samples(wildcards):
 rule limma_and_deseq:
     input:
         #counts = "analysis/STAR/STAR_Gene_Counts.csv"
-        counts = get_STAR_counts(config)
+        counts = get_STAR_counts(config),
+        force_run_upon_meta_change = config['metasheet']
     output:
         limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv",
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",

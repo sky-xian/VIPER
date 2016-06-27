@@ -139,6 +139,7 @@ heatmapSF_plot <- function(rpkmTable,tmp_ann, RPKM_threshold,min_num_samples_exp
             }
             if (kmparam[1] != 0) {
                 output = cbind(hmdata,kmclustsort)
+                output = output[,unlist(column_order(mapplot))]
                 write.table(output, file=sf_txt_out, quote=F, col.names = NA, sep="\t")
             }
         }
@@ -188,7 +189,7 @@ rownames(tmp_ann) <- tmp_ann[,1]
 rowNames <- tmp_ann[,1]
 colNames <- colnames(tmp_ann)
 samples <- intersect(colnames(rpkmTable), rownames(tmp_ann))
-tmp_ann <- as.data.frame(tmp_ann[samples,-1])
+tmp_ann <- as.data.frame(tmp_ann[samples,-1,drop=FALSE])
 #rownames(tmp_ann) <- rowNames
 #colnames(tmp_ann) <- colNames[2:length(colNames)]
 

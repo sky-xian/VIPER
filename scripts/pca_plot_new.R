@@ -17,8 +17,8 @@ if( is.element("ggbiplot", installed.packages())){
 
 options(error = function() traceback(2))
 
-preprocess <- function(rpkm_file, metasheet, filter_miRNA=TRUE, 
-                       min_genes=250, min_samples=4, rpkm_cutoff=2.0) {
+preprocess <- function(rpkm_file, metasheet, filter_miRNA, 
+                       min_genes, min_samples, rpkm_cutoff) {
 
     rpkmTable <- read.csv(rpkm_file, header=T, check.names=F, 
                         row.names=1, stringsAsFactors=FALSE, dec='.')
@@ -75,9 +75,9 @@ pca_plot <- function(rpkmTable, annot, pca_plot_out) {
   all_plots <- list()
   for (ann in colnames(annot)){
   
-    g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 0, var.scale = 0,
-                labels=colnames(rpkmTable),
-                labels.size=3, circle = TRUE, var.axes = FALSE)
+    g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 1, var.scale = 1, obs.scale = 1,
+                labels=colnames(rpkmTable), choices = 1:2,
+                labels.size=2, circle = TRUE, var.axes = FALSE)
     g <- g + scale_color_discrete(name = ann)
     g <- g + theme(legend.direction = 'horizontal',
                    legend.position = 'top',

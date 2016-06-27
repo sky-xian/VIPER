@@ -5,12 +5,10 @@ def getFastq(wildcards):
     return config["samples"][wildcards.sample]
 
 strand_command=""
-cuff_command=""
 rRNA_strand_command=""
 
 if( config["stranded"] ):
     strand_command="--outFilterIntronMotifs RemoveNoncanonical"
-    cuff_command="--library-type " + config["library_type"]
     rRNA_strand_command="--outFilterIntronMotifs RemoveNoncanonical"
 else:
     strand_command="--outSAMstrandField intronMotif"
@@ -125,4 +123,39 @@ rule run_STAR_fusion_report:
         "python viper/modules/scripts/STAR_Fusion_report.py -f {input.sf_list} 1>{output.csv} "
         "&& Rscript viper/modules/scripts/STAR_Fusion_report.R {output.csv} {output.png}"
 
+
+rule run_rRNA_STAR:
+    input:
+        get_fastq
+    output:
+        bam=protected("analysis/STAR_rRNA/{sample}/{sample}.sorted.bam"),
+        log_file="analysis/STAR_rRNA/{sample}/{sample}.Log.final.out"
+    params:
+        stranded=rRNA_strand_command,
+        prefix=lambda wildcards: "analysis/STAR_rRNA/{sample}/{sample}".format(sample=wildcards.sample),
+        readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
+    threads: 8
+    message: "Running rRNA STAR for {wildcards.sample}"
+    shell:
+        "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_rRNA_index]}"
+        " --readFilesIn {input} --readFilesCommand zcat --outFileNamePrefix {params.prefix}."
+        "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
+        "  --limitBAMsortRAM 45000000000"
+        " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
+        " && samtools index {output.bam}"
+
+
+rule generate_rRNA_STAR_report:
+    input:
+        star_log_files=expand( "analysis/STAR_rRNA/{sample}/{sample}.Log.final.out", sample=config["ordered_sample_list"] ),
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
+    output:
+        csv="analysis/STAR_rRNA/STAR_rRNA_Align_Report.csv",
+        png="analysis/STAR_rRNA/STAR_rRNA_Align_Report.png"
+    message: "Generating STAR rRNA report"
+    run:
+        log_files = " -l ".join( input.star_log_files )
+        shell( "perl viper/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
+        shell( "Rscript viper/scripts/map_stats_rRNA.R {output.csv} {output.png}" )
 

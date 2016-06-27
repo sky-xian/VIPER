@@ -9,6 +9,8 @@ def getTargetInfo(config):
     targetFiles.append(_getSTARcounts(config))
     targetFiles.append(["analysis/STAR/star_combat_qc.pdf", 
         "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[])
+    targetFiles.extend([_getCuffCounts(config), _fusionOutput(config), _insertSizeOutput(config), 
+        _rRNAmetrics(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction

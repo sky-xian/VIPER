@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+# vim: syntax=python tabstop=4 expandtab
+# coding: utf-8
+
+from modules.scripts.config_setup import updateConfig
+from modules.scripts.metasheet_setup import updateMeta
+from modules.scripts.utils import getTargetInfo
+
+#---------  CONFIG set up  ---------------
+configfile: "config.yaml"   # This makes snakemake load up yaml into config 
+config = updateConfig(config)
+config = updateMeta(config)
+#-----------------------------------------
+
+rule target:
+    input: getTargetInfo(config)
+    message: "Compiling all output"
+        
+
+include: "./modules/align.snakefile"
+#include: "./modules/cuff.snakefile"

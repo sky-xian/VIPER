@@ -1,5 +1,6 @@
 suppressMessages(library("dplyr"))
 suppressMessages(library("AnnotationDbi"))
+suppressMessages(library("org.Mm.eg.db"))
 suppressMessages(library("org.Hs.eg.db"))
 suppressMessages(library("gage"))
 suppressMessages(library("gageData"))
@@ -99,13 +100,16 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
 
     ## Plot using pathview
     
+    if (reference == "hg19") {orgparam = "hsa"}
+    if (reference == "mm9") {orgparam = "mmu"}
+    
     normwd = getwd()
     setwd(temp_dir)
     
     for ( i in 1:numkeggpathways) {
         pvout <- pathview(gene.data=gageinput,              ## Gene list
                           pathway.id=keggresids[i],         ## Which pathway
-                          species = "hsa",                  ## Species
+                          species = orgparam,                  ## Species
                           #limit = list(gene=max(abs(gageinput)),cpd=1),
                           #kegg.dir = temp_dir               ## Save directory
                           low = list(gene = "blue", cpd = "purple"),
@@ -150,9 +154,12 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     ## GSEA Analysis
     gseainput = sort(gageinput, decreasing=TRUE)
     gseainput = gseainput[is.finite(gseainput)]
+    
+    if (reference == "hg19") {orgparam = "hsa"}
+    if (reference == "mm9") {orgparam = "mmu"}
 
     fullgsea <- gseKEGG(geneList = gseainput,
-                        organism     = "human",
+                        organism     = orgparam,
                         nPerm        = 100,
                         minGSSize    = 1,
                         pvalueCutoff = 0.99,

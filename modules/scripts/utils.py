@@ -9,8 +9,13 @@ def getTargetInfo(config):
     targetFiles.append(_getSTARcounts(config))
     targetFiles.extend(["analysis/STAR/star_combat_qc.pdf", 
         "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[])
-    targetFiles.extend([_getCuffCounts(config), _fusionOutput(config), _insertSizeOutput(config), 
-        _rRNAmetrics(config), _readQC(config)])
+    targetFiles.extend([_getCuffCounts(config), 
+                        _fusionOutput(config), 
+                        _insertSizeOutput(config), 
+                        _rRNAmetrics(config), 
+                        _readQC(config), 
+                        _bw(config),
+                        _SNP(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -51,14 +56,12 @@ def _DEsummaryOutPNG(config):
         file_list.append("analysis/diffexp/de_summary.png")
     return file_list
 
-def _runSNPgenome(config):
-    ls = []
-    if ('snp_scan_genome' in config) and (config['snp_scan_genome'].upper() == 'TRUE'):
-        for sample in config["ordered_sample_list"]:
-            #NOTE: LINE BELOW IS VERY ugly, but it's the only way it will work!
-            ls.append("analysis/snp/"+sample+"/"+sample+".snp.genome.vcf")
-            ls.append("analysis/snp/"+sample+"/"+sample+".snpEff.annot.vcf")
-    return ls
+def _SNP(config):
+    snp_files = ["analysis/plots/sampleSNPcorr_plot.hla.png"]
+    if ('snp_scan_genome' in config and config['snp_scan_genome'].upper() == 'TRUE'):
+        snp_files.extend([["analysis/snp/" + sample + "/" + sample + ".snp.genome.vcf", 
+            "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]]
+    return snp_files
 
 def _readQC(config):
     qc_files = []
@@ -68,6 +71,11 @@ def _readQC(config):
         for sample in config["ordered_sample_list"]])
     return qc_files
 
+
+def _bw(config):
+    bw_files = []
+    bw_files.extend(["analysis/bam2bw/" + sample + "/" + sample = ".bw" for sample in config["ordered_sample_list"]])
+    return bw_files
 
 
 

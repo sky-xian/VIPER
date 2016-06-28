@@ -72,7 +72,7 @@ def _SNP(config):
     snp_files = ["analysis/plots/sampleSNPcorr_plot.hla.png"]
     if ('snp_scan_genome' in config and config['snp_scan_genome'].upper() == 'TRUE'):
         snp_files.extend([["analysis/snp/" + sample + "/" + sample + ".snp.genome.vcf", 
-            "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]]
+            "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]])
     return snp_files
 
 def _readQC(config):
@@ -86,7 +86,7 @@ def _readQC(config):
 
 def _bw(config):
     bw_files = []
-    bw_files.extend(["analysis/bam2bw/" + sample + "/" + sample = ".bw" for sample in config["ordered_sample_list"]])
+    bw_files.extend(["analysis/bam2bw/" + sample + "/" + sample + ".bw" for sample in config["ordered_sample_list"]])
     return bw_files
 
 

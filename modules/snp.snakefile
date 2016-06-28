@@ -37,7 +37,7 @@ rule sample_snps_corr_hla:
         snp_pdf="analysis/plots/sampleSNPcorr_plot.hla.pdf"
     message: "Running snp correlations for HLA fingerprint region"
     shell:
-        "{config[python2]} viper/modules/scripts/sampleSNPcorr.py {snps}> {output.snp_matrix} && "
+        "{config[python2]} viper/modules/scripts/sampleSNPcorr.py {input.snps}> {output.snp_matrix} && "
         "Rscript viper/modules/scripts/sampleSNPcorr_plot.R {output.snp_matrix} {input.metasheet} {output.snp_png} {output.snp_pdf}"
 
 
@@ -70,6 +70,6 @@ rule snpEff_annot:
     message: "Running varscan for snpEff annotation analysis"
     shell:
         "snpEff -Xmx2G -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output}"
-                                                                                                                                                                                           787,1         Bot
+
 
 

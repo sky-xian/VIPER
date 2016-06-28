@@ -20,8 +20,8 @@ rule pca_plot:
         SSnumgenes = config["SSnumgenes"]
     message: "Generating PCA plots"
     shell:
-        """ Rscript viper/modules/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} 
-            {params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out} """
+        "Rscript viper/modules/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} "
+        "{params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out} "
 
 rule heatmapSS_plot:
     input:
@@ -38,9 +38,9 @@ rule heatmapSS_plot:
         SSnumgenes = config["SSnumgenes"]
     message: "Generating Sample-Sample Heatmap"
     shell:
-        """ mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} 
-            {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} 
-            {params.filter_mirna} {params.SSnumgenes} {output.ss_plot_out} {output.ss_txt_out} """
+        "mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
+        "{input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} "
+        "{params.filter_mirna} {params.SSnumgenes} {output.ss_plot_out} {output.ss_txt_out} "
 
 
 rule heatmapSF_plot:
@@ -59,8 +59,8 @@ rule heatmapSF_plot:
         num_kmeans_clust = config["num_kmeans_clust"]
     message: "Generating Sample-Feature heatmap"
     shell:
-        """ mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} 
-            {input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} 
-            {params.filter_mirna} {params.SFnumgenes} {params.num_kmeans_clust} {output.sf_plot_out} {output.sf_txt_out} """
+        "mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} "
+        "{input.annotFile} {params.RPKM_threshold} {params.min_num_samples_expressing_at_threshold} " 
+        "{params.filter_mirna} {params.SFnumgenes} {params.num_kmeans_clust} {output.sf_plot_out} {output.sf_txt_out} "
 
-                                                     
+

@@ -36,9 +36,10 @@ rule limma_and_deseq:
         gene_annotation = config['gene_annotation']
     message: "Running differential expression analysis using limma and deseq for {wildcards.comparison}"
     shell:
-        """ Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" 
-            {output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} 
-            {output.deseqSum} {params.gene_annotation} """
+        "Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" " 
+        "{output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} "
+        "{output.deseqSum} {params.gene_annotation} "
+
 
 rule deseq_limma_fc_plot:
     input:

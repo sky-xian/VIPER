@@ -19,9 +19,9 @@ rule goterm_analysis:
         reference = config["reference"]
     message: "Creating Goterm Analysis plots for Differential Expressions for {wildcards.comparison}"
     shell:
-        """ Rscript viper/modules/scripts/goterm_analysis.R {input.deseq} {params.gotermadjpvalcutoff} 
-            {params.numgoterms} {params.reference} {params.csv} {params.plot} {params.png} && 
-            touch {output.out_file} """
+        "Rscript viper/modules/scripts/goterm_analysis.R {input.deseq} {params.gotermadjpvalcutoff} "
+        "{params.numgoterms} {params.reference} {params.csv} {params.plot} {params.png} && "
+        " touch {output.out_file} "
 
 rule kegg_analysis:
     input:
@@ -44,12 +44,12 @@ rule kegg_analysis:
         temp_dir = "analysis/diffexp/{comparison}/temp/"
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     shell:
-        """ mkdir {params.temp_dir} &&
-            Rscript viper/modules/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} 
-            {params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} 
-            {params.kegg_table_up} {params.kegg_table_down} {params.keggsummary_pdf} 
-            {params.keggsummary_png} {params.gsea_table} {params.gsea_pdf} &&
-            touch {output.out_file} &&
-            rm -rf {params.temp_dir} """
+        "mkdir {params.temp_dir} && "
+        "Rscript viper/modules/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} "
+        "{params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} "
+        "{params.kegg_table_up} {params.kegg_table_down} {params.keggsummary_pdf} " 
+        "{params.keggsummary_png} {params.gsea_table} {params.gsea_pdf} && "
+        "touch {output.out_file} && "
+        "rm -rf {params.temp_dir} "
 
 

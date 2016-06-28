@@ -15,7 +15,10 @@ def getTargetInfo(config):
                         _rRNAmetrics(config), 
                         _readQC(config), 
                         _bw(config),
-                        _SNP(config)])
+                        _SNP(config),
+                        _DE(config),
+                        _cluster(config),
+                        _pathway(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -50,11 +53,20 @@ def _rRNAmetrics(config):
     else:
         return []
 
-def _DEsummaryOutPNG(config):
-    file_list = []
+def _cluster(config):
+    cluster_files = ["analysis/plots/pca_plot.pdf",
+                    "analysis/plots/heatmapSS_plot.pdf",
+                    "analysis/plots/heatmapSF_plot.pdf"]
+    return cluster_files
+
+def _DE(config):
+    de_list = []
     if config["comparisons"]:
-        file_list.append("analysis/diffexp/de_summary.png")
-    return file_list
+        de_list.append("analysis/diffexp/de_summary.png")
+        de_list.extend([["analysis/diffexp/" + comp + "/" + comp + "_volcano.pdf",
+                        "analysis/diffexp/" + comp + "/deseq_limma_fc_corr.png"]
+            for comp in config["comparisons"]])
+    return de_list
 
 def _SNP(config):
     snp_files = ["analysis/plots/sampleSNPcorr_plot.hla.png"]
@@ -76,6 +88,14 @@ def _bw(config):
     bw_files = []
     bw_files.extend(["analysis/bam2bw/" + sample + "/" + sample = ".bw" for sample in config["ordered_sample_list"]])
     return bw_files
+
+
+def _pathway(config):
+    path_files = []
+    path_files.extend([["analysis/diffexp/" + comp + "/" + comp + ".goterm.done",
+                        "analysis/diffexp/" + comp + "/" + comp + ".kegg.done"] 
+        for comp in config["comparisons"]])
+    return path_files
 
 
 

@@ -156,6 +156,6 @@ rule generate_rRNA_STAR_report:
     message: "Generating STAR rRNA report"
     run:
         log_files = " -l ".join( input.star_log_files )
-        shell( "perl viper/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
-        shell( "Rscript viper/scripts/map_stats_rRNA.R {output.csv} {output.png}" )
+        shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
+        shell( "Rscript viper/modules/scripts/map_stats_rRNA.R {output.csv} {output.png}" )
 

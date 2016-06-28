@@ -19,13 +19,13 @@ def getTargetInfo(config):
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
-def _getSTARcounts(config, normalized=False):
+def _getSTARcounts(config):
     if config["batch_effect_removal"] == "true":
         return "analysis/STAR/batch_corrected_STAR_Gene_Counts.csv"
     else:
         return "analysis/STAR/STAR_Gene_Counts.csv"
 
-def _getCuffCounts(config, normalized=False):
+def _getCuffCounts(config):
     if config["batch_effect_removal"] == "true":
         return "analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv"
     else:

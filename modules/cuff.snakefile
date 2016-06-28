@@ -37,3 +37,22 @@ rule generate_cuff_matrix:
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -f {fpkm_files} 1>{output}" )
 
 
+rule batch_effect_removal_star:
+    input:
+        starmat = "analysis/STAR/STAR_Gene_Counts.csv",
+        annotFile = config["metasheet"]
+    output:
+        starcsvoutput="analysis/STAR/batch_corrected_STAR_Gene_Counts.csv",
+        starpdfoutput="analysis/STAR/star_combat_qc.pdf"
+    params:
+        batch_column="batch",
+        datatype = "star"
+    message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
+    priority: 2
+    shell:
+        """
+        Rscript viper/modules/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} 
+        {params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput}
+        && mv {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv
+        """
+

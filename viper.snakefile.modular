@@ -20,3 +20,4 @@ rule target:
 
 include: "./modules/align.snakefile"
 include: "./modules/cuff.snakefile"
+include: "./modules/readQC.snakefile"

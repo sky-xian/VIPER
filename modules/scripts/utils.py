@@ -7,10 +7,10 @@ def getTargetInfo(config):
     targetFiles = ["analysis/STAR/STAR_Align_Report.csv",
         "analysis/STAR/STAR_Align_Report.png"]
     targetFiles.append(_getSTARcounts(config))
-    targetFiles.append(["analysis/STAR/star_combat_qc.pdf", 
+    targetFiles.extend(["analysis/STAR/star_combat_qc.pdf", 
         "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[])
     targetFiles.extend([_getCuffCounts(config), _fusionOutput(config), _insertSizeOutput(config), 
-        _rRNAmetrics(config)])
+        _rRNAmetrics(config), _readQC(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -59,4 +59,18 @@ def _runSNPgenome(config):
             ls.append("analysis/snp/"+sample+"/"+sample+".snp.genome.vcf")
             ls.append("analysis/snp/"+sample+"/"+sample+".snpEff.annot.vcf")
     return ls
+
+def _readQC(config):
+    qc_files = []
+    qc_files.append("analysis/RSeQC/read_distrib/read_distrib.png")
+    qc_files.append("analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png")
+    qc_files.extend(["analysis/RSeQC/junction_saturation/" + sample + "/" + sample + ".junctionSaturation_plot.pdf" 
+        for sample in config["ordered_sample_list"]])
+    return qc_files
+
+
+
+
+
+
 

@@ -126,7 +126,7 @@ rule run_STAR_fusion_report:
 
 rule run_rRNA_STAR:
     input:
-        get_fastq
+        getFastq
     output:
         bam=protected("analysis/STAR_rRNA/{sample}/{sample}.sorted.bam"),
         log_file="analysis/STAR_rRNA/{sample}/{sample}.Log.final.out"

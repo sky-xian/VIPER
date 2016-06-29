@@ -15,7 +15,7 @@ suppressMessages(library("circlize"))
 suppressMessages(library("dendextend"))
 suppressMessages(library("viridis"))
 suppressMessages(library('dplyr'))
-suppressMessages(source('viper/scripts/supp_fns.R'))
+suppressMessages(source('viper/modules/scripts/supp_fns.R'))
 
 #enable stack trace
 #options(error = function() traceback(2))

@@ -1,0 +1,17 @@
+body {
+  overflow: hidden;
+}
+
+.right {
+  overflow: auto;
+  width: 75%;
+  float: left;
+  height: 100%;
+}
+
+.left {
+  overflow: auto;
+  width: 25%;
+  float: left;
+  height: 100%;
+}

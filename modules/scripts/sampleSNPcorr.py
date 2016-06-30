@@ -49,7 +49,7 @@ def main():
     samplesLs = []
     for f in args[1:]:
         #parse out the name: e.g. /some/path/to/SAMPLE.snp.txt
-        sample = (f.split("/")[-1]).strip(".snp.txt")
+        sample = os.path.basename(f)
         (snp[sample], snp_hi[sample]) = readSNPFile(f)
         samplesLs.append(sample)
 

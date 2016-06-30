@@ -5,7 +5,7 @@ suppressMessages(library("circlize"))
 suppressMessages(library("dendextend"))
 suppressMessages(library("viridis"))
 suppressMessages(library('dplyr'))
-source('viper/scripts/supp_fns.R')
+source('viper/modules/scripts/supp_fns.R')
 
 #enable stack trace
 #options(error = function() traceback(2))
@@ -94,7 +94,7 @@ snpCorrMat <- read.table(snpCorrFile, header=TRUE, sep="\t", row.names=1, check.
 #form SAMPLEXXX.snp.chr6 or SAMPLEXXX.snp.[something]
 #WE need to EXTRACT out SAMPLEXXX from this string -> sampleNames
 sampleNames <- sapply(colnames(snpCorrMat),
-                      function(x) substring(x, 1, regexpr('.snp',x) - 1))
+                      function(x) substr(x, 1, (regexpr('.snp',x)[1]-1))
 colnames(snpCorrMat) <- sampleNames
 rownames(snpCorrMat) <- sampleNames
 

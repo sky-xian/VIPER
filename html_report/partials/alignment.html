@@ -1,0 +1,50 @@
+<script>
+            $(function(){
+                var align_data = {"TotalReads":{"Sample1":45607587,"Sample2":38367704,"Sample3":42824485,"Sample4":36510808,"Sample5":40684468,"Sample6":39569286,"Sample7":42575574,"Sample8":44399148,"Sample9":40557435,"Sample10":43955667,"Sample11":45357686,"Sample12":42213908,"Sample13":48410565,"Sample14":44455535,"Sample15":49904125,"Sample16":46386366,"Sample17":46803324,"Sample18":44201129,"Sample19":62294358,"Sample20":52881988,"Sample21":47237968,"Sample22":46990801,"Sample23":49046098,"Sample24":58012690,"Sample25":84020280,"Sample26":59605159,"Sample27":71058884,"Sample28":64014914,"Sample29":70354137,"Sample30":74458443,"Sample31":64872891,"Sample32":64242586},"UniquelyMappedReads":{"Sample1":42269296,"Sample2":35361400,"Sample3":39551969,"Sample4":33391252,"Sample5":37831319,"Sample6":36373928,"Sample7":39284807,"Sample8":40175717,"Sample9":37150227,"Sample10":39139954,"Sample11":41811635,"Sample12":38526780,"Sample13":44225024,"Sample14":40006893,"Sample15":45372709,"Sample16":42898057,"Sample17":43303781,"Sample18":40869405,"Sample19":57514831,"Sample20":48337846,"Sample21":43092372,"Sample22":42691566,"Sample23":43302976,"Sample24":53124171,"Sample25":77233213,"Sample26":53065145,"Sample27":62217573,"Sample28":58841006,"Sample29":62225119,"Sample30":67833377,"Sample31":57967656,"Sample32":58877105}};
+                var sample_names = [];
+                var total_reads = [];
+                var mapped_reads = [];
+                for( var sample_name in align_data["TotalReads"] ){
+                    sample_names.push(sample_name);
+                    total_reads.push(align_data["TotalReads"][sample_name]);
+                    mapped_reads.push(align_data["UniquelyMappedReads"][sample_name]);
+                }
+                $('#container').highcharts({
+                    chart: {
+                        type: 'column',
+                    },
+                    title: {
+                        text: null //'Alignment Info to Reference Genome'
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    },
+                    xAxis: {
+                        categories: sample_names
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Alignment Info'
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'TotalReads',
+                            data: total_reads,
+                            stack: 0
+                        },{
+                            name: 'UniquelyMappedReads',
+                            data: mapped_reads,
+                            stack: 1
+                        }
+                    ]
+                });
+            });
+        </script>
+
+<div class="jumbotron" style="color: grey;">
+  <h3><center>Alignment Info to Reference Genome</center></h3>
+</div>
+<div id="container" style="width:100%; height:auto"></div>

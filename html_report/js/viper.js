@@ -20,7 +20,8 @@ var data = [{
 		name: 'readQC',
         url: './partials/readQC.html',
         children: [{
-            name: 'read_distribution'
+            name: 'read_distribution',
+            url: './partials/read_distrib.html'
         }]
 	},{
 		name: 'DE',

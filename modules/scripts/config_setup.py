@@ -3,6 +3,12 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
+#------------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: July, 1st, 2016
+#------------------------------------
+
 import yaml
 import os, sys, subprocess
 

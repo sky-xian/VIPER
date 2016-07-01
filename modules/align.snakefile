@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # vim: syntax=python tabstop=4 expandtab
 
+#-------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: July, 1st, 2016
+#-------------------------------
+
 def getFastq(wildcards):
     return config["samples"][wildcards.sample]
 
@@ -96,17 +102,17 @@ rule run_STAR_fusion:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam" #just to make sure STAR output is available before STAR_Fusion
     output:
-        protected("analysis/STAR_Fusion/{sample}/{sample}.fusion_candidates.final")
+        protected("analysis/STAR_Fusion/{sample}/{sample}.fusion_candidates.final"),
+        protected("analysis/STAR_Fusion/{sample}/{sample}.fusion_candidates.final.abridged")
     log:
         "analysis/STAR_Fusion/{sample}/{sample}.star_fusion.log"
     message: "Running STAR fusion on {wildcards.sample}"
     shell:
         "STAR-Fusion --chimeric_junction analysis/STAR/{wildcards.sample}/{wildcards.sample}.Chimeric.out.junction "
         "--genome_lib_dir {config[genome_lib_dir]} --output_dir analysis/STAR_Fusion/{wildcards.sample} >& {log}"
-        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final {output}"
-        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final.abridged"
-        " analysis/STAR_Fusion/{wildcards.sample}/{wildcards.sample}.fusion_candidates.final.abridged"
-        " && touch {output}" # For some sample, final.abridged is created but not .final file; temp hack before further investigate into this
+        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final {output[0]}"
+        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final.abridged {output[1]}"
+        " && touch {output[1]}" # For some sample, final.abridged is created but not .final file; temp hack before further investigate into this
 
 
 rule run_STAR_fusion_report:

@@ -3,6 +3,12 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
+#-----------------------------------
+# @authors: Tosh, Mahesh Vangala
+# @emails: , vangalamaheshh@gmail.com
+# @date: July, 1st, 2016
+#-----------------------------------
+
 rule goterm_analysis:
     input:
         deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",

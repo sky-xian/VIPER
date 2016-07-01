@@ -3,6 +3,12 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
+#--------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: July, 1st, 2016
+#--------------------------------
+
 cuff_command=""
 
 if( config["stranded"] ):
@@ -50,7 +56,7 @@ rule batch_effect_removal_cufflinks:
     message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
     priority: 2
     shell:
-        "Rscript viper/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} "
+        "Rscript viper/modules/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} "
         "{params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput} "
         " && mv {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv "
 

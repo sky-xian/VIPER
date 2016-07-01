@@ -3,6 +3,12 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
+#-----------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: July, 1st, 2016
+#-----------------------------------
+
 def getTargetInfo(config):
     targetFiles = ["analysis/STAR/STAR_Align_Report.csv",
         "analysis/STAR/STAR_Align_Report.png"]

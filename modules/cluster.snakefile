@@ -3,6 +3,12 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
+#----------------------------------------
+# @authors: Tosh, Mahesh Vangala
+# @emails: , vangalamaheshh@gmail.com
+# @date: July, 1st, 2016
+#----------------------------------------
+
 from scripts.utils import _getCuffCounts
 
 rule pca_plot:

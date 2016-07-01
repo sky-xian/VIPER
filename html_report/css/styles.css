@@ -1,0 +1,19 @@
+@media (min-width: 768px){
+  #m-left {
+    position: absolute;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    overflow-y: scroll;
+    width: 15%;
+  }
+
+  #m-right {
+    position: absolute;
+    top: 80px;
+    bottom: 0;
+    right: 0;
+    overflow-y: scroll;
+    width: 85%;
+  }
+}

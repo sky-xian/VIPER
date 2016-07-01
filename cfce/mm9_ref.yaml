@@ -13,6 +13,9 @@ gene_annotation: viper/static/mm9.annot.csv.bz2
 #NOTE: in mbcf/mm9_ref.yaml, this was set to 
 genome_lib_dir: ./ref_files/hg19/Hg19_CTAT_resource_lib
 
+#snpEff_dir: ./ref_files/mm9/snpEff
+#snpEff_db: 
+
 #software source paths in case user needs to over-ride
 #python2: 
 #resqc_path: 

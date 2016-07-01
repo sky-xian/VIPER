@@ -1,3 +1,11 @@
+Fri, July, 1, 2016:
+-------------------
+- Modular appraoch of Viper pipeline
+- snpEff module added for hg19
+- Batch effect support
+- Uses snakemake latest version (3.6.1)
+- Other minor bug fixes.
+
 Fri, June, 10, 2016:
 --------------------
 - Fixed x-axis p value display in KEGG barplot

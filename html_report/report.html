@@ -5,10 +5,15 @@
     <title>Viper Report</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="./tools/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./tools/jquery/jqtree/jqtree.css" />
     <link href="./css/styles.css" rel="stylesheet" />
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="./tools/bootstrap/js/bootstrap.min.js"></script>    
+    <script src="./tools/jquery/jquery.min.js"></script>
+    <script src="./tools/jquery/jqtree/tree.jquery.js"></script> 
+    <script src="./tools/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./tools/jquery/highcharts.js"></script>
+    <script src="./js/viper.js"></script>
   </head>
   <body>
     <div class="container-fluid">
@@ -19,10 +24,9 @@
       </nav>
       <div class="row">
         <div class="col-md-4" id="m-left">
-
+          <div id="vtree"></div>
         </div>
         <div class="col-md-8" id="m-right">
-
         </div>
       </div>
     </div>

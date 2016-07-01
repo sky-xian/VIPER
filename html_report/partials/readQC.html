@@ -1,0 +1,49 @@
+<script>
+            $(function(){
+                var rd_data = {"TES_down_5kb":{"Sample1":0.01,"Sample2":0.01,"Sample3":0.01,"Sample4":0.01,"Sample5":0.02,"Sample6":0.01,"Sample7":0.01,"Sample8":0.01,"Sample9":0.02,"Sample10":0.01,"Sample11":0.01,"Sample12":0.01,"Sample13":0.01,"Sample14":0.01,"Sample15":0.01,"Sample16":0.01,"Sample17":0.01,"Sample18":0.01,"Sample19":0.01,"Sample20":0.02,"Sample21":0.02,"Sample22":0.01,"Sample23":0.01,"Sample24":0.02,"Sample25":0.01,"Sample26":0.01,"Sample27":0.02,"Sample28":0.01,"Sample29":0.02,"Sample30":0.01,"Sample31":0.01,"Sample32":0.02},"5\'UTR_Exons":{"Sample1":0.03,"Sample2":0.03,"Sample3":0.03,"Sample4":0.02,"Sample5":0.03,"Sample6":0.03,"Sample7":0.03,"Sample8":0.03,"Sample9":0.03,"Sample10":0.03,"Sample11":0.02,"Sample12":0.04,"Sample13":0.03,"Sample14":0.05,"Sample15":0.05,"Sample16":0.04,"Sample17":0.03,"Sample18":0.03,"Sample19":0.03,"Sample20":0.03,"Sample21":0.03,"Sample22":0.03,"Sample23":0.02,"Sample24":0.03,"Sample25":0.03,"Sample26":0.12,"Sample27":0.05,"Sample28":0.03,"Sample29":0.04,"Sample30":0.03,"Sample31":0.04,"Sample32":0.04},"Introns":{"Sample1":0.17,"Sample2":0.16,"Sample3":0.16,"Sample4":0.15,"Sample5":0.19,"Sample6":0.19,"Sample7":0.22,"Sample8":0.16,"Sample9":0.22,"Sample10":0.17,"Sample11":0.13,"Sample12":0.21,"Sample13":0.14,"Sample14":0.2,"Sample15":0.16,"Sample16":0.19,"Sample17":0.22,"Sample18":0.2,"Sample19":0.18,"Sample20":0.19,"Sample21":0.21,"Sample22":0.19,"Sample23":0.12,"Sample24":0.18,"Sample25":0.23,"Sample26":0.18,"Sample27":0.15,"Sample28":0.2,"Sample29":0.21,"Sample30":0.14,"Sample31":0.17,"Sample32":0.19},"3\'UTR_Exons":{"Sample1":0.23,"Sample2":0.3,"Sample3":0.26,"Sample4":0.33,"Sample5":0.25,"Sample6":0.24,"Sample7":0.23,"Sample8":0.28,"Sample9":0.27,"Sample10":0.31,"Sample11":0.32,"Sample12":0.23,"Sample13":0.28,"Sample14":0.23,"Sample15":0.23,"Sample16":0.22,"Sample17":0.23,"Sample18":0.27,"Sample19":0.25,"Sample20":0.24,"Sample21":0.23,"Sample22":0.25,"Sample23":0.31,"Sample24":0.25,"Sample25":0.26,"Sample26":0.23,"Sample27":0.26,"Sample28":0.24,"Sample29":0.24,"Sample30":0.26,"Sample31":0.28,"Sample32":0.23},"TSS_up_5kb":{"Sample1":0.01,"Sample2":0.01,"Sample3":0.01,"Sample4":0.01,"Sample5":0.01,"Sample6":0.01,"Sample7":0.01,"Sample8":0.01,"Sample9":0.01,"Sample10":0.01,"Sample11":0.01,"Sample12":0.01,"Sample13":0.01,"Sample14":0.01,"Sample15":0.01,"Sample16":0.01,"Sample17":0.01,"Sample18":0.01,"Sample19":0.01,"Sample20":0.01,"Sample21":0.01,"Sample22":0.01,"Sample23":0.01,"Sample24":0.01,"Sample25":0.01,"Sample26":0.0,"Sample27":0.01,"Sample28":0.01,"Sample29":0.01,"Sample30":0.01,"Sample31":0.01,"Sample32":0.01},"CDS_Exons":{"Sample1":0.47,"Sample2":0.41,"Sample3":0.46,"Sample4":0.39,"Sample5":0.42,"Sample6":0.45,"Sample7":0.44,"Sample8":0.43,"Sample9":0.36,"Sample10":0.36,"Sample11":0.41,"Sample12":0.43,"Sample13":0.46,"Sample14":0.44,"Sample15":0.48,"Sample16":0.46,"Sample17":0.43,"Sample18":0.41,"Sample19":0.45,"Sample20":0.43,"Sample21":0.42,"Sample22":0.43,"Sample23":0.42,"Sample24":0.43,"Sample25":0.38,"Sample26":0.4,"Sample27":0.42,"Sample28":0.43,"Sample29":0.37,"Sample30":0.49,"Sample31":0.38,"Sample32":0.44},"TES_down_1kb":{"Sample1":0.01,"Sample2":0.01,"Sample3":0.01,"Sample4":0.01,"Sample5":0.01,"Sample6":0.0,"Sample7":0.0,"Sample8":0.01,"Sample9":0.01,"Sample10":0.0,"Sample11":0.01,"Sample12":0.0,"Sample13":0.0,"Sample14":0.0,"Sample15":0.0,"Sample16":0.0,"Sample17":0.0,"Sample18":0.01,"Sample19":0.01,"Sample20":0.01,"Sample21":0.01,"Sample22":0.01,"Sample23":0.0,"Sample24":0.01,"Sample25":0.0,"Sample26":0.0,"Sample27":0.01,"Sample28":0.01,"Sample29":0.01,"Sample30":0.01,"Sample31":0.0,"Sample32":0.01},"TES_down_10kb":{"Sample1":0.02,"Sample2":0.02,"Sample3":0.02,"Sample4":0.02,"Sample5":0.02,"Sample6":0.02,"Sample7":0.02,"Sample8":0.02,"Sample9":0.02,"Sample10":0.02,"Sample11":0.02,"Sample12":0.01,"Sample13":0.01,"Sample14":0.02,"Sample15":0.01,"Sample16":0.02,"Sample17":0.02,"Sample18":0.02,"Sample19":0.02,"Sample20":0.02,"Sample21":0.02,"Sample22":0.02,"Sample23":0.01,"Sample24":0.02,"Sample25":0.02,"Sample26":0.02,"Sample27":0.02,"Sample28":0.02,"Sample29":0.02,"Sample30":0.02,"Sample31":0.02,"Sample32":0.02},"TSS_up_1kb":{"Sample1":0.0,"Sample2":0.0,"Sample3":0.0,"Sample4":0.0,"Sample5":0.0,"Sample6":0.0,"Sample7":0.0,"Sample8":0.0,"Sample9":0.0,"Sample10":0.01,"Sample11":0.0,"Sample12":0.0,"Sample13":0.0,"Sample14":0.0,"Sample15":0.0,"Sample16":0.0,"Sample17":0.0,"Sample18":0.0,"Sample19":0.0,"Sample20":0.0,"Sample21":0.0,"Sample22":0.0,"Sample23":0.01,"Sample24":0.0,"Sample25":0.0,"Sample26":0.0,"Sample27":0.0,"Sample28":0.0,"Sample29":0.0,"Sample30":0.0,"Sample31":0.0,"Sample32":0.0},"TSS_up_10kb":{"Sample1":0.01,"Sample2":0.01,"Sample3":0.01,"Sample4":0.01,"Sample5":0.01,"Sample6":0.01,"Sample7":0.01,"Sample8":0.01,"Sample9":0.01,"Sample10":0.02,"Sample11":0.01,"Sample12":0.01,"Sample13":0.01,"Sample14":0.01,"Sample15":0.01,"Sample16":0.01,"Sample17":0.01,"Sample18":0.01,"Sample19":0.01,"Sample20":0.01,"Sample21":0.01,"Sample22":0.01,"Sample23":0.01,"Sample24":0.01,"Sample25":0.01,"Sample26":0.01,"Sample27":0.01,"Sample28":0.01,"Sample29":0.01,"Sample30":0.01,"Sample31":0.01,"Sample32":0.01}};
+                var features = [];
+                var sample_names = [];
+                var main_data = [];
+                for( var feature_name in rd_data){
+                    features.push(feature_name);
+                }
+                for( var sample_name in rd_data[features[0]] ){
+                    sample_names.push(sample_name);
+                }
+                for(var index in features){
+                    var data_obj = { "name":features[index] };
+                    var vals = [];
+                    for( var sample_index in sample_names){
+                        vals.push(rd_data[features[index]][sample_names[sample_index]]);
+                    }
+                    data_obj["data"] = vals;
+                    main_data.push(data_obj);
+                }
+                $('#container').highcharts({
+                    chart: {
+                        type: 'column',
+                    },
+                    title: {
+                        text: 'Read Distribution Report'
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'percent'
+                        }
+                    },
+                    xAxis: {
+                        categories: sample_names
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Features %'
+                        }
+                    },
+                    series: main_data
+                });
+            });
+        </script>
+<div class="jumbotron" style="color: grey;">
+  <h3><center>Read Distribution Across Features In Genome</center></h3>
+</div>
+<div id="container" style="width:100%; height:auto"></div>

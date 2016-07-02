@@ -4,6 +4,7 @@ channels:
 - hcc
 - r
 - quasiben
+- ma-tongji
 dependencies:
 - bedtools=2.25.0=1
 - bioconductor-annotate=1.48.0=1

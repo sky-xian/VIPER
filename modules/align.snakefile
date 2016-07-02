@@ -25,13 +25,9 @@ gz_command="--readFilesCommand zcat" if config["samples"][config["ordered_sample
 
 if( run_fusion ):
     if( config["stranded"] ):
-        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None 
-                             --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 
-                             --alignMatesGapMax 200000 --alignIntronMax 200000 """
+        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 """
     else:
-        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None 
-                             --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10
-                             --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif """
+        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif """
 
 
 rule run_STAR:

@@ -8,11 +8,11 @@
 suppressMessages(library(plyr))
 suppressMessages(library(dplyr))
 if( is.element("ggbiplot", installed.packages())){
-  suppressMessages(library(ggbiplot))
+      suppressMessages(library(ggbiplot))
 } else {
-  suppressMessages(require("devtools"))
-  install_github("vqv/ggbiplot")
-  suppressMessages(require(ggbiplot))
+      suppressMessages(require("devtools"))
+      install_github("vqv/ggbiplot")
+      suppressMessages(require(ggbiplot))
 }
 
 options(error = function() traceback(2))
@@ -54,7 +54,6 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA,
 }
 
 pca_plot <- function(rpkmTable, annot, pca_plot_out) {
-
   ## Fail safe to remove rows
   rpkmTable = t(rpkmTable)
   rpkmTable = rpkmTable[,apply(rpkmTable, 2, var, na.rm=TRUE) != 0]
@@ -102,6 +101,6 @@ min_genes <- args[6]
 pca_plot_out <- args[7]
 
 
-info <- preprocess(rpkmFile, annotFile, filter_miRNA, min_genes, 
-                       min_samples, rpkm_cutoff)
+info <- preprocess(rpkmFile, annotFile, filter_miRNA, min_genes,
+                                          min_samples, rpkm_cutoff)
 pca_plot(info$exp_data, info$tmp_ann, pca_plot_out)

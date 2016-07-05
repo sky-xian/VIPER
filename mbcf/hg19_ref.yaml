@@ -9,7 +9,7 @@ star_rRNA_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sap
 
 #Reference files required for whole genome SNP calling
 snpEff_db: hg19
-snpEff_conf: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/SNP/SNPEff/hg19/snpEff.config
+snpEff_conf: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/SNP/snpEff/snpEff.config
 
 #Reference organism; possible value - hg19, mm9 etc.
 reference: hg19

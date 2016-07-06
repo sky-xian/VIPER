@@ -22,24 +22,29 @@ def _getSamples(wildcards):
 
 rule limma_and_deseq:
     input:
-        counts = _getSTARcounts(config)
+        counts = _getSTARcounts(config),
+        meta = config['metasheet'],
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
     output:
-        limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv",
-        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
-        deseqSum = "analysis/diffexp/{comparison}/{comparison}.deseq.sum.csv",
+        limma_out = "analysis/diffexp/{comparison}/{comparison}.limma.csv",
+        deseq_out = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
+        deseqSum_out = "analysis/diffexp/{comparison}/{comparison}.deseq.sum.csv",
         #annotations
         limma_annot = "analysis/diffexp/{comparison}/{comparison}.limma.annot.csv",
         deseq_annot = "analysis/diffexp/{comparison}/{comparison}.deseq.annot.csv",
     params:
         s1=lambda wildcards: ",".join(_getComparison(wildcards.comparison, 1)),
         s2=lambda wildcards: ",".join(_getComparison(wildcards.comparison, 2)),
-        gene_annotation = config['gene_annotation']
+        gene_annotation = config['gene_annotation'],
+        method = config['diffexp_method']
     message: "Running differential expression analysis using limma and deseq for {wildcards.comparison}"
-    shell:
-        "Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" " 
-        "{output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} "
-        "{output.deseqSum} {params.gene_annotation} "
-
+    #shell:
+    #    "Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" {input.meta} \"{params.s1}\" \"{params.s2}\" \"{params.method}\"" 
+    #    "{output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} "
+    #    "{output.deseqSum} {params.gene_annotation} "
+    script:
+        "scripts/DEseq.R"
 
 rule deseq_limma_fc_plot:
     input:

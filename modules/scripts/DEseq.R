@@ -28,7 +28,7 @@ limma_and_deseq_f <- function(arg_counts, arg_s1, arg_s2, limma, deseq, limma_an
     
     ctrllist = as.data.frame(countmat[ ,colnames(countmat) %in% ctrllist])
     treatlist = as.data.frame(countmat[ ,colnames(countmat) %in% treatlist])
-   
+    
     ntreat = ncol(treatlist)
     nctrl = ncol(ctrllist)
 

@@ -18,7 +18,7 @@ suppressMessages(library('dplyr'))
 suppressMessages(source('viper/modules/scripts/supp_fns.R'))
 
 ## Enable stack trace
-options(error = function() traceback(2))
+#options(error = function() traceback(2))
 
 heatmapSS_plot <- function(rpkmTable,tmp_ann, RPKM_threshold,min_num_samples_expressing_at_threshold,filter_mirna,SSnumgenes, ss_plot_out,ss_txt_out) {
 
@@ -156,8 +156,8 @@ rownames(tmp_ann) <- tmp_ann[,1]
 rowNames <- tmp_ann[,1]
 colNames <- colnames(tmp_ann)
 samples <- intersect(colnames(rpkmTable), rownames(tmp_ann))
-tmp_ann <- as.data.frame(tmp_ann[samples,-1])
-rownames(tmp_ann) <- rowNames
-colnames(tmp_ann) <- colNames[2:length(colNames)]
+tmp_ann <- as.data.frame(tmp_ann[samples,-1,drop=FALSE])
+#rownames(tmp_ann) <- rowNames
+#colnames(tmp_ann) <- colNames[2:length(colNames)]
 
 heatmapSS_plot(rpkmTable,tmp_ann, RPKM_threshold,min_num_samples_expressing_at_threshold,filter_mirna,SSnumgenes, ss_plot_out,ss_txt_out)

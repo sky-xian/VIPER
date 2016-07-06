@@ -7,7 +7,7 @@ zscore = function(x){
 }
 
 cmap <- function(x, colorstart=NULL, use_viridis=FALSE) {
-    colors = c("#3182bd", "#e6550d", "#31a354", "#756bb1", "#636363", "#BD4931", "#6baed6", "#fd8d3c", "#74c476", "#9e9ac8", "#969696", "#D67D6B", "#9ecae1", "#fdae6b", "#a1d99b", "#bcbddc", "#bdbdbd", "#E0A89D", "#c6dbef", "#fdd0a2", "#c7e9c0", "#dadaeb", "#d9d9d9", "#F0CEC7")
+    colors = c("#3182bd", "#e6550d", "#31a354", "#756bb1", "#636363", "#BD4931", "#6baed6", "#fd8d3c", "#74c476", "#9e9ac8", "#969696", "#D67D6B", "#9ecae1", "#fdae6b", "#a1d99b", "#bcbddc", "#bdbdbd", "#E0A89D", "#c6dbef", "#fdd0a2", "#c7e9c0", "#dadaeb", "#d9d9d9", "#F0CEC7","#006400", "#FFD700","#1874CD","#575757","#FF3030")
     x <- sort(unique(na.omit(as.vector(x))))
     if(use_viridis) {
         col <- viridis(length(x))

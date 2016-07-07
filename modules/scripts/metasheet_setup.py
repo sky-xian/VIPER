@@ -23,7 +23,7 @@ def updateMeta(config):
 
 def _sanity_checks(config):
     #metasheet pre-parser: converts dos2unix, catches invalid chars
-    _invalid_map = {'\r':'\n', '-':'.', '(':'.', ')':'.', ' ':'_', '/':'.', '$':''}
+    _invalid_map = {'\r':'\n', '(':'.', ')':'.', ' ':'_', '/':'.', '$':''}
     _meta_f = open(config['metasheet'])
     _meta = _meta_f.read()
     _meta_f.close()

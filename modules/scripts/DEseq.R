@@ -20,6 +20,7 @@ limma_and_deseq_f <- function(arg_counts, arg_s1, arg_s2, limma, deseq, limma_an
                                               function(x){paste0("\"",x,"\"")},
                                               simplify="vector")
     
+    ## Read in lists for comparison, read in count matrix, and do "rounding" failsafe
     treatlist = strsplit(arg_s2,',')[[1]]
     ctrllist = strsplit(arg_s1,',')[[1]]
     countmat <- read.table(arg_counts, header=TRUE, sep=",", row.names=1, check.names=FALSE)

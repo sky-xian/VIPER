@@ -33,4 +33,3 @@ include: "./modules/cluster.snakefile"       # PCA, Heatmaps (Sample-Sample & Sa
 include: "./modules/DE.snakefile"            # DESeq2, Limma and volcano plot rules
 include: "./modules/pathway.snakefile"       # GO and KEGG rules
 include: "./modules/final_report.snakefile"  # rules for HTML report 
-

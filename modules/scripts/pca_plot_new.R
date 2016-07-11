@@ -11,7 +11,7 @@ if( is.element("ggbiplot", installed.packages())){
       suppressMessages(library(ggbiplot))
 } else {
       suppressMessages(require("devtools"))
-      install_github("vqv/ggbiplot")
+      install_github("vangalamaheshh/ggbiplot")
       suppressMessages(require(ggbiplot))
 }
 
@@ -54,29 +54,15 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA,
 }
 
 pca_plot <- function(rpkmTable, annot, pca_plot_out) {
-  ## Fail safe to remove rows
-  rpkmTable = t(rpkmTable)
-  rpkmTable = rpkmTable[,apply(rpkmTable, 2, var, na.rm=TRUE) != 0]
-  rpkmTable = t(rpkmTable)
-    
+  rpkmTable = rpkmTable[apply(rpkmTable, 1, var, na.rm=TRUE) != 0, ]
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
-
-  ## Fail safe implemented if there aren't 9 PCs, now 9 is max, otherwise, take all
-  numpc = length(summary(rpkm.pca)[[6]][2,])
-  if (numpc > 9) {numpc=9}
-  
-  pc_var <- signif(100.0 * summary(rpkm.pca)[[6]][2,1:numpc], digits = 3)
-  pc_var <- data.frame(PCA=names(pc_var), Variance=pc_var)
-  plot.var <- ggplot(pc_var, aes(x=PCA,y=Variance))
-  plot.var <- plot.var + geom_bar(stat="identity") + theme_bw() 
-  plot.var <- plot.var + ylab("% Variance") + xlab("PCA")
+  plot.var <- ggscreeplot(rpkm.pca)
   ggsave("analysis/plots/images/pca_plot_scree.png")
   all_plots <- list()
   for (ann in colnames(annot)){
-  
     g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 1, var.scale = 1, obs.scale = 1,
                 labels=colnames(rpkmTable), choices = 1:2,
-                labels.size=2, circle = TRUE, var.axes = FALSE)
+                ellipse=FALSE, circle = TRUE, var.axes = FALSE)
     g <- g + scale_color_discrete(name = ann)
     g <- g + theme(legend.direction = 'horizontal',
                    legend.position = 'top',

@@ -29,7 +29,7 @@ preprocess <- function(rpkm_file, metasheet, filter_miRNA,
 
   rpkmTable <- na.omit(rpkmTable)
   tmp_ann <- read.csv(metasheet, sep=",", header=T, row.names=1, 
-                      stringsAsFactors=FALSE, check.names=F)
+                      stringsAsFactors=FALSE, check.names=F, comment.char='#')
   if(any(grepl("comp_", colnames(tmp_ann)))) { tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_"))) }
     
   #df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))

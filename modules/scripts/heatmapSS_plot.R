@@ -138,7 +138,7 @@ for (n in names(rpkmTable)) {
 rpkmTable = na.omit(rpkmTable)
 
 ## PROCESS ANNOTATIONS
-tmp_ann <- read.delim(annotFile, sep=",", stringsAsFactors=FALSE)
+tmp_ann <- read.delim(annotFile, sep=",", stringsAsFactors=FALSE, comment.char='#')
 ## REMOVE comp_ columns
 tmp_ann <- tmp_ann[ , !grepl('comp_*', names(tmp_ann))]
 

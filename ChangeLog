@@ -2,6 +2,7 @@ Mon, July, 11, 2016:
 --------------------
 - Added ggrepel to PCA plot; Coloring of sample labels and points
 - Added ggrepel conda channel to env.yaml
+- Added support for '#' (comment samples out) in metasheet
 
 Tue, July, 5, 2016:
 -------------------

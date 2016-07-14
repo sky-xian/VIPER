@@ -1,8 +1,9 @@
 Mon, July, 11, 2016:
 --------------------
-- Added ggrepel to PCA plot; Coloring of sample labels and points
-- Added ggrepel conda channel to env.yaml
-- Added support for '#' (comment samples out) in metasheet
+- Added ggrepel to PCA plot; Coloring of sample labels and points.
+- Added ggrepel conda channel to env.yaml.
+- Added support for '#' (comment samples out) in metasheet.
+- Housekeeping of snpEff output (html and summary csv) files.
 
 Tue, July, 5, 2016:
 -------------------

@@ -70,7 +70,8 @@ rule snpEff_annot:
         snpEff_db=config['snpEff_db']
     message: "Running varscan for snpEff annotation analysis"
     shell:
-        "snpEff -Xmx2G -stats {output.vcf_stats} -csvStats -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output.vcf_annot}"
+        "snpEff -Xmx2G -stats {output.vcf_stats} -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output.vcf_annot}"
+
 
 
 

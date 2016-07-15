@@ -9,25 +9,20 @@
 # @date: July, 1st, 2016
 #----------------------------------------
 
-from scripts.utils import _getCuffCounts
+from scripts.utils import _getProcessedCuffCounts
+from scripts.utils import _getCuffCounts #this will go away after testing processedCuffCounts
 
 rule pca_plot:
     input:
-        rpkmFile = _getCuffCounts(config),
-        annotFile=config['metasheet'],
+        rpkmFile = _getProcessedCuffCounts(config),
+        annotFile = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
         expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=config["metacols"]),
         pca_plot_out="analysis/plots/pca_plot.pdf"
-    params:
-        RPKM_threshold = config["RPKM_threshold"],
-        min_num_samples_expressing_at_threshold = config["min_num_samples_expressing_at_threshold"],
-        filter_mirna = config["filter_mirna"],
-        SSnumgenes = config["SSnumgenes"]
     message: "Generating PCA plots"
     shell:
-        "Rscript viper/modules/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {params.RPKM_threshold} "
-        "{params.min_num_samples_expressing_at_threshold} {params.filter_mirna} {params.SSnumgenes} {output.pca_plot_out} "
+        "Rscript viper/modules/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {output.pca_plot_out} "
 
 rule heatmapSS_plot:
     input:

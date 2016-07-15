@@ -5,8 +5,6 @@
 # @date: May, 23, 2016
 #--------------------
 
-suppressMessages(library(plyr))
-suppressMessages(library(dplyr))
 if( is.element("ggbiplot", installed.packages())){
       suppressMessages(library(ggbiplot))
 } else {
@@ -16,42 +14,6 @@ if( is.element("ggbiplot", installed.packages())){
 }
 
 options(error = function() traceback(2))
-
-preprocess <- function(rpkm_file, metasheet, filter_miRNA, 
-                       min_genes, min_samples, rpkm_cutoff) {
-
-    rpkmTable <- read.csv(rpkm_file, header=T, check.names=F, 
-                        row.names=1, stringsAsFactors=FALSE, dec='.')
-
-  for (n in names(rpkmTable)) {
-    rpkmTable[n] <- apply(rpkmTable[n], 1, as.numeric)
-  }
-
-  rpkmTable <- na.omit(rpkmTable)
-  tmp_ann <- read.csv(metasheet, sep=",", header=T, row.names=1, 
-                      stringsAsFactors=FALSE, check.names=F, comment.char='#')
-  if(any(grepl("comp_", colnames(tmp_ann)))) { tmp_ann <- dplyr::select(tmp_ann, -(starts_with("comp_"))) }
-    
-  #df <- dplyr::select_(rpkmTable, .dots=rownames(tmp_ann))
-  df = rpkmTable[,colnames(rpkmTable) %in% rownames(tmp_ann)]
-
-  sub_df <- df[apply(df, 1, function(x) length(x[x>=rpkm_cutoff])>min_samples),]
-  sub_df <- log2(sub_df + 1)
-
-    
-  if (filter_miRNA == TRUE) {
-    sub_df <- sub_df[ !grepl("MIR|SNO",rownames(sub_df)), ]
-  }
-  min_genes = min(min_genes, nrow(sub_df))
-  ## Calculate CVs for all genes (rows)
-  mean_rpkm <- apply(sub_df,1,mean)
-  var_rpkm <- apply(sub_df,1,var)
-  cv_rpkm <- abs(var_rpkm/mean_rpkm)
-  ## Select out the most highly variable genes into the dataframe 'Exp_data'
-  exp_data <- sub_df[order(cv_rpkm,decreasing=T)[1:min_genes],]
-  return (list(exp_data=exp_data, tmp_ann=tmp_ann))
-    
-}
 
 pca_plot <- function(rpkmTable, annot, pca_plot_out) {
   rpkmTable = rpkmTable[apply(rpkmTable, 1, var, na.rm=TRUE) != 0, ]
@@ -79,14 +41,12 @@ pca_plot <- function(rpkmTable, annot, pca_plot_out) {
 
 args <- commandArgs( trailingOnly = TRUE )
 rpkmFile <- args[1]
-annotFile <- args[2]
-rpkm_cutoff <- args[3]
-min_samples <- args[4]
-filter_miRNA <- args[5]
-min_genes <- args[6]
-pca_plot_out <- args[7]
+metaFile <- args[2]
+pca_plot_out <- args[3]
 
-
-info <- preprocess(rpkmFile, annotFile, filter_miRNA, min_genes,
-                                          min_samples, rpkm_cutoff)
-pca_plot(info$exp_data, info$tmp_ann, pca_plot_out)
+rpkmTable <- read.csv(rpkmFile, header=T, check.names=F,
+                        row.names=1, stringsAsFactors=FALSE, dec='.')
+annot <- read.csv(metaFile, sep=",", header=T, row.names=1,
+                      stringsAsFactors=FALSE, check.names=F, comment.char='#')
+annot <- annot[, !grepl('comp_*', colnames(annot))]
+pca_plot(rpkmTable, annot, pca_plot_out)

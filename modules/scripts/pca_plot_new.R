@@ -16,7 +16,6 @@ if( is.element("ggbiplot", installed.packages())){
 options(error = function() traceback(2))
 
 pca_plot <- function(rpkmTable, annot, pca_plot_out) {
-  rpkmTable = rpkmTable[apply(rpkmTable, 1, var, na.rm=TRUE) != 0, ]
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
   plot.var <- ggscreeplot(rpkm.pca)
   ggsave("analysis/plots/images/pca_plot_scree.png")
@@ -48,5 +47,5 @@ rpkmTable <- read.csv(rpkmFile, header=T, check.names=F,
                         row.names=1, stringsAsFactors=FALSE, dec='.')
 annot <- read.csv(metaFile, sep=",", header=T, row.names=1,
                       stringsAsFactors=FALSE, check.names=F, comment.char='#')
-annot <- annot[, !grepl('comp_*', colnames(annot))]
+annot <- as.data.frame(annot[, !grepl('comp_*', colnames(annot))])
 pca_plot(rpkmTable, annot, pca_plot_out)

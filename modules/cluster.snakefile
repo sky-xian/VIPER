@@ -10,7 +10,6 @@
 #----------------------------------------
 
 from scripts.utils import _getProcessedCuffCounts
-from scripts.utils import _getCuffCounts #this will go away after testing processedCuffCounts
 
 rule pca_plot:
     input:

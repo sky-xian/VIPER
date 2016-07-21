@@ -29,6 +29,7 @@ if (LOG2TRANSFORM) {
   legend.title = "Total\nEvidence"
 }
 
+pdf("analysis/STAR_Fusion/STAR_Fusion_Report.pdf")
 ggplot(melt(sfs)) +
   geom_tile(aes(Sample,FusionName,fill=value), color='black') +
   scale_fill_gradient2(low = "white", high = "red",
@@ -42,4 +43,4 @@ ggplot(melt(sfs)) +
   theme(legend.position="top", legend.justification = 'right')
 
 ggsave(args[2])
-
+dev.off()

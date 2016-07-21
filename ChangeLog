@@ -1,5 +1,6 @@
 Mon, July, 11, 2016:
 --------------------
+- Separate preprocess of cuff matrix rule
 - Added ggrepel to PCA plot; Coloring of sample labels and points.
 - Added ggrepel conda channel to env.yaml.
 - Added support for '#' (comment samples out) in metasheet.

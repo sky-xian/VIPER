@@ -40,6 +40,9 @@ def _getCuffCounts(config):
     else:
         return "analysis/cufflinks/Cuff_Gene_Counts.csv"
 
+def _getProcessedCuffCounts(config):
+    return "analysis/cufflinks/Cuff_Gene_Counts.filtered.csv"
+
 def _fusionOutput(config):
     fusion_out = []
     if len(config["samples"][config["ordered_sample_list"][0]]) == 2:

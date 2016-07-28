@@ -794,7 +794,7 @@ rule estimate_immune_abundance:
         fpkm_collected="analysis/cufflinks/Cuff_FPKM_Collected.tsv"
     output:
         "analysis/immunology/output.pdf",
-        "analysis/immunology/score_matrix.txt"
+        "analysis/immunology/relative_abundance.txt"
     message: "Estimating immune cell abundance output"
     run:
         shell( "Rscript viper/scripts/immunology.R {input.fpkm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/immunology/", cancer_type=config["cancer_type"])

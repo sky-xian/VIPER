@@ -67,10 +67,10 @@ LoadImmuneGeneExpression <- function() {
   NK <- 328:331
   Neutrophil <- 344:361
   Macrophage <- 66:80
-  DC <- 151:238
+  Dendritic <- 151:238
 
   curated.ref <- exp[, c(B_cell, T_cell.CD4, T_cell.CD8,
-                         NK, Neutrophil, Macrophage, DC)]
+                         NK, Neutrophil, Macrophage, Dendritic)]
 
   curated.cell.types <- colnames(curated.ref)
   names(curated.cell.types) <- c(rep('B_cell', length(B_cell)),
@@ -79,7 +79,7 @@ LoadImmuneGeneExpression <- function() {
                                  rep('NK', length(NK)),
                                  rep('Neutrophil', length(Neutrophil)),
                                  rep('Macrophage', length(Macrophage)),
-                                 rep('DC', length(DC)))
+                                 rep('Dendritic', length(Dendritic)))
   curated.ref.genes <- ConvertImmuneProbeToRefgene(curated.ref)
   ret <- list(genes=curated.ref.genes, celltypes=curated.cell.types)
   save(ret,file=immuneCuratedData)

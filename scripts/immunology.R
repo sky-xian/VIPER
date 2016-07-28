@@ -208,8 +208,8 @@ main <- function() {
       fractions <- GetFractions.Abbas(XX, YY[,j])
       print (paste("Fractions for", cancer.expFile, cancer.colnames[j]))
       print (fractions)
-      barplot(fractions, cex.names=0.8, names.arg=names(fractions), xlab="cell type", ylab="abundance",
-          main=paste("Abundance estimation for", cancer.colnames[j]))
+      barplot(fractions, cex.names=0.8, names.arg=names(fractions), xlab="cell type", ylab="relative abundance",
+          main=paste("Relative abundance estimation for", cancer.colnames[j]))
       box()
 
       abundance.score.matrix <- cbind(abundance.score.matrix, fractions)
@@ -219,8 +219,11 @@ main <- function() {
   }
 
   dev.off()
-  write.table(abundance.score.matrix, paste(args.global$outdir, '/score_matrix.txt', sep=''),
+  #write.table(abundance.score.matrix, paste(args.global$outdir, '/score_matrix.txt', sep=''),
+  #    sep="\t", quote=FALSE, row.names=TRUE, col.names=NA)
+  write.table(abundance.score.matrix, paste(args.global$outdir, '/relative_abundance.txt', sep=''),
       sep="\t", quote=FALSE, row.names=TRUE, col.names=NA)
+
 
 
 }

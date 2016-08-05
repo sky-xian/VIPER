@@ -60,3 +60,13 @@ rule batch_effect_removal_cufflinks:
         "{params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput} "
         " && mv {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv "
 
+
+rule fpkm_plot:
+    input:
+        cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        annotFile = config["metasheet"]
+    output:
+        fpkm_pdf = "analysis/plots/gene_counts.fpkm.pdf"
+    message: "Plot gene counts at various fpkm cutoffs"
+    shell:
+        "Rscript viper/modules/scripts/fpkm_plot.R {input.cuffmat} {output.fpkm_pdf}"

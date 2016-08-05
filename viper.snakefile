@@ -25,7 +25,7 @@ rule target:
         
 
 include: "./modules/align.snakefile"         # rules specific to STAR and Fusion
-include: "./modules/cuff.snakefile"          # cufflinks' rules
+include: "./modules/cuff.snakefile"          # cufflinks' and fpkm plot rules
 include: "./modules/readQC.snakefile"        # RSeQC and Picard rules 
 include: "./modules/file_format.snakefile"   # bam to bigwig
 include: "./modules/snp.snakefile"           # variant calling rules

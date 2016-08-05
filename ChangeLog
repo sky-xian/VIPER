@@ -5,6 +5,7 @@ Mon, July, 11, 2016:
 - Added ggrepel conda channel to env.yaml.
 - Added support for '#' (comment samples out) in metasheet.
 - Housekeeping of snpEff output (html and summary csv) files.
+- Added gene counts plot at various fpkm cutoffs
 
 Tue, July, 5, 2016:
 -------------------

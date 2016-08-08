@@ -66,7 +66,7 @@ rule fpkm_plot:
         cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
         annotFile = config["metasheet"]
     output:
-        fpkm_pdf = "analysis/plots/gene_counts.fpkm.pdf"
+        fpkm_png = "analysis/plots/gene_counts.fpkm.png"
     message: "Plot gene counts at various fpkm cutoffs"
     shell:
-        "Rscript viper/modules/scripts/fpkm_plot.R {input.cuffmat} {output.fpkm_pdf}"
+        "Rscript viper/modules/scripts/fpkm_plot.R {input.cuffmat} {output.fpkm_png}"

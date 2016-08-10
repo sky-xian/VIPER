@@ -117,7 +117,7 @@ conda update conda
     __NOTE:__ The last serires of digits (cfce-viper-XXXX) will be different for everyone! There should only be one thing in your folder at this though, so use tab completion to complete.
 
 3.  CREATING the viper conda environment.  Run the following from within your `PROJECT/viper` folder.
-    `conda create env
+    `conda env create
     `
     __NOTE:__ You only have to do this once. This may take a few minutes to download and setup the required packages.
 

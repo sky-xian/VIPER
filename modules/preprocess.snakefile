@@ -11,7 +11,7 @@ from scripts.utils import _getCuffCounts
 
 rule filter_cuff_matrix:
     input:
-        rpkmFile = _getCuffCounts(config),
+        rpkmFile = _getCuffCounts(config)[1],
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:

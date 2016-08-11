@@ -49,6 +49,9 @@ def _addExecPaths(config):
 
     if not "varscan_path" in config or not config["varscan_path"]:
         config["varscan_path"] = 'varscan'
-    
+   
+    # update RSEM executable only if rsem_ref key has value from user
+    if "rsem_ref" in config and config["rsem_ref"]:
+        config["rsem_path"] = conda_path + '/rsem-1.2.28-0/bin' 
     return config
 

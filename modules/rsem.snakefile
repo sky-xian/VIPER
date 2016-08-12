@@ -26,4 +26,15 @@ rule rsem_align:
         "{config[rsem_path]}/rsem-calculate-expression {params.stranded} --num-threads {threads} --star --star-gzipped-read-file "
         "{params.paired_end} {input} "
         "{config[rsem_ref]} analysis/RSEM/{params.sample_name}/{params.sample_name} " 
-        
+       
+rule rsem_matrix:
+    input:
+        rsem_out_files = expand( "analysis/RSEM/{sample}/{sample}.isoforms.results", sample=config["ordered_sample_list"] )
+    output:
+        rsem_matrix_file = "analysis/RSEM/tpm_matrix.csv"
+    message: "Running RSEM matrix generation rule"
+    run:
+        args = " -f ".join( input.rsem_out_files )
+        shell("perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --header -f {args} 1>{output.rsem_matrix_file}")
+
+

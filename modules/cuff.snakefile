@@ -40,7 +40,7 @@ rule generate_cuff_matrix:
     priority: 3
     run:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
-        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -f {fpkm_files} 1>{output}" )
+        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -d -f {fpkm_files} 1>{output}" )
 
 
 rule batch_effect_removal_cufflinks:

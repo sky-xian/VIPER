@@ -33,4 +33,5 @@ include: "./modules/preprocess.snakefile"    # preprocess rules for cleaning dat
 include: "./modules/cluster.snakefile"       # PCA, Heatmaps (Sample-Sample & Sample-Feature)
 include: "./modules/DE.snakefile"            # DESeq2, Limma and volcano plot rules
 include: "./modules/pathway.snakefile"       # GO and KEGG rules
+include: "./modules/rsem.snakefile"          # RSEM module
 include: "./modules/final_report.snakefile"  # rules for HTML report 

@@ -53,8 +53,8 @@ def symlink_ref_yaml( org ):
     os.symlink( './viper/mbcf/' + org + '_ref.yaml', 'ref.yaml' )
 
 args = parseArgs()
-if args.reference not in ["hg19","mm9"]:
-    sys.stderr.write( args.reference + " is not supported. Please provide one of the values from [hg19,mm9]. Exiting ...!\n" )
+if args.reference not in ["hg19","mm9","ce11"]:
+    sys.stderr.write( args.reference + " is not supported. Please provide one of the values from [hg19,mm9,ce11]. Exiting ...!\n" )
     sys.exit(1)
 
 if not os.path.isfile(args.metasheet):

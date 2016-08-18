@@ -17,7 +17,6 @@ if( config["stranded"] ):
     strand_command="--outFilterIntronMotifs RemoveNoncanonical"
     rRNA_strand_command="--outFilterIntronMotifs RemoveNoncanonical"
 else:
-    strand_command="--outSAMstrandField intronMotif"
     rRNA_strand_command="--outSAMstrandField intronMotif"
 
 run_fusion= True if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else False

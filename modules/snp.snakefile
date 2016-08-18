@@ -63,13 +63,15 @@ rule snpEff_annot:
     input:
         vcf="analysis/snp/{sample}/{sample}.snp.genome.vcf"
     output:
-        protected("analysis/snp/{sample}/{sample}.snpEff.annot.vcf")
+        vcf_annot = protected("analysis/snp/{sample}/{sample}.snpEff.annot.vcf"),
+        vcf_stats = protected("analysis/snp/{sample}/{sample}.snpEff_summary.html")
     params:
         snpEff_conf=config["snpEff_conf"],
         snpEff_db=config['snpEff_db']
     message: "Running varscan for snpEff annotation analysis"
     shell:
-        "snpEff -Xmx2G -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output}"
+        "snpEff -Xmx2G -stats {output.vcf_stats} -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output.vcf_annot}"
+
 
 
 

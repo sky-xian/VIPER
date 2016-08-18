@@ -6,7 +6,7 @@
 from scripts.utils import _getSTARcounts
 import pandas as pd
 
-metadata = pd.read_table(config['metasheet'], index_col=0, sep=',')
+metadata = pd.read_table(config['metasheet'], index_col=0, sep=',', comment='#')
 
 def _getColumn(comparison):
     return metadata["comp_{}".format(comparison)]

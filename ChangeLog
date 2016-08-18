@@ -1,3 +1,12 @@
+Mon, July, 11, 2016:
+--------------------
+- Separate preprocess of cuff matrix rule
+- Added ggrepel to PCA plot; Coloring of sample labels and points.
+- Added ggrepel conda channel to env.yaml.
+- Added support for '#' (comment samples out) in metasheet.
+- Housekeeping of snpEff output (html and summary csv) files.
+- Added gene counts plot at various fpkm cutoffs
+
 Tue, July, 5, 2016:
 -------------------
 - Added commit string to report. [This helps to pinpoint exact code branch

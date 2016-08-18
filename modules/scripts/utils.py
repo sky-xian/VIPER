@@ -36,10 +36,15 @@ def _getSTARcounts(config):
         return "analysis/STAR/STAR_Gene_Counts.csv"
 
 def _getCuffCounts(config):
+    cuff_files = ["analysis/plots/gene_counts.fpkm.png"]
     if config["batch_effect_removal"] == "true":
-        return "analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv"
+        cuff_files.append("analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
     else:
-        return "analysis/cufflinks/Cuff_Gene_Counts.csv"
+        cuff_files.append("analysis/cufflinks/Cuff_Gene_Counts.csv")
+    return cuff_files
+
+def _getProcessedCuffCounts(config):
+    return "analysis/cufflinks/Cuff_Gene_Counts.filtered.csv"
 
 def _fusionOutput(config):
     fusion_out = []

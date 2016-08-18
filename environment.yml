@@ -211,6 +211,7 @@ dependencies:
 - r-xml2=0.1.2=r3.2.2_0a
 - r-xtable=1.8_0=r3.2.2_0a
 - r-zoo=1.7_12=r3.2.2_1a
+- r-ggrepel=0.5
 - readline=6.2=2
 - requests=2.10.0=py35_0
 - samtools=1.2=2
@@ -231,4 +232,4 @@ dependencies:
 - xz=5.0.5=1
 - yaml=0.1.6=0
 - zlib=1.2.8=0
-
+- r-argparse

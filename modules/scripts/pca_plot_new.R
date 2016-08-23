@@ -49,4 +49,5 @@ rpkmTable <- read.csv(rpkmFile, header=T, check.names=F,
 annot <- read.csv(metaFile, sep=",", header=T, row.names=1,
                       stringsAsFactors=FALSE, check.names=F, comment.char='#')
 annot <- annot[, !grepl('comp_*', colnames(annot))]
+
 pca_plot(rpkmTable, annot, pca_plot_out)

@@ -40,7 +40,7 @@ rule generate_cuff_matrix:
     priority: 3
     run:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
-        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -f {fpkm_files} 1>{output}" )
+        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -d -f {fpkm_files} 1>{output}" )
 
 
 rule batch_effect_removal_cufflinks:
@@ -60,3 +60,13 @@ rule batch_effect_removal_cufflinks:
         "{params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput} "
         " && mv {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv "
 
+
+rule fpkm_plot:
+    input:
+        cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        annotFile = config["metasheet"]
+    output:
+        fpkm_png = "analysis/plots/gene_counts.fpkm.png"
+    message: "Plot gene counts at various fpkm cutoffs"
+    shell:
+        "Rscript viper/modules/scripts/fpkm_plot.R {input.cuffmat} {output.fpkm_png}"

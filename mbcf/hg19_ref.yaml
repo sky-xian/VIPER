@@ -18,6 +18,9 @@ gene_annotation: viper/static/humanhg19.annot.csv.bz2
 #This is required only for PE data.
 genome_lib_dir: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/STAR_Fusion/Hg19_CTAT_resource_lib
 
+#Required only for RSEM module
+rsem_ref: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/UCSC/hg19/Sequence/STARIndex_with_ERCC_RSEM/hg19
+
 #software source paths required from user
 python2:
 rseqc_path:

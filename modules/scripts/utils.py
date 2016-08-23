@@ -24,7 +24,8 @@ def getTargetInfo(config):
                         _SNP(config),
                         _DE(config),
                         _cluster(config),
-                        _pathway(config)])
+                        _pathway(config),
+                        _VirusSeq(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -35,10 +36,12 @@ def _getSTARcounts(config):
         return "analysis/STAR/STAR_Gene_Counts.csv"
 
 def _getCuffCounts(config):
+    cuff_files = ["analysis/plots/gene_counts.fpkm.png"]
     if config["batch_effect_removal"] == "true":
-        return "analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv"
+        cuff_files.append("analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
     else:
-        return "analysis/cufflinks/Cuff_Gene_Counts.csv"
+        cuff_files.append("analysis/cufflinks/Cuff_Gene_Counts.csv")
+    return cuff_files
 
 def _getProcessedCuffCounts(config):
     return "analysis/cufflinks/Cuff_Gene_Counts.filtered.csv"
@@ -106,8 +109,8 @@ def _pathway(config):
         for comp in config["comparisons"]])
     return path_files
 
-
-
-
-
-
+def _VirusSeq(config):
+    virus_seq_targets = []
+    if ('virus_dna_scan' in config and config['virus_dna_scan'].upper() == 'TRUE' and config['reference'] == 'hg19'):
+        virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
+    return virus_seq_targets

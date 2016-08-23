@@ -17,7 +17,6 @@ if( config["stranded"] ):
     strand_command="--outFilterIntronMotifs RemoveNoncanonical"
     rRNA_strand_command="--outFilterIntronMotifs RemoveNoncanonical"
 else:
-    strand_command="--outSAMstrandField intronMotif"
     rRNA_strand_command="--outSAMstrandField intronMotif"
 
 run_fusion= True if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else False
@@ -25,10 +24,11 @@ gz_command="--readFilesCommand zcat" if config["samples"][config["ordered_sample
 
 if( run_fusion ):
     if( config["stranded"] ):
-        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 """
+        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 """
     else:
-        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --outReadsUnmapped None --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif """
+        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif """
 
+_mates = ['mate1', 'mate2'] if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ['mate1']
 
 rule run_STAR:
     input:
@@ -36,7 +36,10 @@ rule run_STAR:
     output:
         bam=protected("analysis/STAR/{sample}/{sample}.sorted.bam"),
         counts="analysis/STAR/{sample}/{sample}.counts.tab",
-        log_file="analysis/STAR/{sample}/{sample}.Log.final.out"
+        log_file="analysis/STAR/{sample}/{sample}.Log.final.out",
+        #COOL hack: {{sample}} is LEFT AS A WILDCARD
+        unmapped_reads = expand( "analysis/STAR/{{sample}}/{{sample}}.Unmapped.out.{mate}", mate=_mates)
+
     params:
         stranded=strand_command,
         gz_support=gz_command,
@@ -51,6 +54,7 @@ rule run_STAR:
         "  --outSAMstrandField intronMotif"
         "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
         "  --limitBAMsortRAM 45000000000 --quantMode GeneCounts"
+        "  --outReadsUnmapped Fastx"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
         " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
         " && samtools index {output.bam}"

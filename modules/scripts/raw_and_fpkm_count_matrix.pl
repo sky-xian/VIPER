@@ -13,9 +13,10 @@ exit $?;
 
 sub parse_options {
 	my $options = {};
-	GetOptions( $options, 'file|f=s@', 'column|l', 'htseq|t', 'cufflinks|c', 'remove_ERCC_ids|e', 'help|h' );
+	GetOptions( $options, 'file|f=s@', 'column|l:i', 'htseq|t', 'cufflinks|c', 'remove_ERCC_ids|e', 'header|d', 'help|h' );
 	unless( $$options{ 'file' } ) {
-		my $usage = "$0 <file|-f> [--file|-f] [--column|-l <1 or 2 or 3; default=3>] [--htseq|-t] [--cufflinks|-c] [--remove_ERCC_ids|-e]";
+		my $usage = "$0 <file|-f> [--file|-f] [--column|-l <1 or 2 or 3; default=3>] [--htseq|-t] 
+				[--header|-d <having this option removes header line>] [--cufflinks|-c] [--remove_ERCC_ids|-e]";
 		print STDERR $usage, "\n";
 		exit 1;
 	}
@@ -41,6 +42,7 @@ sub get_matrix {
 			$file_base =~ s/\.counts\.tab//;
 		}
 		push @$basenames, $file_base;
+		my $header = <FH> if $$options{ 'header' };
 		while( my $line = <FH> ) {
 			chomp $line;
 			if( $$options{ 'cufflinks' } ) {

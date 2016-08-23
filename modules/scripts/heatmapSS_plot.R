@@ -90,7 +90,7 @@ ss_txt_out=args[4]
 rpkmTable <- read.csv(rpkmFile, header=T, check.names=F, row.names=1, stringsAsFactors=FALSE, dec='.')
 
 annot <- read.csv(annotFile, sep=",", header=T, row.names=1, stringsAsFactors=FALSE, check.names=F, comment.char='#')
-annot <- annot[, !grepl('comp_*', colnames(annot))]
 annot <- annot[, !grepl('Pair', colnames(annot))]
+annot <- annot[, !grepl('comp_*', colnames(annot)), drop=F]
 
 heatmapSS_plot(rpkmTable,annot, ss_plot_out,ss_txt_out)

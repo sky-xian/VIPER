@@ -21,11 +21,10 @@ config = updateMeta(config)
 
 rule target:
     input: getTargetInfo(config), "report.html"
-    message: "Compiling all output"
-        
+    message: "Compiling all output"        
 
 include: "./modules/align.snakefile"         # rules specific to STAR and Fusion
-include: "./modules/cuff.snakefile"          # cufflinks' rules
+include: "./modules/cuff.snakefile"          # cufflinks' and fpkm plot rules
 include: "./modules/readQC.snakefile"        # RSeQC and Picard rules 
 include: "./modules/file_format.snakefile"   # bam to bigwig
 include: "./modules/snp.snakefile"           # variant calling rules
@@ -33,4 +32,7 @@ include: "./modules/preprocess.snakefile"    # preprocess rules for cleaning dat
 include: "./modules/cluster.snakefile"       # PCA, Heatmaps (Sample-Sample & Sample-Feature)
 include: "./modules/DE.snakefile"            # DESeq2, Limma and volcano plot rules
 include: "./modules/pathway.snakefile"       # GO and KEGG rules
+include: "./modules/rsem.snakefile"          # RSEM module
 include: "./modules/final_report.snakefile"  # rules for HTML report 
+include: "./modules/virusseq.snakefile"      # Virusseq rules
+        

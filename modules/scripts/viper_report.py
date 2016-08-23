@@ -78,14 +78,6 @@ Alignment Summary
 
     report += "\n"
 
-    if 'FUSION_OUT' in file_dict:
-        report += """
-Fusion Summary
-==============
-"""
-        report += "\n\t.. image:: " + file_dict['FUSION_OUT'] + "\n";
-
-    report += "\n"
     report += """
 Library Prep Quality Metrics
 =============================
@@ -194,6 +186,15 @@ Sample-Feature Correlation Heatmap
 
     report += "\n"
 
+    if 'FUSION_OUT' in file_dict:
+        report += """
+Fusion Summary
+==============
+"""
+        report += "\n\t.. image:: " + file_dict['FUSION_OUT'] + "\n";
+
+    report += "\n"
+ 
     report += """                
 Differential Gene expression
 ============================

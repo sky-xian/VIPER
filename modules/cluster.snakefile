@@ -21,7 +21,7 @@ rule pca_plot:
         pca_plot_out="analysis/plots/pca_plot.pdf"
     message: "Generating PCA plots"
     shell:
-        "Rscript viper/modules/scripts/pca_plot_new.R {input.rpkmFile} {input.annotFile} {output.pca_plot_out} "
+        "Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_plot_out} "
 
 
 rule heatmapSS_plot:

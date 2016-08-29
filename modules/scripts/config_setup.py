@@ -52,7 +52,8 @@ def _addExecPaths(config):
    
     # update RSEM executable only if rsem_ref key has value from user
     if "rsem_ref" in config and config["rsem_ref"]:
-        config["rsem_path"] = conda_root + '/envs/rsem/bin' 
+        config["rsem_path"] = conda_root + '/envs/rsem/bin'
+        config["seurat_path"] = conda_root + '/envs/seurat/bin' 
     
     return config
 

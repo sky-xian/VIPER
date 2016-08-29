@@ -1,0 +1,8 @@
+name: seurat
+channels:
+- bioconda
+- r
+dependencies:
+- r=3.3.1
+- r-png
+- r-devtools

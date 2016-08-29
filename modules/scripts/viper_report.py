@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
 # vim: syntax=python tabstop=4 expandtab
+
+#-------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: Aug, 1, 2015
+#-------------------------------
+
 import os
 import glob
 import subprocess

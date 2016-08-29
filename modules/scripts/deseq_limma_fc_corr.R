@@ -1,3 +1,12 @@
+#!/usr/bin/env Rscript
+# vim: syntax=r tabstop=4 expandtab
+
+#---------------------------
+# @authors: Zach Herbert, Mahesh Vangala
+# @emails: , vangalamaheshh@gmail.com
+# @date: June, 1, 2016
+#---------------------------
+
 merge_data <- function(file1, file2) {
   deseq <- read.csv(file1,header=T, row.names=1)
   limma <- read.csv(file2, header=T, row.names=1)

@@ -1,4 +1,11 @@
 #!/usr/bin/perl
+# vim: syntax=perl tabstop=4 expandtab
+
+#------------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: Aug, 1, 2015
+#------------------------------------
 
 use strict;
 use warnings;
@@ -39,7 +46,11 @@ sub get_matrix {
 		} elsif( $$options{ 'htseq' } ) {
 			$file_base =~ s/\.htseq\.counts//;
 		} else {
-			$file_base =~ s/\.counts\.tab//;
+			$file_base =~ s/\.counts\.tab//; #STAR output
+			#------ RSEM out files contain these ----------#
+			$file_base =~ s/\.genes\.results//;
+			$file_base =~ s/\.isoforms\.results//;
+			#----------------------------------------------#
 		}
 		push @$basenames, $file_base;
 		my $header = <FH> if $$options{ 'header' };

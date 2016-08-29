@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+# vim: syntax=r tabstop=4 expandtab
 #----------------------------------------------------------------
 # @Author: Mahesh Vangala (ggplot code is taken from Henry Long's original script)
 # @Email: vangalamaheshh@gmail.com

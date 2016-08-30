@@ -27,9 +27,7 @@ def getTargetInfo(config):
 
 ## Returns proper count files for with and without batch effect correction
 def _getSTARcounts(config):
-    STAR_out_files = ["analysis/" + config["token"] + "/STAR/STAR_Align_Report.png"]
-    if config["batch_effect_removal"] == "true":
-        STAR_out_files.append("analysis/" + config["token"] + "/STAR/star_combat_qc.pdf")
+    STAR_out_files = ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"] if config["batch_effect_removal"].upper() != "TRUE" else ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"]
     return STAR_out_files
 
 def _getCuffCounts(config):

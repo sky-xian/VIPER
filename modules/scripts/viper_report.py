@@ -13,7 +13,8 @@ import glob
 import subprocess
 from snakemake.report import data_uri
 
-def get_sphinx_report(comps):
+def get_sphinx_report(config):
+    comps = config["comparisons"]
     git_commit_string = subprocess.check_output('git --git-dir="viper/.git" rev-parse --short HEAD',shell=True).decode('utf-8').strip()
     git_link = 'https://bitbucket.org/cfce/viper/commits/' + git_commit_string
     file_dict = {

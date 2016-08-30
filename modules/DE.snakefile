@@ -22,7 +22,7 @@ def _getSamples(wildcards):
 
 rule limma_and_deseq:
     input:
-        counts = _getSTARcounts(config)
+        counts = _getSTARcounts(config)[0]
     output:
         limma = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.limma.csv",
         deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",

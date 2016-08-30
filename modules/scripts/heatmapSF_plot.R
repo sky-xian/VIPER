@@ -9,7 +9,7 @@ suppressMessages(source('viper/modules/scripts/supp_fns.R'))
 ## Enable stack trace
 #options(error = function() traceback(2))
 
-heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_plot_out,sf_txt_out) {
+heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
     
     ## Read in and Log Transform Data
     Exp_data = log2(rpkmTable+1)
@@ -40,7 +40,7 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_plot_out,sf_txt
     if (is.numeric(num_kmeans_clust) == TRUE) {kmparam = num_kmeans_clust}
     if (is.character(num_kmeans_clust) == TRUE) {kmparam = as.numeric(unlist(strsplit(num_kmeans_clust,",")))}
     
-    pdf(file = sf_plot_out, width=11,height=8.5) 
+    pdf(file = paste(sf_out_dir, "heatmapSF_plot.pdf", sep=""), width=11,height=8.5) 
     
     png_count = 0
     for (i in 1:length(kmparam)) {
@@ -84,7 +84,7 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_plot_out,sf_txt
         
         ## First drawing into png
         png_count = png_count+1
-        png(file=paste("analysis/plots/images/heatmapSF_",png_count,"_plot.png",sep=""), width = 8, height = 8, unit="in",res=300)
+        png(file=paste(sf_out_dir, "images/heatmapSF_",png_count,"_plot.png",sep=""), width = 8, height = 8, unit="in",res=300)
         draw(mapplot)
         for(an in colnames(annot[1:ncol(annot)])) {
             decorate_annotation(an,
@@ -106,12 +106,12 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_plot_out,sf_txt
             if (kmparam[1] == 0) {
                 output<-Exp_data
                 output<-output[unlist(row_order(mapplot)), unlist(column_order(mapplot))]
-                write.table(output, file=sf_txt_out, quote=F, col.names = NA, sep="\t")
+                write.table(output, file=paste(sf_out_dir, "heatmapSF.txt",sep=""), quote=F, col.names = NA, sep="\t")
             }
             if (kmparam[1] != 0) {
                 output = cbind(hmdata,kmclustsort)
                 output = output[,unlist(column_order(mapplot))]
-                write.table(output, file=sf_txt_out, quote=F, col.names = NA, sep="\t")
+                write.table(output, file=paste(sf_out_dir, "heatmapSF.txt",sep=""), quote=F, col.names = NA, sep="\t")
             }
         }
     }
@@ -125,8 +125,7 @@ args <- commandArgs( trailingOnly = TRUE )
 rpkmFile=args[1]
 annotFile=args[2]
 num_kmeans_clust=args[3]
-sf_plot_out=args[4]
-sf_txt_out=args[5]
+sf_out_dir=args[4]
 
 rpkmTable <- read.csv(rpkmFile, header=T, check.names=F, row.names=1, stringsAsFactors=FALSE, dec='.')
 
@@ -135,4 +134,4 @@ annot <- annot[, !grepl('Pair', colnames(annot))]
 annot <- annot[, !grepl('comp_*', colnames(annot)), drop=F]
 
 ## Run the function
-heatmapSF_plot(rpkmTable,annot, num_kmeans_clust, sf_plot_out,sf_txt_out)
+heatmapSF_plot(rpkmTable,annot, num_kmeans_clust, sf_out_dir)

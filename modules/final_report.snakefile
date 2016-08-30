@@ -22,7 +22,7 @@ rule generate_report:
         "analysis/" + config["token"] + "/report.html"
     message: "Generating VIPER report"
     run:
-        sphinx_str = get_sphinx_report(config["comparisons"])
+        sphinx_str = get_sphinx_report(config)
         report(sphinx_str, output[0], metadata="Molecular Biology Core Facilities, DFCI", **{'Copyrights:':"./viper/mbcf.jpg"})
 
 

@@ -9,6 +9,8 @@
 # @date: July, 1st, 2016
 #--------------------------------
 
+from scripts.utils import _getCuffCounts
+
 cuff_command=""
 
 if( config["stranded"] ):
@@ -63,7 +65,7 @@ rule batch_effect_removal_cufflinks:
 
 rule fpkm_plot:
     input:
-        cuffmat = "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv",
+        cuffmat = _getCuffCounts(config)[1],
         annotFile = config["metasheet"]
     output:
         fpkm_png = "analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"

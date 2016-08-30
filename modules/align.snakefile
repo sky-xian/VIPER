@@ -23,11 +23,7 @@ run_fusion= True if len(config["samples"][config["ordered_sample_list"][0]]) == 
 gz_command="--readFilesCommand zcat" if config["samples"][config["ordered_sample_list"][0]][0][-3:] == '.gz' else ""
 
 if( run_fusion ):
-    if( config["stranded"] ):
-        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 """
-    else:
-        strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 --outSAMstrandField intronMotif """
-
+    strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 """
 _mates = ['mate1', 'mate2'] if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ['mate1']
 
 rule run_STAR:
@@ -39,7 +35,6 @@ rule run_STAR:
         log_file="analysis/STAR/{sample}/{sample}.Log.final.out",
         #COOL hack: {{sample}} is LEFT AS A WILDCARD
         unmapped_reads = expand( "analysis/STAR/{{sample}}/{{sample}}.Unmapped.out.{mate}", mate=_mates)
-
     params:
         stranded=strand_command,
         gz_support=gz_command,

@@ -19,10 +19,10 @@ rule generate_report:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        "report.html"
+        "analysis/" + config["token"] + "/report.html"
     message: "Generating VIPER report"
     run:
-        sphinx_str = get_sphinx_report(config["comparisons"])
+        sphinx_str = get_sphinx_report(config)
         report(sphinx_str, output[0], metadata="Molecular Biology Core Facilities, DFCI", **{'Copyrights:':"./viper/mbcf.jpg"})
 
 

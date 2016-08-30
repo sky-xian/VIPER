@@ -15,10 +15,10 @@ if( is.element("ggbiplot", installed.packages())){
 
 options(error = function() traceback(2))
 
-pca_plot <- function(rpkmTable, annot, pca_plot_out) {
+pca_plot <- function(rpkmTable, annot, pca_out_dir) {
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
   plot.var <- ggscreeplot(rpkm.pca)
-  ggsave("analysis/plots/images/pca_plot_scree.png")
+  ggsave(paste(pca_out_dir,"images/pca_plot_scree.png", sep=""))
   all_plots <- list()
   for (ann in colnames(annot)){
     g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 1, var.scale = 1, obs.scale = 1,
@@ -29,10 +29,10 @@ pca_plot <- function(rpkmTable, annot, pca_plot_out) {
                    legend.position = 'top',
                    legend.title = element_text(face="bold"))
     all_plots <- c(all_plots, list(g))
-    ggsave(paste("analysis/plots/images/pca_plot_",ann,".png",sep=""))
+    ggsave(paste(pca_out_dir, "images/pca_plot_", ann, ".png", sep=""))
   }
 
-  pdf(pca_plot_out)
+  pdf(paste(pca_out_dir, "pca_plot.pdf", sep=""))
   print(c(all_plots,list(plot.var)))
   dev.off()
 }
@@ -41,11 +41,11 @@ pca_plot <- function(rpkmTable, annot, pca_plot_out) {
 args <- commandArgs( trailingOnly = TRUE )
 rpkmFile <- args[1]
 metaFile <- args[2]
-pca_plot_out <- args[3]
+pca_out_dir <- args[3]
 
 rpkmTable <- read.csv(rpkmFile, header=T, check.names=F,
                         row.names=1, stringsAsFactors=FALSE, dec='.')
 annot <- read.csv(metaFile, sep=",", header=T, row.names=1,
                       stringsAsFactors=FALSE, check.names=F, comment.char='#')
 annot <- annot[, !grepl('comp_*', colnames(annot)), drop=F]
-pca_plot(rpkmTable, annot, pca_plot_out)
+pca_plot(rpkmTable, annot, pca_out_dir)

@@ -20,8 +20,8 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
-def getYaml( org ):
-    org_yaml = './viper/mbcf/' + org + '.yaml'
+def getYaml():
+    org_yaml = './viper/mbcf/config.yaml'
     with open(org_yaml, "r") as fh:
         return yaml.safe_load(fh)
 
@@ -63,7 +63,7 @@ if not os.path.isfile(args.metasheet):
 
  
 if __name__ == '__main__':
-    configObj = getYaml( args.reference )
+    configObj = getYaml()
     sampleInfo = getSampleInfo( args.metasheet )  
     sampleFiles = getSampleFiles( sampleInfo )
     configObj["the_samples"] = sampleFiles

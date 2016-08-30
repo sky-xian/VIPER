@@ -10,9 +10,9 @@
 
 rule run_seurat:
     input:
-        gene_matrix = "analysis/RSEM/tpm_gene_matrix.csv"
+        gene_matrix = "analysis/" + config["token"] + "/RSEM/tpm_gene_matrix.csv"
     output:
-        seurat_out = "analysis/seurat/seurat.done"
+        seurat_out = "analysis/" + config["token"] + "/seurat/seurat.done"
     message: "Running Seurat - tSNE"
     shell:
         "{config[seurat_path]}/Rscript --default-packages=methods,utils viper/modules/scripts/run_seurat.R {input.gene_matrix} "

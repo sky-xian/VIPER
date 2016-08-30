@@ -11,15 +11,15 @@
 
 rule goterm_analysis:
     input:
-        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
+        deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        out_file = "analysis/diffexp/{comparison}/{comparison}.goterm.done"
+        out_file = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.done"
     params:
-        csv = "analysis/diffexp/{comparison}/{comparison}.goterm.csv",
-        plot = "analysis/diffexp/{comparison}/{comparison}.goterm.pdf",
-        png = "analysis/plots/images/{comparison}_goterm.png",
+        csv = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.csv",
+        plot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.pdf",
+        png = "analysis/" + config["token"] + "/plots/images/{comparison}_goterm.png",
         gotermadjpvalcutoff = config["goterm_adjpval_cutoff"],
         numgoterms = config["numgoterms"],
         reference = config["reference"]
@@ -31,23 +31,23 @@ rule goterm_analysis:
 
 rule kegg_analysis:
     input:
-        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
+        deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        out_file = "analysis/diffexp/{comparison}/{comparison}.kegg.done"
+        out_file = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.kegg.done"
     params:
         keggpvalcutoff = config["kegg_pval_cutoff"],
         numkeggpathways = config["numkeggpathways"],
-        kegg_table_up = "analysis/diffexp/{comparison}/{comparison}.kegg.up.csv",
-        kegg_table_down = "analysis/diffexp/{comparison}/{comparison}.kegg.down.csv",
-        keggsummary_pdf = "analysis/diffexp/{comparison}/{comparison}.keggsummary.pdf",
-        keggsummary_png = "analysis/plots/images/{comparison}.keggsummary.png",
-        gsea_table = "analysis/diffexp/{comparison}/{comparison}.gsea.csv",
-        gsea_pdf = "analysis/diffexp/{comparison}/{comparison}.gsea.pdf",
-        kegg_dir = "analysis/diffexp/{comparison}/kegg_pathways/",
+        kegg_table_up = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.kegg.up.csv",
+        kegg_table_down = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.kegg.down.csv",
+        keggsummary_pdf = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.keggsummary.pdf",
+        keggsummary_png = "analysis/" + config["token"] + "/plots/images/{comparison}.keggsummary.png",
+        gsea_table = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gsea.csv",
+        gsea_pdf = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gsea.pdf",
+        kegg_dir = "analysis/" + config["token"] + "/diffexp/{comparison}/kegg_pathways/",
         reference = config["reference"],
-        temp_dir = "analysis/diffexp/{comparison}/temp/"
+        temp_dir = "analysis/" + config["token"] + "/diffexp/{comparison}/temp/"
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     shell:
         "mkdir {params.temp_dir} && "

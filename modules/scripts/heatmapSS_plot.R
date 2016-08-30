@@ -9,7 +9,7 @@ suppressMessages(source('viper/modules/scripts/supp_fns.R'))
 ## Enable stack trace
 #options(error = function() traceback(2))
 
-heatmapSS_plot <- function(rpkmTable,annot, ss_plot_out,ss_txt_out) {
+heatmapSS_plot <- function(rpkmTable,annot, ss_out_dir) {
     
     ## Read in and Log Transform Data
     Exp_data <- log2(rpkmTable+1)
@@ -30,7 +30,7 @@ heatmapSS_plot <- function(rpkmTable,annot, ss_plot_out,ss_txt_out) {
     mi_nolym <- min(cordata)
     my.breaks_nolym<-c(mi_nolym,seq(mi_nolym + 0.01, ma_nolym - 0.01,length.out=99),ma_nolym)
     
-    pdf(file = ss_plot_out)
+    pdf(file = paste(ss_out_dir, "heatmapSS_plot.pdf", sep=""))
 
     ha1 <- make_complexHeatmap_annotation(annot)
 
@@ -63,7 +63,7 @@ heatmapSS_plot <- function(rpkmTable,annot, ss_plot_out,ss_txt_out) {
     }
     dev.off()
     
-    png(file="analysis/plots/images/heatmapSS_plot.png", width = 8, height = 8, unit="in",res=300)
+    png(file=paste(ss_out_dir, "images/heatmapSS_plot.png", sep=""), width = 8, height = 8, unit="in",res=300)
     draw(mapplot)
     for(an in colnames(annot[1:ncol(annot)])) {
         decorate_annotation(an, {
@@ -76,7 +76,7 @@ heatmapSS_plot <- function(rpkmTable,annot, ss_plot_out,ss_txt_out) {
     #WRITE output to file
     output<-as.matrix(cordata)
     output<-output[rowcluster$order, colcluster$order]
-    write.table(output, file=ss_txt_out, quote=F, col.names = NA, sep="\t")
+    write.table(output, file=paste(ss_out_dir, "heatmapSS.txt",sep=""), quote=F, col.names = NA, sep="\t")
     
 }
 
@@ -84,8 +84,7 @@ heatmapSS_plot <- function(rpkmTable,annot, ss_plot_out,ss_txt_out) {
 args <- commandArgs( trailingOnly = TRUE )
 rpkmFile=args[1]
 annotFile=args[2]
-ss_plot_out=args[3]
-ss_txt_out=args[4]
+ss_out_dir=args[3]
 
 rpkmTable <- read.csv(rpkmFile, header=T, check.names=F, row.names=1, stringsAsFactors=FALSE, dec='.')
 
@@ -93,4 +92,4 @@ annot <- read.csv(annotFile, sep=",", header=T, row.names=1, stringsAsFactors=FA
 annot <- annot[, !grepl('Pair', colnames(annot))]
 annot <- annot[, !grepl('comp_*', colnames(annot)), drop=F]
 
-heatmapSS_plot(rpkmTable,annot, ss_plot_out,ss_txt_out)
+heatmapSS_plot(rpkmTable,annot, ss_out_dir)

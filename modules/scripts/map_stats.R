@@ -1,3 +1,12 @@
+#!/usr/bin/env Rscript
+# vim: syntax=r tabstop=4 expandtab
+
+#----------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: Aug, 1, 2015
+#-----------------------------------
+
 library(ggplot2)
 library(reshape2)
 

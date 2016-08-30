@@ -32,9 +32,9 @@ rule sample_snps_corr_hla:
         metasheet = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        snp_matrix="analysis/snp/snp_corr.hla.txt",
-        snp_png="analysis/plots/sampleSNPcorr_plot.hla.png",
-        snp_pdf="analysis/plots/sampleSNPcorr_plot.hla.pdf"
+        snp_matrix="analysis/" + config["token"] + "/snp/snp_corr.hla.txt",
+        snp_png="analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png",
+        snp_pdf="analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.pdf"
     message: "Running snp correlations for HLA fingerprint region"
     shell:
         "{config[python2]} viper/modules/scripts/sampleSNPcorr.py {input.snps}> {output.snp_matrix} && "

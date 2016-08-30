@@ -20,9 +20,8 @@ config = updateMeta(config)
 #-----------------------------------------
 
 rule target:
-    input: getTargetInfo(config), "report.html"
-    message: "Compiling all output"
-        
+    input: getTargetInfo(config), "analysis/" + config["token"] + "/report.html"
+    message: "Compiling all output"        
 
 include: "./modules/align.snakefile"         # rules specific to STAR and Fusion
 include: "./modules/cuff.snakefile"          # cufflinks' and fpkm plot rules
@@ -34,4 +33,7 @@ include: "./modules/cluster.snakefile"       # PCA, Heatmaps (Sample-Sample & Sa
 include: "./modules/DE.snakefile"            # DESeq2, Limma and volcano plot rules
 include: "./modules/pathway.snakefile"       # GO and KEGG rules
 include: "./modules/rsem.snakefile"          # RSEM module
+include: "./modules/seurat.snakefile"        # seurat - tSNE rules
 include: "./modules/final_report.snakefile"  # rules for HTML report 
+include: "./modules/virusseq.snakefile"      # Virusseq rules
+        

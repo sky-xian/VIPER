@@ -10,12 +10,9 @@
 #-----------------------------------
 
 def getTargetInfo(config):
-    targetFiles = ["analysis/STAR/STAR_Align_Report.csv",
-        "analysis/STAR/STAR_Align_Report.png"]
-    targetFiles.append(_getSTARcounts(config))
-    targetFiles.extend(["analysis/STAR/star_combat_qc.pdf", 
-        "analysis/cufflinks/cuff_combat_qc.pdf"] if config["batch_effect_removal"] == "true" else[])
-    targetFiles.extend([_getCuffCounts(config), 
+    targetFiles = []
+    targetFiles.extend([_getSTARcounts(config),
+                        _getCuffCounts(config), 
                         _fusionOutput(config), 
                         _insertSizeOutput(config), 
                         _rRNAmetrics(config), 
@@ -24,31 +21,30 @@ def getTargetInfo(config):
                         _SNP(config),
                         _DE(config),
                         _cluster(config),
-                        _pathway(config)])
+                        _pathway(config),
+                        _VirusSeq(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
 def _getSTARcounts(config):
-    if config["batch_effect_removal"] == "true":
-        return "analysis/STAR/batch_corrected_STAR_Gene_Counts.csv"
-    else:
-        return "analysis/STAR/STAR_Gene_Counts.csv"
+    STAR_out_files = ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"] if config["batch_effect_removal"].upper() != "TRUE" else ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"]
+    return STAR_out_files
 
 def _getCuffCounts(config):
-    cuff_files = ["analysis/plots/gene_counts.fpkm.png"]
+    cuff_files = ["analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"]
     if config["batch_effect_removal"] == "true":
-        cuff_files.append("analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
+        cuff_files.append("analysis/" + config["token"] + "/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
     else:
-        cuff_files.append("analysis/cufflinks/Cuff_Gene_Counts.csv")
+        cuff_files.append("analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv")
     return cuff_files
 
 def _getProcessedCuffCounts(config):
-    return "analysis/cufflinks/Cuff_Gene_Counts.filtered.csv"
+    return "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.filtered.csv"
 
 def _fusionOutput(config):
     fusion_out = []
     if len(config["samples"][config["ordered_sample_list"][0]]) == 2:
-        fusion_out.append("analysis/STAR_Fusion/STAR_Fusion_Report.png")
+        fusion_out.append("analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.png")
     return fusion_out
 
 def _insertSizeOutput(config):
@@ -60,27 +56,27 @@ def _insertSizeOutput(config):
 
 def _rRNAmetrics(config):
     if config["star_rRNA_index"] is not None:
-        return "analysis/STAR_rRNA/STAR_rRNA_Align_Report.csv"
+        return "analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.csv"
     else:
         return []
 
 def _cluster(config):
-    cluster_files = ["analysis/plots/pca_plot.pdf",
-                    "analysis/plots/heatmapSS_plot.pdf",
-                    "analysis/plots/heatmapSF_plot.pdf"]
+    cluster_files = ["analysis/" + config["token"] + "/plots/pca_plot.pdf",
+                    "analysis/" + config["token"] + "/plots/heatmapSS_plot.pdf",
+                    "analysis/" + config["token"] + "/plots/heatmapSF_plot.pdf"]
     return cluster_files
 
 def _DE(config):
     de_list = []
     if config["comparisons"]:
-        de_list.append("analysis/diffexp/de_summary.png")
-        de_list.extend([["analysis/diffexp/" + comp + "/" + comp + "_volcano.pdf",
-                        "analysis/diffexp/" + comp + "/deseq_limma_fc_corr.png"]
+        de_list.append("analysis/" + config["token"] + "/diffexp/de_summary.png")
+        de_list.extend([["analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + "_volcano.pdf",
+                        "analysis/" + config["token"] + "/diffexp/" + comp + "/deseq_limma_fc_corr.png"]
             for comp in config["comparisons"]])
     return de_list
 
 def _SNP(config):
-    snp_files = ["analysis/plots/sampleSNPcorr_plot.hla.png"]
+    snp_files = ["analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png"]
     if ('snp_scan_genome' in config and config['snp_scan_genome'].upper() == 'TRUE'):
         snp_files.extend([["analysis/snp/" + sample + "/" + sample + ".snp.genome.vcf", 
             "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]])
@@ -88,8 +84,8 @@ def _SNP(config):
 
 def _readQC(config):
     qc_files = []
-    qc_files.append("analysis/RSeQC/read_distrib/read_distrib.png")
-    qc_files.append("analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png")
+    qc_files.append("analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.png")
+    qc_files.append("analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png")
     qc_files.extend(["analysis/RSeQC/junction_saturation/" + sample + "/" + sample + ".junctionSaturation_plot.pdf" 
         for sample in config["ordered_sample_list"]])
     return qc_files
@@ -103,13 +99,13 @@ def _bw(config):
 
 def _pathway(config):
     path_files = []
-    path_files.extend([["analysis/diffexp/" + comp + "/" + comp + ".goterm.done",
-                        "analysis/diffexp/" + comp + "/" + comp + ".kegg.done"] 
+    path_files.extend([["analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".goterm.done",
+                        "analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".kegg.done"] 
         for comp in config["comparisons"]])
     return path_files
 
-
-
-
-
-
+def _VirusSeq(config):
+    virus_seq_targets = []
+    if ('virus_dna_scan' in config and config['virus_dna_scan'].upper() == 'TRUE' and config['reference'] == 'hg19'):
+        virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
+    return virus_seq_targets

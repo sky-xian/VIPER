@@ -28,8 +28,8 @@ rule read_distrib_qc_matrix:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        matrix="analysis/RSeQC/read_distrib/read_distrib.matrix.tab",
-        png="analysis/RSeQC/read_distrib/read_distrib.png"
+        matrix="analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.matrix.tab",
+        png="analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.png"
     message: "Creating RseQC read distribution matrix"
     run:
         file_list_with_flag = " -f ".join( input.read_distrib_files )
@@ -48,7 +48,7 @@ rule gene_body_cvg_qc:
         pypath="PYTHONPATH=%s" % config["python2_pythonpath"],
         ds_bam = lambda wildcards: "analysis/RSeQC/gene_body_cvg/" + wildcards.sample + "/" + wildcards.sample + ".ds.bam"
     shell:
-        "picard DownsampleSam I={input} O={params.ds_bam} P=$(samtools flagstat {input} | perl -e 'my $line = <STDIN>; chomp $line; my( $one, $two ) = ($line =~ /(\d+)\s+\+\s+(\d+)/); my $total = $one + $two;  my $one_M = (1000000 / $total); print sprintf(\"%.2f\",$one_M);') && "
+        "picard DownsampleSam I={input} O={params.ds_bam} P=$(samtools flagstat {input} | perl -e 'my $line = <STDIN>; chomp $line; my( $one, $two ) = ($line =~ /(\d+)\s+\+\s+(\d+)/); my $total = $one + $two;  my $one_M = $total < 1000000 ? 1 : (1000000 / $total); print sprintf(\"%.2f\",$one_M);') && "
         "samtools index {params.ds_bam} && "
         "{params.pypath} {config[python2]} {config[rseqc_path]}/geneBody_coverage.py -i {params.ds_bam} -r {config[bed_file]}"
         " -f png -o analysis/RSeQC/gene_body_cvg/{wildcards.sample}/{wildcards.sample}"
@@ -61,9 +61,9 @@ rule plot_gene_body_cvg:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        rscript="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.r",
-        png="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
-        png_curves="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png"
+        rscript="analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.r",
+        png="analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
+        png_curves="analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png"
     message: "Plotting gene body coverage"
     shell:
         "perl viper/modules/scripts/plot_gene_body_cvg.pl --rfile {output.rscript} --png {output.png} --curves_png {output.png_curves}"

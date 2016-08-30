@@ -1,5 +1,11 @@
 #!/usr/bin/perl
+# vim: syntax=perl tabstop=4 expandtab
 
+#-----------------------------------
+# @author: Mahesh Vangala
+# @email: vangalamaheshh@gmail.com
+# @date: Aug, 1, 2015
+#-----------------------------------
 use strict;
 use warnings;
 use Getopt::Long;

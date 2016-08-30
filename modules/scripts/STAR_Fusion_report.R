@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+# vim: syntax=r tabstop=4 expandtab
 #----------------------------------------------------------------
 # @Author: Mahesh Vangala (ggplot code is taken from Henry Long's original script)
 # @Email: vangalamaheshh@gmail.com
@@ -29,7 +31,7 @@ if (LOG2TRANSFORM) {
   legend.title = "Total\nEvidence"
 }
 
-pdf("analysis/STAR_Fusion/STAR_Fusion_Report.pdf")
+png(args[2], width = 8, height = 8, unit="in",res=300)
 ggplot(melt(sfs)) +
   geom_tile(aes(Sample,FusionName,fill=value), color='black') +
   scale_fill_gradient2(low = "white", high = "red",
@@ -42,5 +44,4 @@ ggplot(melt(sfs)) +
   theme(panel.border=element_rect(fill = NA, colour=alpha('black', .5),size=1)) +
   theme(legend.position="top", legend.justification = 'right')
 
-ggsave(args[2])
 dev.off()

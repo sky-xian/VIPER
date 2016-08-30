@@ -52,7 +52,13 @@ def _addExecPaths(config):
    
     # update RSEM executable only if rsem_ref key has value from user
     if "rsem_ref" in config and config["rsem_ref"]:
-        config["rsem_path"] = conda_root + '/envs/rsem/bin' 
+        config["rsem_path"] = conda_root + '/envs/rsem/bin'
+        config["seurat_path"] = conda_root + '/envs/seurat/bin' 
+
+    if "sub_analysis_token" in config and config["sub_analysis_token"]:
+        config["token"] = config["sub_analysis_token"]
+    else:
+        config["token"] = "default"
     
     return config
 

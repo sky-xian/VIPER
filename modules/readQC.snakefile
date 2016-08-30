@@ -28,8 +28,8 @@ rule read_distrib_qc_matrix:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        matrix="analysis/RSeQC/read_distrib/read_distrib.matrix.tab",
-        png="analysis/RSeQC/read_distrib/read_distrib.png"
+        matrix="analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.matrix.tab",
+        png="analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.png"
     message: "Creating RseQC read distribution matrix"
     run:
         file_list_with_flag = " -f ".join( input.read_distrib_files )
@@ -61,9 +61,9 @@ rule plot_gene_body_cvg:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        rscript="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.r",
-        png="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
-        png_curves="analysis/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png"
+        rscript="analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.r",
+        png="analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
+        png_curves="analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png"
     message: "Plotting gene body coverage"
     shell:
         "perl viper/modules/scripts/plot_gene_body_cvg.pl --rfile {output.rscript} --png {output.png} --curves_png {output.png_curves}"

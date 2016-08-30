@@ -24,12 +24,12 @@ rule limma_and_deseq:
     input:
         counts = _getSTARcounts(config)
     output:
-        limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv",
-        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
-        deseqSum = "analysis/diffexp/{comparison}/{comparison}.deseq.sum.csv",
+        limma = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.limma.csv",
+        deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
+        deseqSum = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.sum.csv",
         #annotations
-        limma_annot = "analysis/diffexp/{comparison}/{comparison}.limma.annot.csv",
-        deseq_annot = "analysis/diffexp/{comparison}/{comparison}.deseq.annot.csv",
+        limma_annot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.limma.annot.csv",
+        deseq_annot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.annot.csv",
     params:
         s1=lambda wildcards: ",".join(_getComparison(wildcards.comparison, 1)),
         s2=lambda wildcards: ",".join(_getComparison(wildcards.comparison, 2)),
@@ -43,23 +43,23 @@ rule limma_and_deseq:
 
 rule deseq_limma_fc_plot:
     input:
-        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
-        limma = "analysis/diffexp/{comparison}/{comparison}.limma.csv"
+        deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
+        limma = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.limma.csv"
     output:
-        out_csv = "analysis/diffexp/{comparison}/deseq_limma_fc_corr.csv",
-        out_png = "analysis/diffexp/{comparison}/deseq_limma_fc_corr.png"
+        out_csv = "analysis/" + config["token"] + "/diffexp/{comparison}/deseq_limma_fc_corr.csv",
+        out_png = "analysis/" + config["token"] + "/diffexp/{comparison}/deseq_limma_fc_corr.png"
     shell:
         "Rscript viper/modules/scripts/deseq_limma_fc_corr.R {input.deseq} {input.limma} {output.out_csv} {output.out_png}"
 
 
 rule fetch_DE_gene_list:
     input:
-        deseq_file_list=expand("analysis/diffexp/{comparison}/{comparison}.deseq.csv",comparison=config["comparisons"]),
+        deseq_file_list=expand("analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",comparison=config["comparisons"]),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        csv="analysis/diffexp/de_summary.csv",
-        png="analysis/diffexp/de_summary.png"
+        csv="analysis/" + config["token"] + "/diffexp/de_summary.csv",
+        png="analysis/" + config["token"] + "/diffexp/de_summary.png"
     message: "Creating Differential Expression summary"
     run:
         deseq_file_string = ' -f '.join(input.deseq_file_list)
@@ -70,12 +70,12 @@ rule fetch_DE_gene_list:
 #Generate volcano plots for each comparison
 rule volcano_plot:
     input:
-        deseq = "analysis/diffexp/{comparison}/{comparison}.deseq.csv",
+        deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        plot = "analysis/diffexp/{comparison}/{comparison}_volcano.pdf",
-        png = "analysis/plots/images/{comparison}_volcano.png"
+        plot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}_volcano.pdf",
+        png = "analysis/" + config["token"] + "/plots/images/{comparison}_volcano.png"
     message: "Creating volcano plots for Differential Expressions for {wildcards.comparison}"
     shell:
         "Rscript viper/modules/scripts/volcano_plot.R {input.deseq} {output.plot} {output.png}"

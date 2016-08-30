@@ -35,7 +35,7 @@ rule generate_cuff_matrix:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        "analysis/cufflinks/Cuff_Gene_Counts.csv"
+        "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv"
     message: "Generating expression matrix using cufflinks counts"
     priority: 3
     run:
@@ -45,11 +45,11 @@ rule generate_cuff_matrix:
 
 rule batch_effect_removal_cufflinks:
     input:
-        cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        cuffmat = "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv",
         annotFile = config["metasheet"]
     output:
-        cuffcsvoutput="analysis/cufflinks/batch_corrected_Cuff_Gene_Counts.csv",
-        cuffpdfoutput="analysis/cufflinks/cuff_combat_qc.pdf"
+        cuffcsvoutput="analysis/" + config["token"] + "/cufflinks/batch_corrected_Cuff_Gene_Counts.csv",
+        cuffpdfoutput="analysis/" + config["token"] + "/cufflinks/cuff_combat_qc.pdf"
     params:
         batch_column="batch",
         datatype = "cufflinks"
@@ -58,15 +58,15 @@ rule batch_effect_removal_cufflinks:
     shell:
         "Rscript viper/modules/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} "
         "{params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput} "
-        " && mv {input.cuffmat} analysis/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv "
+        " && mv {input.cuffmat} analysis/{config[token]}/cufflinks/without_batch_correction_Cuff_Gene_Counts.csv "
 
 
 rule fpkm_plot:
     input:
-        cuffmat = "analysis/cufflinks/Cuff_Gene_Counts.csv",
+        cuffmat = "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv",
         annotFile = config["metasheet"]
     output:
-        fpkm_png = "analysis/plots/gene_counts.fpkm.png"
+        fpkm_png = "analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"
     message: "Plot gene counts at various fpkm cutoffs"
     shell:
         "Rscript viper/modules/scripts/fpkm_plot.R {input.cuffmat} {output.fpkm_png}"

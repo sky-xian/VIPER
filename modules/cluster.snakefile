@@ -17,8 +17,8 @@ rule pca_plot:
         annotFile = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        expand("analysis/plots/images/pca_plot_{metacol}.png", metacol=config["metacols"]),
-        pca_plot_out="analysis/plots/pca_plot.pdf"
+        expand("analysis/" + config["token"] + "/plots/images/pca_plot_{metacol}.png", metacol=config["metacols"]),
+        pca_plot_out="analysis/" + config["token"] + "/plots/pca_plot.pdf"
     message: "Generating PCA plots"
     shell:
         "Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_plot_out} "
@@ -30,8 +30,8 @@ rule heatmapSS_plot:
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        ss_plot_out="analysis/plots/heatmapSS_plot.pdf",
-        ss_txt_out="analysis/plots/heatmapSS.txt"
+        ss_plot_out="analysis/" + config["token"] + "/plots/heatmapSS_plot.pdf",
+        ss_txt_out="analysis/" + config["token"] + "/plots/heatmapSS.txt"
     message: "Generating Sample-Sample Heatmap"
     shell:
         "mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
@@ -44,8 +44,8 @@ rule heatmapSF_plot:
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        sf_plot_out="analysis/plots/heatmapSF_plot.pdf",
-        sf_txt_out="analysis/plots/heatmapSF.txt"
+        sf_plot_out="analysis/" + config["token"] + "/plots/heatmapSF_plot.pdf",
+        sf_txt_out="analysis/" + config["token"] + "/plots/heatmapSF.txt"
     params:
         num_kmeans_clust = config["num_kmeans_clust"]
     message: "Generating Sample-Feature heatmap"

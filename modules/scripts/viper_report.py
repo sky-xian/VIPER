@@ -17,19 +17,19 @@ def get_sphinx_report(comps):
     git_commit_string = subprocess.check_output('git --git-dir="viper/.git" rev-parse --short HEAD',shell=True).decode('utf-8').strip()
     git_link = 'https://bitbucket.org/cfce/viper/commits/' + git_commit_string
     file_dict = {
-        'align_report': "analysis/STAR/STAR_Align_Report.png",
-        'rRNA_report': "analysis/STAR_rRNA/STAR_rRNA_Align_Report.png",
-        'read_distrib': "analysis/RSeQC/read_distrib/read_distrib.png",
-        'gb_cov_heatmap': "analysis/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
-        'gb_cov_curves': "analysis/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png",
-        'heatmapSF_plot': "analysis/plots/images/heatmapSF_plot.png",
-        'heatmapSS_plot': "analysis/plots/images/heatmapSS_plot.png",
-        'heatmapSS_cluster': "analysis/plots/images/heatmapSS_cluster.png",
-        'DEsummary_plot': "analysis/diffexp/de_summary.png",
-        'SNP_chr6' : "analysis/plots/sampleSNPcorr_plot.chr6.png",
-        'SNP_HLA': "analysis/plots/sampleSNPcorr_plot.hla.png",
-        'SNP_genome' : "analysis/plots/sampleSNPcorr_plot.genome.png",
-        'FUSION_OUT': "analysis/STAR_Fusion/STAR_Fusion_Report.png"
+        'align_report': "analysis/" + config["token"] + "/STAR/STAR_Align_Report.png",
+        'rRNA_report': "analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.png",
+        'read_distrib': "analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.png",
+        'gb_cov_heatmap': "analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
+        'gb_cov_curves': "analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png",
+        'heatmapSF_plot': "analysis/" + config["token"] + "/plots/images/heatmapSF_plot.png",
+        'heatmapSS_plot': "analysis/" + config["token"] + "/plots/images/heatmapSS_plot.png",
+        'heatmapSS_cluster': "analysis/" + config["token"] + "/plots/images/heatmapSS_cluster.png",
+        'DEsummary_plot': "analysis/" + config["token"] + "/diffexp/de_summary.png",
+        'SNP_chr6' : "analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.chr6.png",
+        'SNP_HLA': "analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png",
+        'SNP_genome' : "analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.genome.png",
+        'FUSION_OUT': "analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.png"
     }
     copy_file_dict = {}
     for key in file_dict.keys():
@@ -44,17 +44,17 @@ def get_sphinx_report(comps):
     volcano_list = []
     SF_png_list = []
 
-    for pca_plot in sorted(glob.glob("./analysis/plots/images/pca_plot*.png")):
+    for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:
             pca_png_list.append(data_uri(pca_plot))
 
-    if(os.path.isfile("./analysis/plots/images/pca_plot_scree.png")):
-        pca_png_list.append(data_uri("./analysis/plots/images/pca_plot_scree.png"))    
+    if(os.path.isfile("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png")):
+        pca_png_list.append(data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png"))    
 
-    for volcano_plot in glob.glob("./analysis/plots/images/*_volcano.png"):
+    for volcano_plot in glob.glob("./analysis/" + config["token"] + "/plots/images/*_volcano.png"):
         volcano_list.append(data_uri(volcano_plot))
 
-    for SF_plot in sorted(glob.glob("./analysis/plots/images/heatmapSF_*_plot.png")):
+    for SF_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/heatmapSF_*_plot.png")):
         SF_png_list.append(data_uri(SF_plot))
 
     if pca_png_list:
@@ -274,7 +274,7 @@ Gene-Ontology Annotation
     for comp in comps:
         report += "\n" + comp + "\n"
         report += "^" * len(comp) + "\n"
-        go_png = "analysis/plots/images/" + comp + "_goterm.png"
+        go_png = "analysis/" + config["token"] + "/plots/images/" + comp + "_goterm.png"
         if os.path.isfile(go_png):
             report += "\n\n\t.. image:: " + data_uri(go_png) + "\n"
         else:
@@ -287,7 +287,7 @@ KEGG-Pathway Analysis
     for comp in comps:
         report += "\n" + comp + "\n"
         report += "^" * len(comp) + "\n"
-        cur_path = "analysis/diffexp/" + comp + "/kegg_pathways/"
+        cur_path = "analysis/" + config["token"] + "/diffexp/" + comp + "/kegg_pathways/"
         path_list =  glob.glob(cur_path + "*.png")
         if not path_list:
             report += "\nInsufficient data\n"

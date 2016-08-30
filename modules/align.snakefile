@@ -67,9 +67,9 @@ rule generate_STAR_report:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        csv="analysis/STAR/STAR_Align_Report.csv",
-        png="analysis/STAR/STAR_Align_Report.png",
-        gene_counts="analysis/STAR/STAR_Gene_Counts.csv"
+        csv="analysis/" + config["token"] + "/STAR/STAR_Align_Report.csv",
+        png="analysis/" + config["token"] + "/STAR/STAR_Align_Report.png",
+        gene_counts="analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
     priority: 3
     run:
@@ -82,11 +82,11 @@ rule generate_STAR_report:
 
 rule batch_effect_removal_star:
     input:
-        starmat = "analysis/STAR/STAR_Gene_Counts.csv",
+        starmat = "analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv",
         annotFile = config["metasheet"]
     output:
-        starcsvoutput="analysis/STAR/batch_corrected_STAR_Gene_Counts.csv",
-        starpdfoutput="analysis/STAR/star_combat_qc.pdf"
+        starcsvoutput="analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv",
+        starpdfoutput="analysis/" + config["token"] + "/STAR/star_combat_qc.pdf"
     params:
         batch_column="batch",
         datatype = "star"
@@ -95,7 +95,7 @@ rule batch_effect_removal_star:
     shell:
         "Rscript viper/modules/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} "
         "{params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput} "
-        " && mv {input.starmat} analysis/STAR/without_batch_correction_STAR_Gene_Counts.csv"
+        " && mv {input.starmat} analysis/{config[token]}/STAR/without_batch_correction_STAR_Gene_Counts.csv"
 
 
 rule run_STAR_fusion:
@@ -121,8 +121,8 @@ rule run_STAR_fusion_report:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        csv="analysis/STAR_Fusion/STAR_Fusion_Report.csv",
-        png="analysis/STAR_Fusion/STAR_Fusion_Report.png"
+        csv="analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.csv",
+        png="analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.png"
     message: "Generating STAR fusion report"
     shell:
         "python viper/modules/scripts/STAR_Fusion_report.py -f {input.sf_list} 1>{output.csv} "
@@ -156,8 +156,8 @@ rule generate_rRNA_STAR_report:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        csv="analysis/STAR_rRNA/STAR_rRNA_Align_Report.csv",
-        png="analysis/STAR_rRNA/STAR_rRNA_Align_Report.png"
+        csv="analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.csv",
+        png="analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.png"
     message: "Generating STAR rRNA report"
     run:
         log_files = " -l ".join( input.star_log_files )

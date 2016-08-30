@@ -31,7 +31,7 @@ rule rsem_iso_matrix:
     input:
         rsem_iso_files = expand( "analysis/RSEM/{sample}/{sample}.isoforms.results", sample=config["ordered_sample_list"] )
     output:
-        rsem_iso_matrix = "analysis/RSEM/tpm_iso_matrix.csv"
+        rsem_iso_matrix = "analysis/" + config["token"] + "/RSEM/tpm_iso_matrix.csv"
     message: "Running RSEM matrix generation rule for isoforms"
     run:
         args = " -f ".join( input.rsem_iso_files )
@@ -42,7 +42,7 @@ rule rsem_gene_matrix:
     input:
         rsem_gene_files = expand( "analysis/RSEM/{sample}/{sample}.genes.results", sample=config["ordered_sample_list"] )
     output:
-        rsem_gene_matrix = "analysis/RSEM/tpm_gene_matrix.csv"
+        rsem_gene_matrix = "analysis/" + config["token"] + "/RSEM/tpm_gene_matrix.csv"
     message: "Running RSEM matrix generation rule for genes"
     run:
         args = " -f ".join( input.rsem_gene_files )

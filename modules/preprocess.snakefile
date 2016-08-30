@@ -15,7 +15,7 @@ rule filter_cuff_matrix:
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        filtered_rpkm = "analysis/cufflinks/Cuff_Gene_Counts.filtered.csv"
+        filtered_rpkm = "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.filtered.csv"
     params:
         sample_names = " ".join(config["ordered_sample_list"])
     message: "Generating Pre-processed Cuff RPKM matrix file"

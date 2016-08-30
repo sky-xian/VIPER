@@ -1,3 +1,10 @@
+Tue, Aug, 30, 2016:
+--------------------
+- Support for sub-analysis with out overriding the previous results
+- Moved env.yamls into envs folder
+- Bug fixes in calling batch effect output in rules
+- VirusSeq module addition
+
 Thu, Aug, 25, 2016:
 -------------------
 - Addition of RSEM module, which generates TPM matrix files for genes and

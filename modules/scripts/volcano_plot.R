@@ -16,7 +16,7 @@ volcano_plot_f <- function(deseq_results, pdf_file, png_file, makePDF = TRUE) {
     res <- read.table(deseq_results, header=TRUE, sep=",")
 
     #get comparisonName
-    comparisonName = strsplit(deseq_results, "/")[[1]][3]
+    comparisonName = strsplit(deseq_results, "/")[[1]][4]
 
     # Make a basic volcano plot
     #LEN NOTE: the original graph was cutting things off, in terms of log2FC

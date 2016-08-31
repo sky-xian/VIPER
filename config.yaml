@@ -37,6 +37,11 @@ num_kmeans_clust: "4"
 # possible value are ["true","false"]
 snp_scan_genome: "true"
 
+#Uncomment the following if you want to perform a scan of viral dna on your samples
+# possible value are ["true","false"]
+#virus_dna_scan: "true"
+
+
 # If this flag is on, you must have a metasheet column called batch with at least 2 samples per batch 
 batch_effect_removal: "false"
 

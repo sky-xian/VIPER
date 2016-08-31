@@ -208,7 +208,8 @@ main <- function() {
       fractions <- GetFractions.Abbas(XX, YY[,j])
       print (paste("Fractions for", cancer.expFile, cancer.colnames[j]))
       print (fractions)
-      barplot(fractions, cex.names=0.8, names.arg=names(fractions), xlab="cell type", ylab="relative abundance",
+
+      barplot(fractions, cex.names=0.8, names.arg=names(fractions),xlab="cell type", ylab="relative abundance",
           main=paste("Relative abundance estimation for", cancer.colnames[j]))
       box()
 
@@ -217,6 +218,19 @@ main <- function() {
     }
 
   }
+  dev.off()
+  pdf(paste(args.global$outdir, '/TIMER_results.pdf', sep=''))
+  boxplot(t(abundance.score.matrix), las=2, cex.lab=0.6, ylab="relative abundance",
+          main=paste("Relative abundance across all Samples"), varwidth=TRUE)
+
+  #draw integrated plot
+  for (j in 1:nrow(abundance.score.matrix)) {
+      barplot(abundance.score.matrix[j,], las=2, ylim=c(0,1.0), cex.names=0.6,
+              ylab="relative abundance",
+          main=rownames(abundance.score.matrix)[j])
+  box()
+  }
+  
 
   dev.off()
   #write.table(abundance.score.matrix, paste(args.global$outdir, '/score_matrix.txt', sep=''),

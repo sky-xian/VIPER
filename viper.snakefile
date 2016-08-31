@@ -164,7 +164,7 @@ def run_snp_genome(wildcards):
 def immunology(wildcards):
     ls = []
     if ('cancer_type' in config) and (config["cancer_type"].upper() != 'FALSE'):
-        ls = ["analysis/immunology/score_matrix.txt"]
+        ls = ["analysis/immunology/relative_abundance.txt"]
     return ls
 
 rule target:

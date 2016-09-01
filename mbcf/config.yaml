@@ -30,6 +30,8 @@ filter_mirna: "TRUE"
 # Varscan - default turned off 
 snp_scan_genome: "false"
 
+# VirusSeq module - possible values [true,false]
+virus_dna_scan: "false"
 
 # Pathway params
 numgoterms: 10

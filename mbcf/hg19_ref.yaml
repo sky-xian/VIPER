@@ -21,6 +21,10 @@ genome_lib_dir: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapi
 #Required only for RSEM module
 rsem_ref: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/UCSC/hg19/Sequence/STARIndex_with_ERCC_RSEM/hg19
 
+#VirusSeq module reference files
+virusseq_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/virusseq/STAR_hg19Virus
+virusseq_gtf_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/virusseq/hg19Virus_refGene_RIS.gtf
+
 #software source paths required from user
 python2:
 rseqc_path:

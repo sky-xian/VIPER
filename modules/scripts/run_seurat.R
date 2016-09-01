@@ -20,23 +20,23 @@ if( is.element("Seurat", installed.packages())){
 
 options(error = function() traceback(2))
 
-runSeurat <- function( matrix_file ){
+runSeurat <- function( matrix_file, out_dir ){
     sc.data <- read.csv( matrix_file, header=TRUE, row.names=1 )
     sc.data <- log( sc.data + 1 )
     sc <- new( "seurat", raw.data=sc.data )
     sc <- Setup( sc, project="Viper Single Cell Analysis", min.cells = 3, names.field = 1, names.delim = "_", min.genes = 1000, is.expr=1, )
-    #png( "analysis/seurat/mean_var_plot.png", width = 8, height = 8, unit="in",res=300 )
+    png( paste(out_dir, "/mean_var_plot.png", sep=""), width = 8, height = 8, unit="in",res=300 )
     sc <- MeanVarPlot( sc, y.cutoff = 2, x.low.cutoff = 1, fxn.x = expMean, fxn.y = logVarDivMean )
-    #dev.off()
-    #png( "analysis/seurat/linear_PCA.png", width = 8, height = 8, unit="in",res=300)
+    dev.off()
+    png( paste(out_dir, "/linear_PCA.png", sep=""), width = 8, height = 8, unit="in",res=300)
     sc <- PCA( sc, do.print=FALSE )
     PCAPlot( sc, 1, 2, pt.size = 2 )
-    #dev.off()
+    dev.off()
     
-    #png( "analysis/seurat/non_linear_tSNE_PCA.png", width = 8, height = 8, unit="in",res=300 )
+    png( paste(out_dir, "/non_linear_tSNE_PCA.png", sep=""), width = 8, height = 8, unit="in",res=300 )
     sc <- RunTSNE( sc, dims.use = 1:2, max_iter=2000 )
     TSNEPlot( sc )
-    #dev.off()
+    dev.off()
 }
 
 parse_args <- function() {
@@ -48,4 +48,4 @@ parse_args <- function() {
 
 #args <- parse_args()
 args <- commandArgs( trailingOnly = TRUE )
-runSeurat( args[1] )
+runSeurat( args[1], args[2] )

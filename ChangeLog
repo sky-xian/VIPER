@@ -1,0 +1,62 @@
+Tue, Aug, 30, 2016:
+--------------------
+- Support for sub-analysis with out overriding the previous results
+- Moved env.yamls into envs folder
+- Bug fixes in calling batch effect output in rules
+- VirusSeq module addition
+
+Thu, Aug, 25, 2016:
+-------------------
+- Addition of RSEM module, which generates TPM matrix files for genes and
+isoforms
+- Run gene_body_cvg_qc rule with downsampled data (1M reads) to both fasten
+the process and to weed out memory issues when multiple instances of this is
+run on same node.
+
+
+Mon, July, 11, 2016:
+--------------------
+- Separate preprocess of cuff matrix rule
+- Added ggrepel to PCA plot; Coloring of sample labels and points.
+- Added ggrepel conda channel to env.yaml.
+- Added support for '#' (comment samples out) in metasheet.
+- Housekeeping of snpEff output (html and summary csv) files.
+- Added gene counts plot at various fpkm cutoffs
+
+Tue, July, 5, 2016:
+-------------------
+- Added commit string to report. [This helps to pinpoint exact code branch
+used to generate the report.]
+
+
+Fri, July, 1, 2016:
+-------------------
+- Modular appraoch of Viper pipeline
+- snpEff module added for hg19
+- Batch effect support
+- Uses snakemake latest version (3.6.1)
+- Other minor bug fixes.
+
+Fri, June, 10, 2016:
+--------------------
+- Fixed x-axis p value display in KEGG barplot
+
+Thu, June, 9, 2016:
+--------------------
+- Added Fusion and HLA images to Report
+- Added new PCA plot script - used ggbiplot instead of base plot function
+- Fixed bugs in handling of single column metasheet in SNP Corr Plot R script
+- Fixed GO and KEGG image file paths in report rule
+
+Tue, June, 7, 2016:
+-------------------
+- Batch effect support 
+- Added p-val and number of go terms params to config
+- Added p-val and number of kegg pathway params to config
+- Added sanity checks to metasheet (including converting windows/mac format to
+UNIX)
+- Refactored DEseq.R code as per DESeq2 vignette.
+- Added Limma - DESeq2 correlation plot.
+- Added STAR-FUSION plot generation rule
+- SNP-HLA
+

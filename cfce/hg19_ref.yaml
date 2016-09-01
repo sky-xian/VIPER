@@ -12,6 +12,12 @@ gene_annotation: viper/static/humanhg19.annot.csv.bz2
 #This is required only for PE data.
 genome_lib_dir: ./ref_files/hg19/Hg19_CTAT_resource_lib
 
+snpEff_conf: ./ref_files/hg19/snpEff/snpEff.config
+snpEff_db: hg19
+
+virusseq_index: ./ref_files/hg19/virusseq/STAR_hg19Virus
+virusseq_gtf_file: ./ref_files/hg19/virusseq/hg19Virus_refGene_RIS.gtf
+
 #software source paths in case user needs to over-ride
 #python2: 
 #resqc_path: 

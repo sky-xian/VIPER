@@ -37,6 +37,11 @@ num_kmeans_clust: "4"
 # possible value are ["true","false"]
 snp_scan_genome: "true"
 
+#Uncomment the following if you want to perform a scan of viral dna on your samples
+# possible value are ["true","false"]
+#virus_dna_scan: "true"
+
+
 # If this flag is on, you must have a metasheet column called batch with at least 2 samples per batch 
 batch_effect_removal: "false"
 
@@ -45,9 +50,11 @@ numgoterms: 5
 kegg_pval_cutoff: 0.05
 numkeggpathways: 5
 
+#Uncomment the following line to perform TIMER (immunology) analysis. refer to 
+#README.md
 #cancer_type: 'sarc'
 
-samples:
+the_samples:
   P4_OE1:
     - /zfs/cores/mbcf/mbcf-storage/devel/umv/snakemake/20151105-P4-1plus-DL2436_S4_R1_001.fastq.gz
   P4_OE2:

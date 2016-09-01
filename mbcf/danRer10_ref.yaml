@@ -1,0 +1,26 @@
+# vim: syntax=yaml tabstop=4 expandtab
+
+#Reference files required
+star_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/zebrafish/UCSC/Sequence/STARIndex/
+gtf_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/zebrafish/UCSC/Sequence/Annotation/Genes/genes.gtf
+bed_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/zebrafish/UCSC/Sequence/Annotation/Genes/genes.bed
+ref_fasta: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/zebrafish/UCSC/Sequence/WholeGenomeFasta/danRer10.fa
+star_rRNA_index:
+
+#Reference files required for whole genome SNP calling
+snpEff_db:
+snpEff_conf:
+
+#Reference organism; possible value - hg19, mm9 etc.
+reference: danRer10
+gene_annotation:
+#STAR-Fusion
+#This is required only for PE data.
+genome_lib_dir:
+
+#software source paths required from user
+python2:
+rseqc_path:
+picard_path:
+varscan_path:
+

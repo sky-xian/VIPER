@@ -36,7 +36,7 @@ rule heatmapSS_plot:
         ss_out_dir = "analysis/" + config["token"] + "/plots/"
     message: "Generating Sample-Sample Heatmap"
     shell:
-        "mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
+        "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
         "{input.annotFile} {output.ss_out_dir} "
 
 
@@ -53,5 +53,5 @@ rule heatmapSF_plot:
         num_kmeans_clust = config["num_kmeans_clust"]
     message: "Generating Sample-Feature heatmap"
     shell:
-        "mkdir -p analysis/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} "
+        "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} "
         "{input.annotFile} {params.num_kmeans_clust} {output.sf_out_dir} "

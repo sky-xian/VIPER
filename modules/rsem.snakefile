@@ -15,7 +15,8 @@ rule rsem_align:
     input:
         getFastq
     output:
-        rsem_transcript_out = protected("analysis/RSEM/{sample}/{sample}.isoforms.results")
+        rsem_transcript_out = protected("analysis/RSEM/{sample}/{sample}.isoforms.results"),
+        rsem_genes_out = protected("analysis/RSEM/{sample}/{sample}.genes.results")
     threads: 8
     message: "Running RSEM on {wildcards.sample}"
     params:

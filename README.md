@@ -250,7 +250,10 @@ This section holds parameters specific to your project design
 > 
 > snp_scan_genome: "true"   
 >  -  Boolean Flag "{True | False}" on whether to perform a genome-wide snp scan *IN ADDITION* to the snp scan done on chr6.
-
+>
+> cancer_type: "sarc"
+> - Cancer Immunology analysis.  Cancer types available {'kich', 'blca', 'brca', 'cesc', 'gbm', 'hnsc', 'kirp', 'lgg', 'lihc', 'luad', 'lusc', 'prad', 'sarc', 'pcpg', 'paad', 'tgct', 'ucec', 'ov', 'skcm', 'dlbc', 'kirc', 'acc', 'meso', 'thca', 'uvm', 'ucs', 'thym', 'esca', 'stad', 'read', 'coad', 'chol'}
+> - Comment out if not needed or set to 'False'!
 
 ##### SAMPLES:
 

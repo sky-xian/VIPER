@@ -30,23 +30,25 @@ rule rsem_align:
        
 rule rsem_iso_matrix:
     input:
-        rsem_iso_files = expand( "analysis/RSEM/{sample}/{sample}.isoforms.results", sample=config["ordered_sample_list"] )
+        rsem_iso_files = expand( "analysis/RSEM/{sample}/{sample}.isoforms.results", sample=config["ordered_sample_list"] ),
+        metasheet = config['metasheet']
     output:
         rsem_iso_matrix = "analysis/" + config["token"] + "/RSEM/tpm_iso_matrix.csv"
     message: "Running RSEM matrix generation rule for isoforms"
     run:
         args = " -f ".join( input.rsem_iso_files )
-        shell("perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --header -f {args} 1>{output.rsem_iso_matrix}")
+        shell("perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_iso_matrix}")
 
 
 rule rsem_gene_matrix:
     input:
-        rsem_gene_files = expand( "analysis/RSEM/{sample}/{sample}.genes.results", sample=config["ordered_sample_list"] )
+        rsem_gene_files = expand( "analysis/RSEM/{sample}/{sample}.genes.results", sample=config["ordered_sample_list"] ),
+        metasheet = config["metasheet"]
     output:
         rsem_gene_matrix = "analysis/" + config["token"] + "/RSEM/tpm_gene_matrix.csv"
     message: "Running RSEM matrix generation rule for genes"
     run:
         args = " -f ".join( input.rsem_gene_files )
-        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --header -f {args} 1>{output.rsem_gene_matrix}" )
+        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_gene_matrix}" )
 
 

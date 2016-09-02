@@ -13,17 +13,19 @@ use Getopt::Long;
 use File::Basename;
 
 my $options = parse_options();
+my $meta_info = exists $$options{ 'metasheet' } ? get_metasheet_info( $$options{ 'metasheet' } ) : undef;
 my ( $matrix, $files ) = get_matrix( $options );
-print_matrix( $matrix, $options, $files );
+print_matrix( $matrix, $options, $files, $meta_info );
 exit $?;
 
 
 sub parse_options {
 	my $options = {};
-	GetOptions( $options, 'file|f=s@', 'column|l:i', 'htseq|t', 'cufflinks|c', 'remove_ERCC_ids|e', 'header|d', 'help|h' );
+	GetOptions( $options, 'file|f=s@', 'column|l:i', 'htseq|t', 'cufflinks|c', 'remove_ERCC_ids|e', 'header|d', 'metasheet|m:s', 'help|h' );
 	unless( $$options{ 'file' } ) {
 		my $usage = "$0 <file|-f> [--file|-f] [--column|-l <1 or 2 or 3; default=3>] [--htseq|-t] 
-				[--header|-d <having this option removes header line>] [--cufflinks|-c] [--remove_ERCC_ids|-e]";
+				[--header|-d <having this option removes header line>] [--cufflinks|-c] [--remove_ERCC_ids|-e]
+                [--metasheet|-m <having this option generates a matrix with header from metasheet annotation columns";
 		print STDERR $usage, "\n";
 		exit 1;
 	}
@@ -31,6 +33,33 @@ sub parse_options {
 		$$options{ 'column' } = 3;
 	}
 	return $options;
+}
+
+sub get_metasheet_info {
+    my( $file ) = @_;
+    my $info = {};
+    open( FH, "<$file" ) or die "Error in opening the file, $file, $!\n";
+    my @columns = ();
+    my $header = <FH>;
+    chomp $header;
+    my @head = split(",", $header);
+    foreach my $index( 1 .. scalar @head -1 ) {
+        unless( substr($head[$index], 0, 5) eq 'comp_' ) {
+            push @columns, $index;
+        }
+    }
+    my $count = 1; 
+    while( my $line = <FH> ) {
+        chomp $line;
+        my @array = split(",", $line );
+        foreach my $col( @columns ) {
+            $array[$col] =~ s/_/./g;
+        }
+        $$info{ $array[0] } = join("_", @array[@columns]) . '_' . $count;
+        $count++;
+    }
+    close FH or die "Error closign the file, $file, $!\n";
+    return $info;
 }
 
 sub get_matrix {
@@ -95,8 +124,9 @@ sub get_matrix {
 }
 
 sub print_matrix {
-	my( $matrix, $options, $files ) = @_;
-	print STDOUT "Gene_ID", ",", join( ",", @$files ), "\n";
+	my( $matrix, $options, $files, $meta_info ) = @_;
+	my @header = $meta_info ? get_seurat_header($files, $meta_info) : @$files;
+    print STDOUT join(",", ("Gene_ID",@header)), "\n";
 	foreach my $gene_id( keys %$matrix ) {
 		my @counts = ();
 		foreach my $file_base( @$files ) { 
@@ -109,4 +139,13 @@ sub print_matrix {
 		}
 		print STDOUT join( ",", ( $gene_id, @counts ) ), "\n";
 	}
+}
+
+sub get_seurat_header {
+    my( $files, $meta_info ) = @_;
+    my @header = ();
+    foreach my $file( @$files ) {
+        push @header, $$meta_info{ $file };
+    }
+    return @header;      
 }

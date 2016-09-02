@@ -22,7 +22,8 @@ def getTargetInfo(config):
                         _DE(config),
                         _cluster(config),
                         _pathway(config),
-                        _VirusSeq(config)])
+                        _VirusSeq(config),
+                        _immunology(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -109,3 +110,12 @@ def _VirusSeq(config):
     if ('virus_dna_scan' in config and config['virus_dna_scan'].upper() == 'TRUE' and config['reference'] == 'hg19'):
         virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
     return virus_seq_targets
+
+def _immunology(config):
+    targets = []
+    #NOTE: cancer_type must be a valid string that is NOT 'FALSE'
+    if ('cancer_type' in config) and (config["cancer_type"].upper() !='FALSE'):
+        targets = ["analysis/immunology/relative_abundance.txt",
+                   "analysis/immunology/output.pdf",
+                   "analysis/immunology/TIMER_results.pdf"]
+    return targets

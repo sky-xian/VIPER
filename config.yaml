@@ -50,6 +50,10 @@ numgoterms: 5
 kegg_pval_cutoff: 0.05
 numkeggpathways: 5
 
+#Uncomment the following line to perform TIMER (immunology) analysis. refer to 
+#README.md
+#cancer_type: 'sarc'
+
 the_samples:
   P4_OE1:
     - /zfs/cores/mbcf/mbcf-storage/devel/umv/snakemake/20151105-P4-1plus-DL2436_S4_R1_001.fastq.gz

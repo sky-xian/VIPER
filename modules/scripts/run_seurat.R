@@ -37,6 +37,12 @@ runSeurat <- function( matrix_file, out_dir ){
     sc <- RunTSNE( sc, dims.use = 1:2, max_iter=2000 )
     TSNEPlot( sc )
     dev.off()
+
+    png( paste(out_dir, "/viz_PCA.png", sep=""), width = 8, height = 8, unit="in",res=300 )
+    VizPCA(sc,1:2)
+    dev.off()
+
+    
 }
 
 parse_args <- function() {

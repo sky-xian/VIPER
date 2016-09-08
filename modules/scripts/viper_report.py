@@ -11,6 +11,7 @@
 import os
 import glob
 import subprocess
+from scripts.csv_to_sphinx_table import get_sphinx_table 
 from snakemake.report import data_uri
 
 def get_sphinx_report(config):
@@ -44,6 +45,7 @@ def get_sphinx_report(config):
     pca_png_list = []
     volcano_list = []
     SF_png_list = []
+    virusseq_out = "analysis/" + config["token"] + "/virusseq/virusseq_table.csv"
 
     for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:
@@ -297,6 +299,13 @@ KEGG-Pathway Analysis
             token = ",".join([os.path.basename(file_path) for file_path in path_list[1:]]).replace(".png","")
             if token:
                 report += "\n" + "More pathway plots such as, " + token + " - can be found at " + cur_path + ".\n"    
+
+    if os.path.isfile(virusseq_out):
+        report += """
+Virus-Seq Module Output
+=======================
+"""
+        report += "\n" + get_sphinx_table(virusseq_out) + "\n"
 
     report += "\n\nThis report is generated using [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"

@@ -4,7 +4,7 @@ rule virusseq_all:
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.transcripts.gtf" for sample in config['ordered_sample_list']],
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.filtered.gtf" for sample in config['ordered_sample_list']],
         "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
-        "analysis/" + config["token"] + "/virusseq/virusseq_summary.txt",
+        "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
 
 def getUnmappedReads(wildcards):
     ls = ["analysis/STAR/%s/%s.Unmapped.out.mate1" % (wildcards.sample, wildcards.sample)]
@@ -72,7 +72,7 @@ rule virusseq_summarize:
     input:
         "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
     output:
-        "analysis/" + config["token"] + "/virusseq/virusseq_summary.txt",
+        "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
     message: "Summarizing virusseq output"
     shell:
         "viper/modules/scripts/virusseq_summarize.py -f {input} > {output}"

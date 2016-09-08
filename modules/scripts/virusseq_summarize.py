@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Script to summarize the virusseq results--outputs to stdout:
+"""Script to summarize the virusseq results--outputs to stdout: AS CSV
 SampleID, TranscriptID, Counts, FPKM
 """
 
@@ -23,21 +23,23 @@ def main():
     #RELYING on the table file already being sorted!
     lastID = ''
     #print header
-    print("\t".join(["SampleID","TranscriptID","Counts","FPKM"]))
+    print(",".join(["SampleID","TranscriptID","Counts","FPKM"]))
     for l in f:
         tmp = l.strip().split(',')
+        #FPKM - only one sig. digit
+        tmp[-1] = "%.1f" % float(tmp[-1])
         if tmp[0] != lastID:
             #NEW SET
             ct = 1
             lastID = tmp[0]
             #PRINT the whole row
-            print("\t".join(tmp))
+            print(",".join(tmp))
             continue
 
         if ct < 5:
             #PRINT JUST the new info
+            print(",".join(tmp))
             tmp[0] = ''
-            print("\t".join(tmp))
             ct += 1
 
 if __name__=='__main__':

@@ -45,7 +45,7 @@ def get_sphinx_report(config):
     pca_png_list = []
     volcano_list = []
     SF_png_list = []
-    virusseq_out = "analysis/" + config["token"] + "/virusseq/virusseq_table.csv"
+    virusseq_out = "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"
 
     for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:

@@ -38,8 +38,8 @@ def main():
 
         if ct < 5:
             #PRINT JUST the new info
-            tmp[0] = ''
             print(",".join(tmp))
+            tmp[0] = ''
             ct += 1
 
 if __name__=='__main__':

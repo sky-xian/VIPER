@@ -3,8 +3,8 @@ rule virusseq_all:
     input:
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.transcripts.gtf" for sample in config['ordered_sample_list']],
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.filtered.gtf" for sample in config['ordered_sample_list']],
-        "analysis/virusseq/virusseq_table.csv",
-        "analysis/virusseq/virusseq_summary.txt",
+        "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
+        "analysis/" + config["token"] + "/virusseq/virusseq_summary.txt",
 
 def getUnmappedReads(wildcards):
     ls = ["analysis/STAR/%s/%s.Unmapped.out.mate1" % (wildcards.sample, wildcards.sample)]
@@ -61,7 +61,7 @@ rule virusseq_table:
         filteredFPKMs = expand("analysis/virusseq/{sample}/{sample}.virusseq.filtered.gtf", sample=config["ordered_sample_list"]),
         readCounts = expand("analysis/virusseq/{sample}/STAR/{sample}.virus.ReadsPerGene.out.tab", sample=config["ordered_sample_list"])
     output:
-        table="analysis/virusseq/virusseq_table.csv",
+        table="analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
     message: "Generating virusseq output table"
     run:
         fpkms = " -f ".join(input.filteredFPKMs)
@@ -70,9 +70,9 @@ rule virusseq_table:
 
 rule virusseq_summarize:
     input:
-        "analysis/virusseq/virusseq_table.csv",
+        "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
     output:
-        "analysis/virusseq/virusseq_summary.txt",
+        "analysis/" + config["token"] + "/virusseq/virusseq_summary.txt",
     message: "Summarizing virusseq output"
     shell:
         "viper/modules/scripts/virusseq_summarize.py -f {input} > {output}"

@@ -22,7 +22,7 @@ rule pca_plot:
         pca_out_dir = "analysis/" + config["token"] + "/plots/"
     message: "Generating PCA plots"
     shell:
-        "Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_out_dir} "
+        "mkdir -p {output.pca_out_dir} && Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_out_dir} "
 
 
 rule heatmapSS_plot:

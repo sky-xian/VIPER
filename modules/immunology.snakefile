@@ -15,4 +15,4 @@ rule estimate_immune_abundance:
         token = config["token"]
     message: "Estimating immune cell abundance output"
     run:
-        shell( "Rscript viper/modules/scripts/immunology.R {input.fpkm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/params.token}/immunology/", cancer_type=config["cancer_type"])
+        shell( "Rscript viper/modules/scripts/immunology.R {input.fpkm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/{params.token}/immunology/", cancer_type=config["cancer_type"])

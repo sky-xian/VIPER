@@ -106,6 +106,7 @@ def _pathway(config):
     return path_files
 
 def _VirusSeq(config):
+    virus_seq_targets = []
     if ('virus_dna_scan' in config and config['virus_dna_scan'].upper() == 'TRUE' and config['reference'] == 'hg19'):
         virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
         virus_seq_targets = ["analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"]
@@ -115,7 +116,7 @@ def _immunology(config):
     targets = []
     #NOTE: cancer_type must be a valid string that is NOT 'FALSE'
     if ('cancer_type' in config) and (config["cancer_type"].upper() !='FALSE'):
-        targets = ["analysis/immunology/relative_abundance.txt",
-                   "analysis/immunology/output.pdf",
-                   "analysis/immunology/TIMER_results.pdf"]
+        targets = ["analysis/" + config["token"] + "/immunology/relative_abundance.txt",
+                   "analysis/" + config["token"] + "/immunology/output.pdf",
+                   "analysis/" + config["token"] + "/immunology/TIMER_results.pdf"]
     return targets

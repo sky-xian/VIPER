@@ -18,12 +18,14 @@ rule pca_plot:
         force_run_upon_config_change = config['config_file']
     output:
         expand("analysis/" + config["token"] + "/plots/images/pca_plot_{metacol}.png", metacol=config["metacols"]),
-        pca_plot_out="analysis/" + config["token"] + "/plots/pca_plot.pdf",
+        pca_plot_out="analysis/" + config["token"] + "/plots/pca_plot.pdf"
+        #pca_out_dir = "analysis/" + config["token"] + "/plots/"
+    params:
         pca_out_dir = "analysis/" + config["token"] + "/plots/"
     message: "Generating PCA plots"
     shell:
-        "mkdir -p {output.pca_out_dir} && Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_out_dir} "
-
+        #"mkdir -p {output.pca_out_dir} && Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_out_dir} "
+        " Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.pca_out_dir} "
 
 rule heatmapSS_plot:
     input:

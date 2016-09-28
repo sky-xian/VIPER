@@ -116,7 +116,7 @@ def _immunology(config):
     targets = []
     #NOTE: cancer_type must be a valid string that is NOT 'FALSE'
     if ('cancer_type' in config) and (config["cancer_type"].upper() !='FALSE'):
-        targets = ["analysis/"+config["token"]+"/immunology/relative_abundance.txt",
-                   "analysis/"+config["token"]+"/immunology/output.pdf",
-                   "analysis/"+config["token"]+"/immunology/TIMER_results.pdf"]
+        targets = ["analysis/" + config["token"] + "/immunology/relative_abundance.txt",
+                   "analysis/" + config["token"] + "/immunology/output.pdf",
+                   "analysis/" + config["token"] + "/immunology/TIMER_results.pdf"]
     return targets

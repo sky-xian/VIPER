@@ -170,7 +170,7 @@ main <- function() {
   print(paste("Outlier genes:", paste(outlier.genes, collapse=' ')))
 
   abundance.score.matrix <- c()
-  pdf(paste(args.global$outdir, '/output.pdf', sep=''))
+  pdf(paste(args.global$outdir, 'output.pdf', sep=''))
   for (i in 1:nrow(cancers)) {
     cancer.expFile <- cancers[i, 1]
     cancer.category <- cancers[i, 2]

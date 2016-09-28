@@ -18,7 +18,7 @@ options(error = function() traceback(2))
 pca_plot <- function(rpkmTable, annot, pca_out_dir) {
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)
   plot.var <- ggscreeplot(rpkm.pca)
-  ggsave(paste(pca_out_dir,"images/pca_plot_scree.png", sep=""))
+  suppressMessages(ggsave(paste(pca_out_dir,"images/pca_plot_scree.png", sep="")))
   all_plots <- list()
   for (ann in colnames(annot)){
     g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 1, var.scale = 1, obs.scale = 1,
@@ -29,12 +29,12 @@ pca_plot <- function(rpkmTable, annot, pca_out_dir) {
                    legend.position = 'top',
                    legend.title = element_text(face="bold"))
     all_plots <- c(all_plots, list(g))
-    ggsave(paste(pca_out_dir, "images/pca_plot_", ann, ".png", sep=""))
+    suppressMessages(ggsave(paste(pca_out_dir, "images/pca_plot_", ann, ".png", sep="")))
   }
 
   pdf(paste(pca_out_dir, "pca_plot.pdf", sep=""))
-  print(c(all_plots,list(plot.var)))
-  dev.off()
+  capture.output(print(c(all_plots,list(plot.var))))
+  junk <- dev.off()
 }
 
 
@@ -47,5 +47,7 @@ rpkmTable <- read.csv(rpkmFile, header=T, check.names=F,
                         row.names=1, stringsAsFactors=FALSE, dec='.')
 annot <- read.csv(metaFile, sep=",", header=T, row.names=1,
                       stringsAsFactors=FALSE, check.names=F, comment.char='#')
-annot <- annot[, !grepl('comp_*', colnames(annot)), drop=F]
+if(any(grepl("comp_*", colnames(annot)))) {
+  annot <- annot[, !grepl('comp_*', colnames(annot)), drop = F]
+}
 pca_plot(rpkmTable, annot, pca_out_dir)

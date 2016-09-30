@@ -34,7 +34,8 @@ rule run_STAR:
         counts="analysis/STAR/{sample}/{sample}.counts.tab",
         log_file="analysis/STAR/{sample}/{sample}.Log.final.out",
         #COOL hack: {{sample}} is LEFT AS A WILDCARD
-        unmapped_reads = expand( "analysis/STAR/{{sample}}/{{sample}}.Unmapped.out.{mate}", mate=_mates)
+        unmapped_reads = expand( "analysis/STAR/{{sample}}/{{sample}}.Unmapped.out.{mate}", mate=_mates),
+        sjtab = "analysis/STAR/{sample}/{sample}.SJ.out.tab",
     params:
         stranded=strand_command,
         gz_support=gz_command,
@@ -159,3 +160,11 @@ rule generate_rRNA_STAR_report:
         shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
         shell( "Rscript viper/modules/scripts/map_stats_rRNA.R {output.csv} {output.png}" )
 
+rule align_SJtab2JunctionsBed:
+    """Convert STAR's SJ.out.tab to (tophat) junctions.bed BED12 format"""
+    input:
+        "analysis/STAR/{sample}/{sample}.SJ.out.tab"
+    output:
+        "analysis/STAR/{sample}/{sample}.junctions.bed"
+    shell:
+        "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"

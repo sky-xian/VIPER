@@ -12,6 +12,7 @@
 def getTargetInfo(config):
     targetFiles = []
     targetFiles.extend([_getSTARcounts(config),
+                        _convertSJoutToBed(config),
                         _getCuffCounts(config), 
                         _fusionOutput(config), 
                         _insertSizeOutput(config), 
@@ -30,6 +31,10 @@ def getTargetInfo(config):
 def _getSTARcounts(config):
     STAR_out_files = ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"] if config["batch_effect_removal"].upper() != "TRUE" else ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"]
     return STAR_out_files
+
+def _convertSJoutToBed(config):
+    ls = ["analysis/STAR/"+sample+"/"+sample+".junctions.bed" for sample in config['ordered_sample_list']]
+    return ls
 
 def _getCuffCounts(config):
     cuff_files = ["analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"]
@@ -111,6 +116,7 @@ def _VirusSeq(config):
         virus_seq_targets = ["analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"]
         virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
         virus_seq_targets.extend(["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.Aligned.sortedByCoord.out.bw" for sample in config['ordered_sample_list']])
+        virus_seq_targets.extend(["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.junctions.bed" for sample in config['ordered_sample_list']])
     return virus_seq_targets
 
 def _immunology(config):

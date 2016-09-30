@@ -5,6 +5,7 @@ rule virusseq_all:
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.filtered.gtf" for sample in config['ordered_sample_list']],
         #GENERATE .bw for each of the alignments
         ["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.Aligned.sortedByCoord.out.bw" for sample in config['ordered_sample_list']],
+        ["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.junctions.bed" for sample in config['ordered_sample_list']],
         "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
         "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
 
@@ -19,7 +20,8 @@ rule virusseq_map:
         getUnmappedReads
     output:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam",
-        "analysis/virusseq/{sample}/STAR/{sample}.virus.ReadsPerGene.out.tab"
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.ReadsPerGene.out.tab",
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.SJ.out.tab"
     params:
         prefix=lambda wildcards: "analysis/virusseq/{sample}/STAR/{sample}.virus.".format(sample=wildcards.sample),
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
@@ -106,3 +108,12 @@ rule virusseq_bdgToBw:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bw"
     shell:
         "bedGraphToBigWig {input} {config[virusseq_chrom_len]} {output}"
+
+rule virusseq_SJtab2JunctionsBed:
+    """Convert STAR's SJ.out.tab to (tophat) junctions.bed BED12 format"""
+    input:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.SJ.out.tab"
+    output:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.junctions.bed"
+    shell:
+        "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"

@@ -3,6 +3,8 @@ rule virusseq_all:
     input:
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.transcripts.gtf" for sample in config['ordered_sample_list']],
         ["analysis/virusseq/"+sample+"/"+sample+".virusseq.filtered.gtf" for sample in config['ordered_sample_list']],
+        #GENERATE .bw for each of the alignments
+        ["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.Aligned.sortedByCoord.out.bw" for sample in config['ordered_sample_list']],
         "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
         "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
 
@@ -76,3 +78,31 @@ rule virusseq_summarize:
     message: "Summarizing virusseq output"
     shell:
         "viper/modules/scripts/virusseq_summarize.py -f {input} > {output}"
+
+rule virusseq_bamToBdg:
+    """Convert bam to bedGraph"""
+    input:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam",
+    output:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bg"
+    shell:
+        "bedtools genomecov -bg -split -ibam {input} -g {config[virusseq_chrom_len]} > {output}"
+
+rule virusseq_sortBdg:
+    """sort bedGraph"""
+    input:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bg"
+    output:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.sorted.bg"
+    shell:
+        "bedSort {input} {output}"
+
+
+rule virusseq_bdgToBw:
+    """Convert bedGraph to bigwig"""
+    input:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.sorted.bg"
+    output:
+        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bw"
+    shell:
+        "bedGraphToBigWig {input} {config[virusseq_chrom_len]} {output}"

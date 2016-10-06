@@ -8,6 +8,8 @@ rule virusseq_all:
         ["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.junctions.bed" for sample in config['ordered_sample_list']],
         "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
         "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
+        "analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv",
+
 
 def getUnmappedReads(wildcards):
     ls = ["analysis/STAR/%s/%s.Unmapped.out.mate1" % (wildcards.sample, wildcards.sample)]
@@ -44,7 +46,8 @@ rule virusseq_cuff:
     input:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam"
     output:
-        "analysis/virusseq/{sample}/{sample}.virusseq.transcripts.gtf"
+        "analysis/virusseq/{sample}/{sample}.virusseq.transcripts.gtf",
+        "analysis/virusseq/{sample}/isoforms.fpkm_tracking"
     threads: 4
     params:
         library_command=cuff_command
@@ -117,3 +120,18 @@ rule virusseq_SJtab2JunctionsBed:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.junctions.bed"
     shell:
         "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"
+
+rule virusseq_gen_cuff_isoform_matrix:
+    """Collect all of the virusseq isoform fpkms"""
+    input:
+        cuff_gene_fpkms=expand( "analysis/virusseq/{sample}/isoforms.fpkm_tracking", sample=config["ordered_sample_list"] ),
+    output:
+        "analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv",
+    message: "Generating expression matrix using cufflinks isoform counts"
+    priority: 3
+    params:
+        #What to call our col 0
+        iid="Transcript_ID"
+    run:
+        fpkm_files= " -f ".join(input.cuff_gene_fpkms)
+        shell("viper/modules/scripts/cuff_collect_fpkm.py -n {params.iid} -f {fpkm_files} > {output}")

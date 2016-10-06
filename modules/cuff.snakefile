@@ -21,7 +21,8 @@ rule run_cufflinks:
     input:
         "analysis/STAR/{sample}/{sample}.sorted.bam"
     output:
-        protected("analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking")
+        protected("analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking"),
+        protected("analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking")
     threads: 4
     message: "Running Cufflinks on {wildcards.sample}"
     params:
@@ -44,6 +45,21 @@ rule generate_cuff_matrix:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -d -f {fpkm_files} 1>{output}" )
 
+rule generate_cuff_isoform_matrix:
+    input:
+        cuff_gene_fpkms=expand( "analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking", sample=config["ordered_sample_list"] ),
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
+    output:
+        "analysis/" + config["token"] + "/cufflinks/Cuff_Isoform_Counts.csv"
+    message: "Generating expression matrix using cufflinks isoform counts"
+    priority: 3
+    params:
+        #What to call our col 0
+        iid="Transcript_ID"
+    run:
+        fpkm_files= " -f ".join(input.cuff_gene_fpkms)
+        shell("viper/modules/scripts/cuff_collect_fpkm.py -n {params.iid} -f {fpkm_files} > {output}")
 
 rule batch_effect_removal_cufflinks:
     input:

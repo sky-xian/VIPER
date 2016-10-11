@@ -12,6 +12,7 @@
 from modules.scripts.viper_report import get_sphinx_report
 from snakemake.utils import report
 from modules.scripts.utils import getTargetInfo
+from modules.scripts.utils import _copyMetaFiles
 
 rule generate_report:
     input:
@@ -25,4 +26,14 @@ rule generate_report:
         sphinx_str = get_sphinx_report(config)
         report(sphinx_str, output[0], metadata="Molecular Biology Core Facilities, DFCI", **{'Copyrights:':"./viper/mbcf.jpg"})
 
-
+rule copy_meta_files:
+    input:
+        config_file = config["config_file"], 
+        meta_file = config["metasheet"]
+    output:
+        config_file = _copyMetaFiles(config)[0], 
+        meta_file = _copyMetaFiles(config)[1]
+    message: "Saving config and metasheet into analysis/{config[token]}"
+    shell:
+        "cp {input.config_file} {output.config_file} && "
+        "cp {input.meta_file} {output.meta_file}"         

@@ -25,7 +25,8 @@ def getTargetInfo(config):
                         _cluster(config),
                         _pathway(config),
                         _VirusSeq(config),
-                        _immunology(config)])
+                        _immunology(config),
+                        _copyMetaFiles(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -133,3 +134,7 @@ def _immunology(config):
                    "analysis/" + config["token"] + "/immunology/output.pdf",
                    "analysis/" + config["token"] + "/immunology/TIMER_results.pdf"]
     return targets
+
+def _copyMetaFiles(config):
+    return ["analysis/" + config["token"] + "/" + config["token"] + '.config.yaml',
+            "analysis/" + config["token"] + "/" + config["token"] + '.metasheet.csv']

@@ -24,6 +24,7 @@ rsem_ref: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/UC
 #VirusSeq module reference files
 virusseq_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/virusseq/STAR_hg19Virus
 virusseq_gtf_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/virusseq/hg19Virus_refGene_RIS.gtf
+virusseq_chrom_len: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/virusseq/hg19Virus.len
 
 #software source paths required from user
 python2:

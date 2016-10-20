@@ -20,7 +20,7 @@ rule generate_report:
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
-        "analysis/" + config["token"] + "/report.html"
+        "analysis/" + config["token"] + "/" + config["token"] + ".html"
     message: "Generating VIPER report"
     run:
         sphinx_str = get_sphinx_report(config)

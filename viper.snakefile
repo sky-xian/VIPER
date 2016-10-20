@@ -20,7 +20,7 @@ config = updateMeta(config)
 #-----------------------------------------
 
 rule target:
-    input: getTargetInfo(config), "analysis/" + config["token"] + "/report.html"
+    input: getTargetInfo(config), "analysis/" + config["token"] + "/" + config["token"] + ".html"
     message: "Compiling all output"        
 
 include: "./modules/align.snakefile"         # rules specific to STAR and Fusion

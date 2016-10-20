@@ -55,10 +55,10 @@ def _addExecPaths(config):
         config["rsem_path"] = conda_root + '/envs/rsem/bin'
         config["seurat_path"] = conda_root + '/envs/seurat/bin' 
 
-    if "sub_analysis_token" in config and config["sub_analysis_token"]:
-        config["token"] = config["sub_analysis_token"]
+    if "analysis_token" in config and config["analysis_token"]:
+        config["token"] = config["analysis_token"]
     else:
-        config["token"] = "default"
+        config["token"] = "summary_reports"
     
     return config
 

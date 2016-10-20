@@ -67,9 +67,9 @@ def get_sphinx_report(config):
     if SF_png_list:
         file_dict['sf_png_list'] = SF_png_list
     report = """
-==============================================
-VIPER: Visualization Pipeline for RNAseq
-==============================================
+========================================================================
+VIPER: Visualization Pipeline for RNAseq - {sub_analysis_token}
+========================================================================
 
 
 Alignment Summary
@@ -82,7 +82,7 @@ Alignment Summary
     The **uniquely mapped read counts** and the **total read counts** for all the samples are summarized in the following image. In most cases, more than 70% of the reads should uniquely map to the reference genome.
     Contamination, low quality sequencing data, or poor library contruction may result in <60% uniquely aligned reads.
 
-"""
+""".format(sub_analysis_token = config["token"])
     if 'align_report' in file_dict:
         report += "\n\t.. image:: " + file_dict['align_report'] + "\n";
 
@@ -307,7 +307,7 @@ Virus-Seq Module Output
 """
         report += "\n" + get_sphinx_table(virusseq_out) + "\n"
 
-    report += "\n\nThis report is generated using [ `" + git_commit_string + "`_ ].\n"
+    report += "\n\nThis report is generated using ViPeR version [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"
     return report + "\n"
 

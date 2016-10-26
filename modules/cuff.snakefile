@@ -21,16 +21,16 @@ rule run_cufflinks:
     input:
         "analysis/STAR/{sample}/{sample}.sorted.bam"
     output:
-        protected("analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking"),
-        protected("analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking")
+        genes_cuff_out = protected("analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking"),
+        iso_cuff_out = protected("analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking")
     threads: 4
     message: "Running Cufflinks on {wildcards.sample}"
     params:
         library_command=cuff_command
     shell:
         "cufflinks -o analysis/cufflinks/{wildcards.sample} -p {threads} -G {config[gtf_file]} {params.library_command} {input}"
-        " && mv analysis/cufflinks/{wildcards.sample}/genes.fpkm_tracking {output}"
-        " && mv analysis/cufflinks/{wildcards.sample}/isoforms.fpkm_tracking analysis/cufflinks/{wildcards.sample}/{wildcards.sample}.isoforms.fpkm_tracking"
+        " && mv analysis/cufflinks/{wildcards.sample}/genes.fpkm_tracking {output.genes_cuff_out}"
+        " && mv analysis/cufflinks/{wildcards.sample}/isoforms.fpkm_tracking {output.iso_cuff_out}"
 
 rule generate_cuff_matrix:
     input:

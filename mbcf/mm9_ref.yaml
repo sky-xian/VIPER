@@ -3,7 +3,7 @@
 
 #STAR-Fusion
 #This is required only for PE data.
-genome_lib_dir: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/STAR_Fusion/Hg19_CTAT_resource_lib
+genome_lib_dir: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/STAR_Fusion/UCSC_mm9_build/
 
 #Reference files required
 star_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/UCSC/mm9/Sequence/STARIndex_with_ERCC/ 
@@ -13,8 +13,8 @@ ref_fasta: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/U
 star_rRNA_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/Ensembl/GRCm38/Sequence/non_coding_RNA/STAR_index_rRNA_SA_5/
 
 #Reference files required for whole genome SNP calling
-snpEff_db: 
-snpEff_conf:
+snpEff_db: mm9
+snpEff_conf: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/snpEff/snpEff.config
 
 #Reference organism; possible value - hg19, mm9 etc.
 reference: mm9

@@ -25,6 +25,7 @@ gz_command="--readFilesCommand zcat" if config["samples"][config["ordered_sample
 if( run_fusion ):
     strand_command = """ --outFilterIntronMotifs RemoveNoncanonicalUnannotated --chimSegmentMin 12 --chimJunctionOverhangMin 12 --alignSJDBoverhangMin 10 --alignMatesGapMax 200000 --alignIntronMax 200000 """
 _mates = ['mate1', 'mate2'] if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ['mate1']
+_keepPairs = "KeepPairs" if len(_mates) == 2 else ""
 
 rule run_STAR:
     input:
@@ -40,7 +41,8 @@ rule run_STAR:
         stranded=strand_command,
         gz_support=gz_command,
         prefix=lambda wildcards: "analysis/STAR/{sample}/{sample}".format(sample=wildcards.sample),
-        readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
+        readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample),
+        keepPairs = _keepPairs
     threads: 8
     message: "Running STAR Alignment on {wildcards.sample}"
     shell:
@@ -51,6 +53,7 @@ rule run_STAR:
         "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
         "  --limitBAMsortRAM 45000000000 --quantMode GeneCounts"
         "  --outReadsUnmapped Fastx"
+        "  --outSAMunmapped Within {params.keepPairs}"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
         " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
         " && samtools index {output.bam}"

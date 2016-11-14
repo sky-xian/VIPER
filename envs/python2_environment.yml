@@ -2,11 +2,13 @@ name: viper_py2
 channels:
 - bioconda
 dependencies:
+- biopython=1.68=py27_0
 - mkl=11.3.1=0
 - numpy=1.11.0=py27_0
 - openssl=1.0.1k=1
 - pip=8.1.1=py27_1
 - python=2.7.9=3
+- pysam=0.8.3
 - readline=6.2=2
 - rseqc=2.6.2=0
 - setuptools=20.3=py27_0

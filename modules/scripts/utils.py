@@ -26,7 +26,8 @@ def getTargetInfo(config):
                         _pathway(config),
                         _VirusSeq(config),
                         _immunology(config),
-                        _copyMetaFiles(config)])
+                        _copyMetaFiles(config),
+                        _CDR3(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -139,3 +140,13 @@ def _immunology(config):
 def _copyMetaFiles(config):
     return ["analysis/" + config["token"] + "/" + config["token"] + '.config.yaml',
             "analysis/" + config["token"] + "/" + config["token"] + '.metasheet.csv']
+
+def _CDR3(config):
+    cdr3_targets = []
+    if ('cdr3_analysis' in config and config['cdr3_analysis'].upper() == 'TRUE' and config['reference'] == 'hg19'):
+        #LEN: Do we need to tokenize these results??--can bams be reanalyzed?
+        cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]
+        cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-Locs.bam" for sample in config["ordered_sample_list"]])
+        cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-unmapped.bam" for sample in config["ordered_sample_list"]])
+
+    return cdr3_targets

@@ -54,6 +54,9 @@ numkeggpathways: 5
 #README.md
 #cancer_type: 'sarc'
 
+#Uncomment the following line to perform a TRUST (cdr3) analysis.  refer to README.md
+#cdr3_analysis: "True"
+
 the_samples:
   P4_OE1:
     - /zfs/cores/mbcf/mbcf-storage/devel/umv/snakemake/20151105-P4-1plus-DL2436_S4_R1_001.fastq.gz

@@ -10,15 +10,6 @@ suppressMessages(library("XML"))
 suppressMessages(library("ggplot2"))
 suppressMessages(library("stringr"))
 
-kegg.set = kegg.gsets()
-ks = kegg.set$kg.sets
-kss = kegg.set$kg.sets[kegg.set$sigmet.idx]
-names(kss) = gsub("/","",names(kss))
-
-## Removing pathways that I know don't load properly... no idea why
-pathway_errors = c("hsa01200 Carbon metabolism", "hsa01230 Biosynthesis of amino acids", "hsa01212 Fatty acid metabolism", "hsa01210 2-Oxocarboxylic acid metabolism", "hsa01100 Metabolic pathways", "hsa00533 Glycosaminoglycan biosynthesis - keratan sulfate", "hsa00514 Other types of O-glycan biosynthesis", "hsa00511 Other glycan degradation")
-kss[which(names(kss) %in% pathway_errors)] <- NULL
-
 ## The traceback is actually necessary to not break pipe at the stop step, so leave on
 options(error = function() traceback(2))
 
@@ -122,18 +113,26 @@ kegg_pathway_f<- function(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,re
     ## Renaming files
     # Create variable with keggrespathways sorted and pull out name
     sortkeggrespathways = sort(keggrespathways)
-    newnames = substr(sortkeggrespathways, 10, nchar(sortkeggrespathways))
-    newnames = gsub(" ", "_", newnames)
-    newnames = paste0(newnames, "_", match(sortkeggrespathways,keggrespathways))
+    if (reference == "hg19") {
+      newnames = substr(sortkeggrespathways, 10, nchar(sortkeggrespathways))
+      newnames = gsub(" ", "_", newnames)
+      newnames = paste0(newnames, "_", match(sortkeggrespathways,keggrespathways))
+    }
     
     # Read in the list of made png files
     png_files <- list.files(temp_dir, pattern=glob2rx("*.pathview.png"))
-    file.rename(paste0(temp_dir,png_files), paste0(kegg_dir, newnames, ".png"))
-
+    if (reference == "hg19") {
+      file.rename(paste0(temp_dir,png_files), paste0(kegg_dir, newnames, ".png"))
+    } else {
+      file.rename(paste0(temp_dir, png_files), paste0(kegg_dir, png_files))
+    }
     # Repeat for xml files
     xml_files <- list.files(temp_dir, pattern=glob2rx("*.xml"))
-    file.rename(paste0(temp_dir,xml_files), paste0(kegg_dir, newnames, ".xml"))
-
+    if (reference == "hg19") {
+      file.rename(paste0(temp_dir,xml_files), paste0(kegg_dir, newnames, ".xml"))
+    } else {
+      file.rename(paste0(temp_dir, xml_files), paste0(kegg_dir, xml_files))
+    }
     
     ## Create Kegg Summary Table
     values = sapply(fullkegg[,4], as.numeric)
@@ -196,6 +195,16 @@ keggsummary_pdf = args[9]
 keggsummary_png = args[10]
 gsea_table = args[11]
 gsea_pdf = args[12]
+
+species <- ifelse(reference == 'hg19', 'hsa', 'mmu')
+kegg.set = kegg.gsets(species = species)
+ks = kegg.set$kg.sets
+kss = kegg.set$kg.sets[kegg.set$sigmet.idx]
+names(kss) = gsub("/","",names(kss))
+
+## Removing pathways that I know don't load properly... no idea why
+pathway_errors = c("hsa01200 Carbon metabolism", "hsa01230 Biosynthesis of amino acids", "hsa01212 Fatty acid metabolism", "hsa01210 2-Oxocarboxylic acid metabolism", "hsa01100 Metabolic pathways", "hsa00533 Glycosaminoglycan biosynthesis - keratan sulfate", "hsa00514 Other types of O-glycan biosynthesis", "hsa00511 Other glycan degradation")
+kss[which(names(kss) %in% pathway_errors)] <- NULL
 
 
 kegg_pathway_f(deseq_file, keggpvalcutoff,numkeggpathways,kegg_dir,reference,temp_dir, kegg_table_up,kegg_table_down,keggsumary_pdf,keggsummary_png,gsea_table,gsea_pdf)

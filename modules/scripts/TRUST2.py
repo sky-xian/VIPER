@@ -7,12 +7,16 @@
 # All rights preserved by Bo Li: bli@jimmy.harvard.edu
 # Sep 30, 2015
 # Updates: May 31, 2016, add single end component
+# Updates: Nov 08, election day, 2016: add multiple-variable gene assignment
+#               force TRUST to screen for all vgene assignment, slow
 ##-------------------------------------------------------
 
 ##-------------------------------------------------------
 # Update: 2016-10-31 making this compatible with VIPER
 # 1. fixing -o option
 # 2. setting correct static file directory
+# Update: 2016-11-14 updating the TRUST2.1 script w/ these changes
+# TRUST _version# 2.1
 ##-------------------------------------------------------
 
 import sys,re,os,resource,subprocess
@@ -28,10 +32,11 @@ from optparse import OptionParser
 from copy import deepcopy
 from collections import defaultdict
 from Bio import pairwise2
-
 pairwise2.MAX_ALIGNMENTS=1
 t0=time.time()
 curDir=re.sub('TRUST2.py','',os.path.dirname(os.path.realpath(sys.argv[0])))+'/'
+#curDir='./'
+
 #ASSUME it's being run in the VIPER PROJECT directory
 #MAYBE this should be a command line option in the future!!!
 _static_path_dir=os.path.join(os.getcwd(), "viper", "static", "cdr3")
@@ -196,7 +201,7 @@ def GetVMotifs(FaDict,PAT=CDR3patV):
                 if mm is not None:
                     break
             mms=mm.span()
-            kkV=vv[mms[0]-3:mms[1]]
+            kkV=vv[mms[0]-3:mms[1]] ## Keep at least 3 flanking amino acids
             VmotifList.append(kkV)
         for kk in FaDict:
             vv=FaDict[kk]
@@ -567,6 +572,8 @@ def DetectCDR3(seq,VFaDict,JFaDict,Bcell=False):
                                 bestMatchListV.append((bestMatch,vv[0]))
                                 bestScoreListV.append(bestScore)
                                 continue
+                            matched_vgenes=[]
+                            vscores=[]
                             for Vgene in VFaDict:
                                 Vseq=VFaDict[Vgene][-(Nv+10):]
                                 aln=pairwise2.align.localms(Vseq,ss,1,-1,-9,0)
@@ -577,10 +584,14 @@ def DetectCDR3(seq,VFaDict,JFaDict,Bcell=False):
                                 if aln[2]>bestScore:
                                     bestMatch=Vgene
                                     bestScore=aln[2]
+                                matched_vgenes.append(Vgene)
+                                vscores.append(aln[2])
                             if bestScore<Nv-10:
                                 # allow for 5 mismatches or single gaps
                                 bestMatch=''
                                 bestScore=0
+                            bestIdx=np.where(np.array(vscores)==bestScore)[0]
+                            bestMatch='_'.join(list(np.array(matched_vgenes)[bestIdx]))
                             bestMatchListV.append((bestMatch,vv[0]))
                             bestScoreListV.append(bestScore)                        
                 bSv=max(bestScoreListV)
@@ -621,6 +632,8 @@ def DetectCDR3(seq,VFaDict,JFaDict,Bcell=False):
                         bestMatchList.append((bestMatch,vv[0]))
                         bestScoreList.append(bestScore)
                         continue
+                    matched_vgenes=[]
+                    vscores=[]
                     for Vgene in VFaDict:
                         Vseq=VFaDict[Vgene][-(Nv+10):]
                         aln=pairwise2.align.localms(Vseq,ss,1,-1,-9,0)
@@ -631,10 +644,14 @@ def DetectCDR3(seq,VFaDict,JFaDict,Bcell=False):
                         if aln[2]>bestScore:
                             bestMatch=Vgene
                             bestScore=aln[2]
+                        matched_vgenes.append(Vgene)
+                        vscores.append(aln[2])
                     if bestScore<Nv-10:
                         # allow for 5 mismatches or single gaps
                         bestMatch=''
                         bestScore=0
+                    bestIdx=np.where(np.array(vscores)==bestScore)[0]
+                    bestMatch='_'.join(list(np.array(matched_vgenes)[bestIdx]))
                     bestMatchList.append((bestMatch,vv[0]))
                     bestScoreList.append(bestScore)                        
                 bSv=max(bestScoreList)
@@ -657,7 +674,7 @@ def DetectCDR3(seq,VFaDict,JFaDict,Bcell=False):
 def AllocateReadsIntoGenes(rr,geneLoci,geneName,REFs):
 	readDict={}
 	for read in rr:
-		if 'N' in read.seq:
+		if 'N' in read.seq and read.flag & 4>0: ## Remove unmapped reads with "N"
 			continue
 		if read.qname not in readDict:
                     if '/1' == read.qname[-2:] or '/2' == read.qname[-2:]:
@@ -1223,6 +1240,8 @@ def AssembleCommReads(readComm,OpDict,OverlapInfo,PairedReadDict,readDict,contig
                     if tmp[0]==3:
                             vDict[qn]=0
                             continue
+                    if len(tmpSeq) is not nr:
+                        continue
                     tmpSeq0=ConvertBitToDNA(ReverseComp(ConvertDNAtoBinary(tmpSeq),n=nr),n=nr)
                 if mode=='contig':
                     tmpSeq=contigDict[qn]
@@ -1366,7 +1385,6 @@ def AssembleCommReads(readComm,OpDict,OverlapInfo,PairedReadDict,readDict,contig
                         else:
                             if rr not in remainReads[ii]:
                                 remainReads[ii].append(rr)
-                                #print rr
         ## Count reads in each contig                        
         temp=list(chain(*assembleReadsNew))+list(chain(*remainReads))
         countDict=defaultdict(int)
@@ -1512,10 +1530,12 @@ def AnnotateCDR3(Seq,pRD,ContigReads=[],geneType='',error=1,overlap_thr=10,Bcell
                 offset=-tag0-1
             AAseq=CDR3[0][0]
             Vinfo=CDR3[1][0]
+            Vgene=''
             if len(Vinfo)>0:
-                Vgene=Vinfo.split('|')[1]
-            else:
-                Vgene=''
+                VgeneList=Vinfo.split('_')
+                for VgeneC in VgeneList:
+                    Vgene+='_'+VgeneC.split('|')[1]
+            Vgene=Vgene[1:]
             st=int(CDR3[2])
             Jinfo=CDR3[3][0]
             if len(Jinfo)>0:
@@ -1656,6 +1676,7 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                             N_all+=1
         time2=time.time()
         print "... time elapsed %f" %(time2-time1)
+        print N_all
         print "Extract reads with joining gene DNA motif"
         for rr in fHandle.fetch(until_eof=True):
             if nr==0:
@@ -1677,7 +1698,7 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                             CDR3_rr[geneKey]=[rr]
                         else:
                             CDR3_rr[geneKey].append(rr)
-                        break
+#                        break
             else:
                 if HeavyChain:
                     for geneKey in patDict:
@@ -1688,7 +1709,7 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                                 CDR3_rr[geneKey]=[rr]
                             else:
                                 CDR3_rr[geneKey].append(rr)
-                            break
+#                            break
                 else:
                     for geneKey in patDictAll:
                         patDNA=patDictAll[geneKey]
@@ -1698,9 +1719,10 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                                 CDR3_rr[geneKey]=[rr]
                             else:
                                 CDR3_rr[geneKey].append(rr)
-                            break
+#                                break
         time2=time.time()
         print "... time elapsed %f" %(time2-time1)
+        print count
         print "Convert DNA sequence into Amino Acid"
         time1=time.time()
         CDR3_AA={}
@@ -1711,6 +1733,7 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                 CDR3_AA[geneKey].append((rr,TranslateAA(rr.seq)))
         time2=time.time()
         print "... time elapsed %f" %(time2-time1)
+        print len(CDR3_AA)
         print "Filter in reads with gene AA motif"
         time1=time.time()
         filteredCDR3_AA={}
@@ -1741,7 +1764,8 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                     if flag==1:
                         break
         time2=time.time()
-        print "... time elapsed %f" %(time2-time1)                    
+        print "... time elapsed %f" %(time2-time1)
+        print len(filteredCDR3_AA)
         print "Realign kept CDR3 DNA sequences to IMGT reference genes"
         time1=time.time()
         MatchedCDR3s={}
@@ -1777,6 +1801,7 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
                     MatchedCDR3s[geneKey].append((AA[0],AA[2],matched_aln))
         time2=time.time()
         print "... time elapsed %f" %(time2-time1)
+        print len(MatchedCDR3s)
         print "Allocate unmapped SE reads into TCR genes"
         geneDict={} ## dictionary of dictionary: gene name first, then qname
         rD={}
@@ -1820,6 +1845,7 @@ def ProcessSingleEndReads(fname,LocusFile,HeavyChain=True,err=1,overlap_thr=10,f
             MasterContig[kk]=Contigs
         time2=time.time()
         print "... time elapsed %f" %(time2-time1)
+        print len(MasterContig)
         print "Merging contigs"
         time1=time.time()
         ContigFinalList=MergeMasterContig(MasterContig,pRD,rD,overlap_thr,err)
@@ -1975,8 +2001,7 @@ def ScreenGenome(fname,LocusFile,InsThr=10,saveDir='./'):
                                 	print "---retrived %d unmapped reads" %(count_r)
         if paired_flag==0:  ## In case the total library has fewer than 1M reads
             return 1
-	#nfname=saveDir+fname.split('/')[-1]+'-Locs.bam'
-        nfname=os.path.join(saveDir, fname.split('/')[-1]+'-Locs.bam')
+	nfname=os.path.join(saveDir, fname.split('/')[-1]+'-Locs.bam')
 	HH=handle.header
         ghandle=pysam.Samfile(nfname,mode='wb',header=HH,referencenames=handle.references,referencelengths=handle.nreferences)
         for kk in seqDir:
@@ -1999,7 +2024,6 @@ def ScreenGenome(fname,LocusFile,InsThr=10,saveDir='./'):
         for kk in pDict:
              if len(pDict[kk])==2:
                      paired_unmapped.append(pDict[kk])
-        #unmapped_file_name=fname.split('/')[-1]+'-unmapped.bam'
         unmapped_file_name=os.path.join(saveDir, fname.split('/')[-1]+'-unmapped.bam')
         uhandle=pysam.Samfile(unmapped_file_name,mode='wb',header=HH,referencenames=handle.references,referencelengths=handle.nreferences)
         for kk in paired_unmapped:
@@ -2101,8 +2125,6 @@ def main():
                 if sr==0:   ## Paired end mode checks out
                     ffm=WD+'/'+fname+'-Locs.bam'
                     ffu=WD+'/'+fname+'-unmapped.bam'
-                    #os.path.join(WD, fname+"-Locs.bam")
-                    #os.path.join(WD, fname+"-unmapped.bam")
                     hh=pysam.Samfile(ffm)
                     REFs=hh.references
                     # Extract all reads from the bam file without index
@@ -2189,6 +2211,7 @@ def main():
                 if sr==1:
                     print "Switching to single end mode"
                     annList,ContigFinalList,N_all=ProcessSingleEndReads(ff,LocusFile,HeavyChain=HC,err=Err,overlap_thr=thr_L,fasta=fasta,Bcell=Bcell)
+                    print "Number of annList %d" %(len(annList))
                 for ii in xrange(0,len(annList)):
                     ann=annList[ii]
                     if len(ann)>0:

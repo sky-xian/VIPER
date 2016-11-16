@@ -84,7 +84,8 @@ def _DE(config):
         de_list.append("analysis/" + config["token"] + "/diffexp/de_summary.png")
         de_list.extend([["analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + "_volcano.pdf",
                         "analysis/" + config["token"] + "/diffexp/" + comp + "/deseq_limma_fc_corr.png"]
-            for comp in config["comparisons"]])
+            if len(config['comps'][comp]['control']) > 1 and len(config['comps'][comp]['treat']) > 1 else
+            ["analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + "_volcano.pdf"] for comp in config["comparisons"]])
     return de_list
 
 def _SNP(config):

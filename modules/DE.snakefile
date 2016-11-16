@@ -4,21 +4,6 @@
 # coding: utf-8
 
 from scripts.utils import _getSTARcounts
-import pandas as pd
-
-metadata = pd.read_table(config['metasheet'], index_col=0, sep=',', comment='#')
-
-def _getColumn(comparison):
-    return metadata["comp_{}".format(comparison)]
-
-def _getComparison(name, group):
-    comp = _getColumn(name)
-    return metadata[comp == group].index
-
-def _getSamples(wildcards):
-    comp = _getColumn(wildcards.comparison)
-    return comp.dropna().index
-
 
 rule limma_and_deseq:
     input:
@@ -31,14 +16,17 @@ rule limma_and_deseq:
         limma_annot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.limma.annot.csv",
         deseq_annot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.annot.csv",
     params:
-        s1=lambda wildcards: ",".join(_getComparison(wildcards.comparison, 1)),
-        s2=lambda wildcards: ",".join(_getComparison(wildcards.comparison, 2)),
+        s1 = lambda wildcards: ",".join(config['comps'][wildcards.comparison]['control']),
+        s2 = lambda wildcards: ",".join(config['comps'][wildcards.comparison]['treat']),
         gene_annotation = config['gene_annotation']
     message: "Running differential expression analysis using limma and deseq for {wildcards.comparison}"
     shell:
         "Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" " 
         "{output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} "
         "{output.deseqSum} {params.gene_annotation} "
+        # ridiculous hack for singletons (Mahesh Vangala)
+        "&& touch {output.limma} "
+        "&& touch {output.limma_annot}"
 
 
 rule deseq_limma_fc_plot:

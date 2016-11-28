@@ -1,9 +1,9 @@
 ## Load required packages
 suppressMessages(library("gplots"))
-suppressMessages(library("ComplexHeatmap"))
+suppressWarnings(suppressMessages(library("ComplexHeatmap")))
 suppressMessages(library("circlize"))
 suppressMessages(library("viridis"))
-suppressMessages(library('dplyr'))
+suppressMessages(library("dplyr"))
 suppressMessages(source('viper/modules/scripts/supp_fns.R'))
 
 ## Enable stack trace
@@ -17,7 +17,7 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
     ## Make SF (sample-feature) heatmap
     Exp_data <- apply(Exp_data,1,function(x) zscore(x))
 
-    ## Set breaks for data
+    ## Set breaks for data for color scale
     ma_nolym <- max(Exp_data)
     mi_nolym <- min(Exp_data)
     my.breaks_nolym<-c(-3,seq(-2.5,2.5,length.out=99),3)
@@ -28,8 +28,10 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
     ## Make annotation bars
     ha1 <- make_complexHeatmap_annotation(annot)
 
-    ## Set Column Clustering
-    coldistance = dist(t(Exp_data), method = "euclidean")
+    ## Calc. spearman correlation and use values for column clustering
+    cordata <- cor(Exp_data, method="spearman")
+
+    coldistance = dist(t(as.matrix(cordata)), method = "euclidean")
     colcluster = hclust(coldistance, method = "ward.D2")
 
     ## Turn on rownames if less than 100 genes
@@ -92,7 +94,7 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
               grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
               })
         }
-        dev.off()
+        junk <- dev.off()
 
         ## Repeated to get into the pdf
         draw(mapplot)
@@ -115,7 +117,7 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
             }
         }
     }
-    dev.off()        
+    junk <- dev.off()        
         
 }
 

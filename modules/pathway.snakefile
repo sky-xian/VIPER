@@ -17,16 +17,18 @@ rule goterm_analysis:
     output:
         out_file = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.done"
     params:
-        csv = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.csv",
+        up_csv = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.up.csv",
+        down_csv = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.down.csv",
         plot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.goterm.pdf",
-        png = "analysis/" + config["token"] + "/plots/images/{comparison}_goterm.png",
+        up_png = "analysis/" + config["token"] + "/plots/images/{comparison}_goterm.up.png",
+        down_png = "analysis/" + config["token"] + "/plots/images/{comparison}_goterm.down.png",
         gotermadjpvalcutoff = config["goterm_adjpval_cutoff"],
         numgoterms = config["numgoterms"],
         reference = config["reference"]
     message: "Creating Goterm Analysis plots for Differential Expressions for {wildcards.comparison}"
     shell:
         "Rscript viper/modules/scripts/goterm_analysis.R {input.deseq} {params.gotermadjpvalcutoff} "
-        "{params.numgoterms} {params.reference} {params.csv} {params.plot} {params.png} && "
+        "{params.numgoterms} {params.reference} {params.up_csv} {params.down_csv} {params.plot} {params.up_png} {params.down_png} && "
         " touch {output.out_file} "
 
 rule kegg_analysis:
@@ -37,12 +39,12 @@ rule kegg_analysis:
     output:
         out_file = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.kegg.done"
     params:
-        keggpvalcutoff = config["kegg_pval_cutoff"],
         numkeggpathways = config["numkeggpathways"],
         kegg_table_up = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.kegg.up.csv",
         kegg_table_down = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.kegg.down.csv",
         keggsummary_pdf = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.keggsummary.pdf",
-        keggsummary_png = "analysis/" + config["token"] + "/plots/images/{comparison}.keggsummary.png",
+        up_kegg_png = "analysis/" + config["token"] + "/plots/images/{comparison}.keggsummary.up.png",
+        down_kegg_png = "analysis/" + config["token"] + "/plots/images/{comparison}.keggsummary.down.png",
         gsea_table = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gsea.csv",
         gsea_pdf = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gsea.pdf",
         kegg_dir = "analysis/" + config["token"] + "/diffexp/{comparison}/kegg_pathways/",
@@ -50,11 +52,11 @@ rule kegg_analysis:
         temp_dir = "analysis/" + config["token"] + "/diffexp/{comparison}/temp/"
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
     shell:
-        "mkdir {params.temp_dir} && "
-        "Rscript viper/modules/scripts/kegg_pathway.R {input.deseq} {params.keggpvalcutoff} "
+        "mkdir -p {params.temp_dir} && "
+        "Rscript viper/modules/scripts/kegg_pathway.R {input.deseq} "
         "{params.numkeggpathways} {params.kegg_dir} {params.reference} {params.temp_dir} "
         "{params.kegg_table_up} {params.kegg_table_down} {params.keggsummary_pdf} " 
-        "{params.keggsummary_png} {params.gsea_table} {params.gsea_pdf} && "
+        "{params.up_kegg_png} {params.down_kegg_png} {params.gsea_table} {params.gsea_pdf} && "
         "touch {output.out_file} && "
         "rm -rf {params.temp_dir} "
 

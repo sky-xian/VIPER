@@ -48,7 +48,7 @@ parse_args <- function() {
 				type="double", nargs=1)
 	parser$add_argument('--filter_miRNA', help="If TRUE, filters genes with MIR and SNO names",
 				type="logical", nargs=1)
-	parser$add_argument('--SS_numgenes', help="Number of genes to be considered for plotting",
+	parser$add_argument('--numgenes', help="Number of genes to be considered for plotting",
                         	type="integer", nargs=1)
 	parser$add_argument('--out_file', help="Output filename to generate filtered RPKM counts",
                         	type="character", nargs=1)
@@ -60,5 +60,5 @@ parse_args <- function() {
 
 args <- parse_args()
 filtered_cuff <- preprocess(args$rpkm_file, args$sample_names, args$filter_miRNA,
-				args$SS_numgenes, args$min_samples, args$RPKM_cutoff)
+				args$numgenes, args$min_samples, args$RPKM_cutoff)
 write.csv(filtered_cuff, file=args$out_file, quote=FALSE)

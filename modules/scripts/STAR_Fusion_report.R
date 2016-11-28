@@ -6,10 +6,10 @@
 # @Date: May, 9, 2016
 #----------------------------------------------------------------
 
-library("reshape2")
-library("ggplot2")
-library("gplots")
-library("RColorBrewer")
+suppressMessages(library("reshape2"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("gplots"))
+suppressMessages(library("RColorBrewer"))
 
 args <- commandArgs( trailingOnly = TRUE )
 
@@ -32,7 +32,7 @@ if (LOG2TRANSFORM) {
 }
 
 png(args[2], width = 8, height = 8, unit="in",res=300)
-ggplot(melt(sfs)) +
+ggplot(suppressMessages(melt(sfs))) +
   geom_tile(aes(Sample,FusionName,fill=value), color='black') +
   scale_fill_gradient2(low = "white", high = "red",
                        midpoint = ds_mid , limit =  c(0,ds_max),
@@ -44,4 +44,4 @@ ggplot(melt(sfs)) +
   theme(panel.border=element_rect(fill = NA, colour=alpha('black', .5),size=1)) +
   theme(legend.position="top", legend.justification = 'right')
 
-dev.off()
+junk <- dev.off()

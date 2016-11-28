@@ -32,7 +32,7 @@ def getTargetInfo(config):
 
 ## Returns proper count files for with and without batch effect correction
 def _getSTARcounts(config):
-    STAR_out_files = ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"] if config["batch_effect_removal"].upper() != "TRUE" else ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"]
+    STAR_out_files = ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"] if config["batch_effect_removal"] == True else ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"]
     return STAR_out_files
 
 def _convertSJoutToBed(config):
@@ -41,7 +41,7 @@ def _convertSJoutToBed(config):
 
 def _getCuffCounts(config):
     cuff_files = ["analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"]
-    if config["batch_effect_removal"] == "true":
+    if config["batch_effect_removal"] == True:
         cuff_files.append("analysis/" + config["token"] + "/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
     else:
         cuff_files.append("analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv")
@@ -91,7 +91,7 @@ def _DE(config):
 
 def _SNP(config):
     snp_files = ["analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png"]
-    if ('snp_scan_genome' in config and config['snp_scan_genome'].upper() == 'TRUE'):
+    if ('snp_scan_genome' in config and config['snp_scan_genome'] == True):
         snp_files.extend([["analysis/snp/" + sample + "/" + sample + ".snp.genome.vcf", 
             "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]])
     return snp_files
@@ -120,7 +120,7 @@ def _pathway(config):
 
 def _VirusSeq(config):
     virus_seq_targets = []
-    if ('virus_dna_scan' in config and config['virus_dna_scan'].upper() == 'TRUE' and config['reference'] == 'hg19'):
+    if ('virus_dna_scan' in config and config['virus_dna_scan'] == True and config['reference'] == 'hg19'):
         virus_seq_targets = ["analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"]
         virus_seq_targets.extend(["analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv"])
         virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
@@ -143,7 +143,7 @@ def _copyMetaFiles(config):
 
 def _CDR3(config):
     cdr3_targets = []
-    if ('cdr3_analysis' in config and config['cdr3_analysis'].upper() == 'TRUE' and config['reference'] == 'hg19'):
+    if ('cdr3_analysis' in config and config['cdr3_analysis'] == True and config['reference'] == 'hg19'):
         #LEN: Do we need to tokenize these results??--can bams be reanalyzed?
         cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]
         cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-Locs.bam" for sample in config["ordered_sample_list"]])

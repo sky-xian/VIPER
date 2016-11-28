@@ -36,6 +36,7 @@ rule deseq_limma_fc_plot:
     output:
         out_csv = "analysis/" + config["token"] + "/diffexp/{comparison}/deseq_limma_fc_corr.csv",
         out_png = "analysis/" + config["token"] + "/diffexp/{comparison}/deseq_limma_fc_corr.png"
+    message: "Creatting deseq-limma correlation plot for {wildcards.comparison}"
     shell:
         "Rscript viper/modules/scripts/deseq_limma_fc_corr.R {input.deseq} {input.limma} {output.out_csv} {output.out_png}"
 

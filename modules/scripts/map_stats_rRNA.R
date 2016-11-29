@@ -43,5 +43,5 @@ guides(fill=guide_legend(title=NULL)) + theme_bw() +
 #geom_hline(yintercept =10, linetype= "dash") +
 theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=10))
 
-dev.off()
+junk <- dev.off()
 

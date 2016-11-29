@@ -20,7 +20,7 @@ corr_plot <- function(merged_data, png_file, title="DESeq2 v limma") {
   smoothScatter(merged_data$log2FoldChange,merged_data$logFC,xlab="DESeq Log2FC", ylab="Limma LogFC",main=title)
   abline(lm(merged_data$log2FoldChange ~ merged_data$logFC),col="red")
   abline(v=0,h=0,lty=2)
-  dev.off()
+  junk <- dev.off()
 }
 
 args <- commandArgs(trailingOnly=TRUE)

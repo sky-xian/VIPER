@@ -34,12 +34,13 @@ rule heatmapSS_plot:
         force_run_upon_config_change = config['config_file']
     output:
         ss_plot_out="analysis/" + config["token"] + "/plots/heatmapSS_plot.pdf",
-        ss_txt_out="analysis/" + config["token"] + "/plots/heatmapSS.txt",
-        ss_out_dir = "analysis/" + config["token"] + "/plots/"
+        ss_txt_out="analysis/" + config["token"] + "/plots/heatmapSS.txt"
     message: "Generating Sample-Sample Heatmap"
+    params:
+        ss_out_dir = "analysis/" + config["token"] + "/plots/"
     shell:
         "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
-        "{input.annotFile} {output.ss_out_dir} "
+        "{input.annotFile} {params.ss_out_dir} "
 
 
 rule heatmapSF_plot:
@@ -49,11 +50,11 @@ rule heatmapSF_plot:
         force_run_upon_config_change = config['config_file']
     output:
         sf_plot_out="analysis/" + config["token"] + "/plots/heatmapSF_plot.pdf",
-        sf_txt_out="analysis/" + config["token"] + "/plots/heatmapSF.txt",
-        sf_out_dir = "analysis/" + config["token"] + "/plots/"
+        sf_txt_out="analysis/" + config["token"] + "/plots/heatmapSF.txt"
     params:
-        num_kmeans_clust = config["num_kmeans_clust"]
+        num_kmeans_clust = config["num_kmeans_clust"],
+        sf_out_dir = "analysis/" + config["token"] + "/plots/"
     message: "Generating Sample-Feature heatmap"
     shell:
         "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} "
-        "{input.annotFile} {params.num_kmeans_clust} {output.sf_out_dir} "
+        "{input.annotFile} {params.num_kmeans_clust} {params.sf_out_dir} "

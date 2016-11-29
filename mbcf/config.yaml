@@ -6,9 +6,9 @@
 #Refer to https://github.com/vangalamaheshh/ROOT/blob/master/bioifx/pipelines/snakemake/metasheet.sample.csv
 metasheet: metasheet.csv
 
-#possible values are, true and false
-stranded: true
-# if stranded true, library_type is a required argument
+#possible values are, True and False
+stranded: True
+# if stranded True, library_type is a required argument
 # Possible values are [ff-firststrand, ff-secondstrand, ff-unstranded, fr-firststrand, fr-secondstrand, fr-unstranded (default), transfrags]
 library_type: fr-firststrand
 
@@ -20,27 +20,32 @@ library_type: fr-firststrand
 RPKM_threshold: 2.0
 min_num_samples_expressing_at_threshold: 4
 
-SSnumgenes: 250
-SFnumgenes: 1000
+# Number of genes to be represented in the Sample-Sample, Sample-Feature, and PCA plots
+numgenes_plots: 1000
 
 num_kmeans_clust: '0,4'
 
-filter_mirna: "TRUE"
+filter_mirna: True
 
 # Varscan - default turned off 
-snp_scan_genome: "false"
+snp_scan_genome: False
 
-# VirusSeq module - possible values [true,false]
-virus_dna_scan: "false"
+# VirusSeq module - possible values [True,False]
+virus_dna_scan: False
+
+# to perform a TRUST (cdr3) analysis.  refer to README.md
+cdr3_analysis: False
 
 # Pathway params
 numgoterms: 10
 goterm_adjpval_cutoff: 0.05
-kegg_pval_cutoff: 0.05
 numkeggpathways: 5
 
+#Uncomment the following line to perform TIMER (immunology) analysis. refer to README.md
+#cancer_type: 'sarc'
+
 # Batch params
-batch_effect_removal: "false"
+batch_effect_removal: False
 
 # sub-analyses
 analysis_token: 

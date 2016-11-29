@@ -25,7 +25,7 @@ rule filter_cuff_matrix:
         "--min_samples {config[min_num_samples_expressing_at_threshold]} "
         "--RPKM_cutoff {config[RPKM_threshold]} "
         "--filter_miRNA {config[filter_mirna]} "
-        "--SS_numgenes {config[SSnumgenes]} "
+        "--numgenes {config[numgenes_plots]} "
         "--out_file {output.filtered_rpkm} "
         "--sample_names {params.sample_names} "
 

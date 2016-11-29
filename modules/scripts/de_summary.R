@@ -2,15 +2,18 @@ library(ggplot2)
 library(reshape2)
 
 args <- commandArgs( trailingOnly = TRUE )
+
 dedata <- read.csv(args[1],header = TRUE)
 df <- dedata
 df[,1] <- as.character(df[,1])
-mdf <- melt(df)
+
+suppressMessages(mdf <- melt(df))
 mdf$dir <- ifelse (grepl("up",mdf$variable),"UP","DOWN") 
 mdf$adjp <- ifelse (grepl("p1",mdf$variable),"Padj < 0.1",ifelse(grepl("p05",mdf$variable),"Padj < 0.05", "Padj < 0.01"))
 mdf$l2fc <- ifelse(grepl("log1",mdf$variable),"|FC| > 1", "|FC| > 2")
 mdf <- subset(mdf, adjp == "Padj < 0.05" | adjp == "Padj < 0.01")
 #yl <- 1.1*(max(mdf$value))
+
 png(args[2], width = 8, height = 8, unit="in",res=300)
 ggplot(mdf,aes(l2fc,value,fill=dir))+
   ggtitle("\nDifferential Gene Expression Summary\n")+
@@ -23,5 +26,5 @@ ggplot(mdf,aes(l2fc,value,fill=dir))+
   #coord_cartesian(ylim=c(0,yl))+
   facet_grid(adjp~Comparison,scales = "free_y")+
   theme_bw(base_size = 10)
-dev.off()
+junk <- dev.off()
 

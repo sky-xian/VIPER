@@ -1,6 +1,6 @@
 ## Load required packages
 suppressMessages(library("gplots"))
-suppressMessages(library("ComplexHeatmap"))
+suppressWarnings(suppressMessages(library("ComplexHeatmap")))
 suppressMessages(library("circlize"))
 suppressMessages(library("viridis"))
 suppressMessages(library('dplyr'))

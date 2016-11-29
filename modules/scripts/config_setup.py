@@ -16,11 +16,10 @@ def updateConfig(config):
     ref_info = _getRefInfo()
     for k,v in ref_info.items():
         config[k] = v
-    config["samples"] = config["the_samples"]
     config["config_file"] = "config.yaml" # trick to force rules on config change
 	
     for k in ["RPKM_threshold","min_num_samples_expressing_at_threshold", 
-                "SSnumgenes","SFnumgenes","num_kmeans_clust","filter_mirna","snp_scan_genome"]:
+                "numgenes_plots","num_kmeans_clust","filter_mirna","snp_scan_genome"]:
         config[k] = str(config[k])
 
     config = _addExecPaths(config)

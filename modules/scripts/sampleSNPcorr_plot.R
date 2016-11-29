@@ -1,6 +1,6 @@
 # load required packages
 suppressMessages(library("gplots"))
-suppressMessages(library("ComplexHeatmap"))
+suppressWarnings(suppressMessages(library("ComplexHeatmap")))
 suppressMessages(library("circlize"))
 suppressMessages(library("dendextend"))
 suppressMessages(library("viridis"))
@@ -43,7 +43,7 @@ snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
                      margins=c(10,10),
                      main = "SNP Correlation Plot")
     #draw(graph)
-    dev.off()
+    junk <- dev.off()
 
     #LEN: OLD plotting code
     

@@ -10,7 +10,8 @@ import argparse
 import sys
 import os.path
 import yaml
-import pandas
+import pandas as pd
+from collections import OrderedDict
 
 def parseArgs():
     parser = argparse.ArgumentParser()
@@ -20,13 +21,39 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+def orderedLoad(stream, Loader = yaml.Loader, object_pairs_hook = OrderedDict):
+    class OrderedLoader(Loader):
+        pass
+
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+    
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    
+    return yaml.load(stream, OrderedLoader)
+
+def orderedDump(data, stream=None, Dumper=yaml.Dumper, **kwds):
+    class OrderedDumper(Dumper):
+        pass
+    
+    def _dict_representer(dumper, data):
+        return dumper.represent_mapping(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            data.items())
+    
+    OrderedDumper.add_representer(OrderedDict, _dict_representer)
+    return yaml.dump(data, stream, OrderedDumper, **kwds)
+
 def getYaml():
     org_yaml = './viper/mbcf/config.yaml'
     with open(org_yaml, "r") as fh:
-        return yaml.safe_load(fh)
+        return orderedLoad(fh, yaml.SafeLoader)
 
 def getSampleInfo( metasheet ):
-    df = pandas.read_csv( metasheet,index_col=1 )
+    df = pd.read_csv( metasheet,index_col=1 )
     return df[df.columns[0]].to_dict()  
 
 def getSampleFiles( sampleInfo ):
@@ -42,10 +69,10 @@ def getSampleFiles( sampleInfo ):
 
 def print_config_yaml( configObj ):
     with open( "config.yaml", "w" ) as outfile:
-        outfile.write( yaml.dump( configObj, default_flow_style=False ) )
+        outfile.write( orderedDump( configObj, Dumper = yaml.SafeDumper, default_flow_style = False ) )
 
 def print_metasheet( metasheet ):
-    df = pandas.read_csv( metasheet )
+    df = pd.read_csv( metasheet )
     with open("metasheet.csv","w") as outfile:
         outfile.write(df[df.columns[1:]].to_csv(index=False))
 
@@ -66,7 +93,7 @@ if __name__ == '__main__':
     configObj = getYaml()
     sampleInfo = getSampleInfo( args.metasheet )  
     sampleFiles = getSampleFiles( sampleInfo )
-    configObj["the_samples"] = sampleFiles
+    configObj["samples"] = sampleFiles
     print_config_yaml( configObj )
     print_metasheet( args.metasheet )
     symlink_ref_yaml( args.reference )

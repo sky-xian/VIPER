@@ -1,5 +1,5 @@
 #libraries
-library(calibrate)
+suppressMessages(library("calibrate"))
 
 volcano_plot_f <- function(deseq_results, pdf_file, png_file, makePDF = TRUE) {
     #NOTE: if makePDF is FALSE, generate PNG file
@@ -38,7 +38,7 @@ volcano_plot_f <- function(deseq_results, pdf_file, png_file, makePDF = TRUE) {
     ##print(head(topSig))
     #with(head(topSig, 100), textxy(log2FoldChange, -log10(pvalue), labs=id, cex=.5))
     
-    dev.off()
+    junk <- dev.off()
 
     #--------------------------------------------------------------------------
     #REMOVED: DUPLICATED CODE

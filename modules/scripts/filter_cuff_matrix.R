@@ -11,7 +11,7 @@ suppressMessages(library(argparse))
 
 preprocess <- function(rpkm_file, sample_names, filter_miRNA,
                        min_genes, min_samples, rpkm_cutoff) {
-
+    
 	rpkmTable <- read.csv(rpkm_file, header=T, check.names=F,
                         row.names=1, stringsAsFactors=FALSE, dec='.')
 

@@ -343,14 +343,73 @@ Adding comp columns will automatically make it generate new differential express
 `
 touch metasheet.csv
 `
+### APPENDIX C: Deploying for a group of users- 
+NOTE: this section is by no means "the solution".  It is just the particular 
+solution that we deployed for our center.
 
+Problem1: The install instructions above applied to single users.  But suppose 
+you work within a lab and you want all of your lab users to use VIPER.  You 
+want a way to centralize your VIPER deployment so that everyone in your lab
+is using the same (updated) version of VIPER.
 
+Problem2: Installing miniconda for in your own local environment has a tendency
+to "clobber" the global enviroment on your system.  For example, your 
+lab/server uses python2.7, but once your install the latest miniconda pkgs, 
+you find yourself *forced* to use python3.5.  Or on the server, STAR ver X.Y
+is installed, but with conda, you are using STAR ver Z.A.
 
- 
+There are ways to hack around this by modifying your .bashrc but you 
+don't even know what a .bashrc is.
 
+Solution: One solution to these problems is to install VIPER (as above)
+for one "central" user--we created a 'viper' user account on our ubuntu system.
+And then we created a simple initialization script, 'viperSetup.sh', which 
+setup the PROJECT directory for our users.
 
+Let's walk through this setup in more detail:
 
+## setting up a central viper user:
+1. on your machine, create a new user--e.g. 'viper'
+2. check out the latest VIPER code: e.g.
+   /home/viper$ git clone git@bitbucket.org:cfce/viper.git
+3. install miniconda and create the VIPER conda enviromentS, etc: 
+   see "Installing VIPER and setting up your environment" above
+4. optional but recommended: create template config.yaml and metasheets.csv 
+   that will help your users run VIPER.  For example, in this template 
+   config.yaml, preset all of the paths that VIPER will need or comment 
+   out/in the options that will be commonly used in your lab.
+5. This is the key step: write a viper_env.bash script that looks like this:
+   >export CONDA_ROOT=/home/viper/local/miniconda3
+   >export CONDA_ENVS_PATH=/home/viper/local/miniconda3/envs
+   >export PATH=$CONDA_ENVS_PATH/viper/bin:$PATH
+   >unset PYTHONPATH
 
+   CONDA_ROOT is where you installed miniconda for user 'viper'
+   CONDA_ENVS_PATH should simply be $CONDA_ROOT/envs
+   PATH is overriding the user's PATH variable
+   and the last command is to UNSET the user's PYTHONPATH, just in case they 
+   set it b/c we want them to use 'viper's CONDA PYTHONPATH.
+6. So viper's home directory might look like this:
+   >config.yaml
+   >metasheet.csv
+   >viper/
+   >viper_env.bash
+7. The final step is to write a simple bash script, viperSetup.sh to 
+   copy /home/viper/* to the local directory, i.e.:
+   #!/bin/bash
+   cp -r /home/viper/* .
+8. Finally, as sudo, place viperSetup.sh into a place like /usr/local/bin
 
+##Setting up and Running VIPER with the initialization procedure
+So once you have setup a central viper user, the other users in the lab can 
+start using viper by doing the following:
 
+1. $ mkdir PROJECT #some arbitrary PROJECT name
+2. $ cd PROJECT
+3. PROJECT$ viperSetup.sh #which will copy the central viper to the local dir
+4. PROJECT$ source viper_env.bash #which will take on the central viper's PATH
+5. PROJECT$ source activate viper #which will activate the viper conda env
+#This is where the user will have to define config.yaml and metasheet.csv
+6. (viper) PROJECT$ snakemake -s viper/viper.snakefile -n #to invoke a DRY-RUN
+7. (viper) PROJECT$ snakemake -s viper/viper.snakefile #to invoke VIPER
 

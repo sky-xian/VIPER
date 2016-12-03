@@ -67,8 +67,13 @@ __NOTE__: you will only have to install the VIPER conda environments once.
 ## DOWNLOADING the VIPER static reference files
 
 __VIPER__ is dependent on reference files which can be found for the supported species listed below:
-[hg19](https://www.dropbox.com/s/013myjyw5kguxcp/hg19.tar.gz?dl=0)
-[mm9](https://www.dropbox.com/s/fo8kkq6xo6b8glv/mm9.tar.gz?dl=0)
+[hg19](https://www.dropbox.com/s/013myjyw5kguxcp/hg19.tar.gz)
+[mm9](https://www.dropbox.com/s/fo8kkq6xo6b8glv/mm9.tar.gz)
+
+To unzip these files: 
+>tar -xzf hg19.tar.gz
+OR
+>tar -xzf mm9.tar.gz
 
 __BEST PRACTICE:__ we recommend that you download the reference files that you need and then untarring then in a directory called "VIPER_static".  So for example, suppose you make "VIPER_static" in you home directory then you would have the following directory structure:
 >VIPER_static/
@@ -86,6 +91,16 @@ If you haven't already, start by making your __PROJECT__ folder and changing int
 >cd PROJECT
 
 __NOTE__: remember, you can name your __PROJECT__ folder anything
+
+##### Linking the VIPER static reference files (optional best practice)
+
+If you followed the __BEST PRACTICE__ of placing the reference files in a 
+directory called "VIPER_static" then you __should__ create a symbolic link to that directory and name it 'ref_files':
+1. cd PROJECT
+2. ln -s /path/to/VIPER_static ./ref_files
+__NOTE__: if VIPER_static is in your home directory, then the path would be ~/VIPER_static
+
+This is the recommended __BEST PRACTICE__ because it will ease setting up the __PARAMETERS__ and __PATHS__ in config.yaml described below.  If you don't choose to implement this __BEST PRACTICE__ then you can manually define the paths to the required files in config.yaml.
 
 ##### DOWNLOADING the VIPER source code
 Within your __PROJECT__ directory, issue the following commands:
@@ -124,9 +139,10 @@ __WE will explain how to edit and configure these files shortly below__
 
 ##### What your PROJECT directory should look like (up to now):
 > PROJECT/
-> viper/  
-> data/  - *optional*   
-> config.yaml  
+> ref_files/ *optional*
+> viper/
+> data/  - *optional*
+> config.yaml
 > metasheet.csv
 
 __NOTE__: you will have to setup your PROJECT directory for each VIPER run.
@@ -135,17 +151,19 @@ __NOTE__: you will have to setup your PROJECT directory for each VIPER run.
 The config.yaml file has three main sections. __PATHS__, __PARAMS__, __SAMPLES__:
 
 ##### PATHS:
-In this section, you will need to specify the location of the following reference files.  If you followed the __BEST PRACTICE:__ in the *DOWNLOADING the VIPER static reference files* section, then __ALL__ of these files will be found in your 'VIPER_static' directory.
+In this section, you will need to specify the location of the following static reference files.  
 
-__BEST PRACTICE:__ once you've configured your paths for your *first* run you can just use it as a template for future runs by copying it. __SO this is something you probably will only have to do once!__
+__BEST PRACTICE:__ IF you followed the best practices of downloading the VIPER static reference files to a directory in your home directory named "VIPER_static" and then created a symbolic link to this directory (calling the link "ref_files") then you can __skip most__ of this section __AS the default config.yaml ASSUMES that ref_file points contains the VIPER STATIC reference directories__ (i.e. anything that starts with ./ref_files can be skipped/ignored).  Simply make sure that your references are appropriate for your species/assembly.  The only parts you will need to be responsible for are downloading the ref_fasta file and generating the STAR index as these were too large to include in the static reference files. 
 
->bed_file: VIPER_static/ref_files/hg19/RefGene/refseqGenesHg19.bed  
+__NOTE:__ Even if you haven't followed the __BEST PRACICE:__, once you've configured your paths for your *first* run you can usually just use it as a template for future runs by copying it. __SO this is something you probably will only have to do once!__
+
+>bed_file: ./ref_files/hg19/RefGene/refseqGenesHg19.bed  
 >  -  RefSeq gene file for your assembly
 >
->genome_lib_dir: VIPER_static/ref_files/hg19/Hg19_CTAT_resource_lib  
+>genome_lib_dir: ./ref_files/hg19/Hg19_CTAT_resource_lib  
 >  -  path to your CTAT_resource_lib (used by STAR-Fusion module)
 >
->gtf_file: VIPER_static/ref_files/hg19/Hg19_CTAT_resource_lib/ref_annot.gtf  
+>gtf_file: ./ref_files/hg19/Hg19_CTAT_resource_lib/ref_annot.gtf  
 >  -  Gene annotation file
 >
 >metasheet: metasheet.csv  
@@ -154,6 +172,8 @@ __BEST PRACTICE:__ once you've configured your paths for your *first* run you ca
 >ref_fasta: /some/path/to/humanhg19/rawgenome/hg19.fasta  
 >  -  Reference genome in a .fasta or .fa format
 >  -  __IMPORTANT__ Assemblies are not found within the VIPER_static reference files as they are prohibitively __LARGE__.  You can download genome assemblies here at [UCSC](http://hgdownload.cse.ucsc.edu/downloads.html)
+>  -  __IMPORTANT__ You must also index the fasta file by issuing this command
+>  -  samtools faidx [fasta file], e.g. samtools faidx hg19.fasta
 >
 >reference: hg19  
 >  -  What assembly (shortname) you are using
@@ -168,7 +188,7 @@ __BEST PRACTICE:__ once you've configured your paths for your *first* run you ca
 >`
 >
 >  - __runThreadN__ 24 means to use 24 cores (optional parameter)
->star_rRNA_index: VIPER_static/ref_files/hg19/humanhg38_ncrna/  
+>star_rRNA_index: ./ref_files/hg19/humanhg38_ncrna/  
 > 
 > gene_annotation: viper/static/humanhg19.annot.csv  
 >  -  Path to annotation files (e.g. ENSEMBL\_ID, Gene Description, Go Terms, etc.).  This file can be generated by using [SCRIPT that Len needs to include].  Pre-made annotations for hg19 and mm9 can be found in viper/static (simply bunzip2 them).

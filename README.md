@@ -1,11 +1,11 @@
 
 # VIPER - Visualization Pipeline for RNA-seq
 
-## Introduction to VIPER:
+# Introduction to VIPER:
 
 __VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home) which allows for ease of use, optimal speed, and a highly modular code that can be further added onto and customized by experienced users. VIPER combines the use of several dozen RNA-seq tools, suites, and packages to create a complete pipeline that takes RNA-seq analysis from raw sequencing data all the way through alignment, quality control, unsupervised analyses, differential expression, and downstream pathway analysis. In addition, VIPER has been outfitted with several recently published tools that allow for interrogation of immune and virus infiltrate. The results are compiled in a simple and highly visual report containing the key figures to explain the analysis, and then compiles all of the relevant files, tables, and pictures into an easy to navigate folder.
 
-## Anatomy of a VIPER PROJECT:
+# Anatomy of a VIPER PROJECT:
 All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:
 (We first lay out the directory structure and explain each element below)
 > PROJECT/  
@@ -16,12 +16,12 @@ All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a dire
 
 The 'viper' directory contains all of the viper code.  We'll explain how to download that directory below.  The 'data' directory is an optional directory that contains all of your raw data.  It is optional because those paths __may__ be fully established in the config.yaml, __however__ it is best practice to gather your raw data within 'data' using [symbolic links](https://www.cyberciti.biz/faq/creating-soft-link-or-symbolic-link/).
 
-The config.yaml and metasheet.csv are configurations for your VIPER run (also explained below).
+The *config.yaml* and *metasheet.csv* are configurations for your VIPER run (also explained below).
 
 After a successful __VIPER__ run, another 'analysis' folder is generated which contains all of the resulting output files.
 
-## Getting Started - One time installation of components necessary for an individual user:
-__If you are looking to install for a system of users, we recommend you look at appendix C below.__
+# Getting Started - One time installation of components necessary for an individual user:
+__If you are looking to install for a system of users, we recommend you look at appendix C below. Note that this can also be a very useful step for individual users as well!__
 
 Although included in this README are step-by-step instructions, it is assumed that the user has a basic understanding of the [nix command line interface](https://en.wikipedia.org/wiki/Command-line_interface).
 
@@ -78,16 +78,17 @@ __BEST PRACTICE:__ we recommend that you download the reference files that you n
 
 __NOTE__: you will only have to download the static references once.
 
-## Setting up your PROJECT folder for a VIPER run:
+# Setting up your PROJECT folder for a VIPER run:
 
 We are now ready to setup __VIPER__ within our __PROJECT__ folder.  
 If you haven't already, start by making your __PROJECT__ folder and changing into that directory.  
+
 `mkdir PROJECT`  
 `cd PROJECT`  
 
 __NOTE__: remember, you can name your __PROJECT__ folder anything
 
-#### Linking the VIPER static reference files (optional best practice):
+### Linking the VIPER static reference files (optional best practice):
 
 If you followed the __BEST PRACTICE__ of placing the reference files in a 
 directory called "VIPER_static" then you __should__ create a symbolic link to that directory and name it 'ref_files':  
@@ -97,7 +98,7 @@ __NOTE__: if VIPER_static is in your home directory, then the path would be ~/VI
 
 This is the recommended __BEST PRACTICE__ because it will ease setting up the __PARAMETERS__ and __PATHS__ in config.yaml described below.  If you don't choose to implement this __BEST PRACTICE__ then you can manually define the paths to the required files in config.yaml.
 
-#### DOWNLOADING the VIPER source code:
+### DOWNLOADING the VIPER source code:
 Within your __PROJECT__ directory, issue the following commands:  
 1.	`wget https://bitbucket.org/cfce/viper/get/master.tar.gz`  
 2.	`tar -xf master.tar.gz`  
@@ -106,7 +107,7 @@ __NOTE__: the XXXXX refers to the latest changeset of viper, so it will differ
 
 __ADVANCED__: you may clone the latest version of [__VIPER__](https://bitbucket.org/cfce/viper) using git
 
-#### Setting up your 'data' directory (optional):
+### Setting up your 'data' directory (optional):
 
 As mentioned above, we highly recommend that you pool your raw data into a directory called 'data' (within __PROJECT__).  
 
@@ -118,7 +119,7 @@ The 'ln -s' command creates a symbolic link from '/some/path/to/my/data/' and na
 __IF your files are not centrally stored__:  
 - make a directory within __PROJECT__ called 'data' and copy your raw files into data
 
-#### Copying over the __META__ files:
+### Copying over the __META__ files:
 
 The __META__ files (*config.yaml* and *metasheet.csv*) allow you to configure each run.  They are explained in much more detail below.  For now, we simply copy them from the viper source directory:
 ```
@@ -363,12 +364,13 @@ Let's walk through this setup in more detail:
    see "Installing VIPER and setting up your environment" above
 4. optional but recommended: create template config.yaml and metasheet.csv that will help your users run VIPER.  For example, in this template config.yaml, preset all of the paths that VIPER will need or comment out/in the options that will be commonly used in your lab.
 5. This is the key step: write a viper_env.bash script that looks like this:
-   ```
-   export CONDA_ROOT=/home/viper/local/miniconda3  
-   export CONDA_ENVS_PATH=/home/viper/local/miniconda3/envs  
-   export PATH=$CONDA_ENVS_PATH/viper/bin:$PATH  
-   unset PYTHONPATH  
-   ```
+   
+```
+export CONDA_ROOT=/home/viper/local/miniconda3  
+export CONDA_ENVS_PATH=/home/viper/local/miniconda3/envs  
+export PATH=$CONDA_ENVS_PATH/viper/bin:$PATH  
+unset PYTHONPATH  
+```
    
    - CONDA_ROOT is where you installed miniconda for user 'viper'  
    - CONDA_ENVS_PATH should simply be $CONDA_ROOT/envs  
@@ -391,12 +393,12 @@ Let's walk through this setup in more detail:
 So once you have setup a central viper user, the other users in the lab can 
 start using viper by doing the following:
 
-1. `$ mkdir PROJECT` #some arbitrary PROJECT name
-2. `$ cd PROJECT`
-3. `PROJECT$ viperSetup.sh` #which will copy the central viper to the local dir
-4. `PROJECT$ source viper_env.bash` #which will take on the central viper's PATH
-5. `PROJECT$ source activate viper` #which will activate the viper conda env
+1. $ `mkdir PROJECT` #some arbitrary PROJECT name
+2. $ `cd PROJECT`
+3. PROJECT$ `viperSetup.sh` #which will copy the central viper to the local dir
+4. PROJECT$ `source viper_env.bash` #which will take on the central viper's PATH
+5. PROJECT$ `source activate viper` #which will activate the viper conda env
 \#This is where the user will have to define config.yaml and metasheet.csv
-6. `(viper) PROJECT$ snakemake -s viper/viper.snakefile -n` #to invoke a DRY-RUN
-7. `(viper) PROJECT$ snakemake -s viper/viper.snakefile #to` invoke VIPER
+6. (viper) PROJECT$ `snakemake -s viper/viper.snakefile -n` #to invoke a DRY-RUN
+7. (viper) PROJECT$ `snakemake -s viper/viper.snakefile #to` invoke VIPER
 

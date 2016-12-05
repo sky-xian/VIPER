@@ -1,14 +1,14 @@
 
 # VIPER - Visualization Pipeline for RNA-seq
 
-## Intro
+## Introduction to VIPER
 
 __VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home) which allows for ease of use, optimal speed, and a highly modular code that can be further added onto and customized by experienced users. VIPER combines the use of several dozen RNA-seq tools, suites, and packages to create a complete pipeline that takes RNA-seq analysis from raw sequencing data all the way through alignment, quality control, unsupervised analyses, differential expression, and downstream pathway analysis. In addition, VIPER has been outfitted with several recently published tools that allow for interrogation of immune and virus infiltrate. The results are compiled in a simple and highly visual report containing the key figures to explain the analysis, and then compiles all of the relevant files, tables, and pictures into an easy to navigate folder.
 
 ## Anatomy of a VIPER PROJECT
 All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:
 (We first lay out the directory structure and explain each element below)
-> PROJECT/
+> PROJECT/  
 > viper/  
 > data/  - *optional*   
 > config.yaml  
@@ -23,11 +23,11 @@ After a successful __VIPER__ run, another 'analysis' folder is generated which c
 ## Getting Started - Installation of certain parts necessary for an individual user
 __If you are looking to install for a system of users, we recommend you look at appendix C below.__
 
-Although included in this README are step-by-step instructions, it is assumed that the user has a basic understanding of the *nix command line interface.
+Although included in this README are step-by-step instructions, it is assumed that the user has a basic understanding of the [nix command line interface](https://en.wikipedia.org/wiki/Command-line_interface).
 
 ### Installing wget and git
 
-To get some of the required software packages, we will use the command line tools called [wget](http://www.gnu.org/software/wget/) and [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).  *wget* is a popular tool for downloading things off of the internet.  *git* is a distrubted version controll system which we will use to checkout the VIPER code.
+To get some of the required software packages, we will use the command line tools called [wget](http://www.gnu.org/software/wget/) and [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).  *wget* is a popular tool for downloading things off of the internet.  *git* is a distributed version control system which we will use to checkout the VIPER code.
 
 __These tools are already pre-installed in most systems__, but if you are unsure whether or not you have *wget* enter `wget` and if the return is `wget: command not found`, then you will have to install *wget*.  Do likewise for *git*.
 
@@ -35,48 +35,48 @@ __These tools are already pre-installed in most systems__, but if you are unsure
 
 We will be using the [Miniconda3](http://conda.pydata.org/miniconda.html) package management system (aka __CONDA__) to manage all of the software packages that __VIPER__ is dependent on. 
 
-Use following commands to retrieve and then __RUN__ the Minicoda3 installation script:
-1.	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-2.	bash Miniconda3-latest-Linux-x86_64.sh
+Use following commands to retrieve and then __RUN__ the Minicoda3 installation script:  
+1.	`wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh`  
+2.	`bash Miniconda3-latest-Linux-x86_64.sh`  
 
-- Whilst running the installation script, follow the commands listed on screen,and press the _enter_ key to scroll.
+- Whilst running the installation script, follow the commands listed on screen, and press the _enter_ key to scroll.
 - __Make sure to answer yes when asked if you want to prepend Miniconda3 to PATH.__
 - Close your terminal, open a new one and you should now have Conda working! Test by entering:  
-	conda update conda
+	`conda update conda`
 	- Press `y` to confirm the conda updates
 
-__NOTE__: you will only have to install Minicoda3 once.
+__NOTE__: you will only have to install Minicoda3 once.  
 __NOTE__: remember to close your terminal session and re-login
 
 ## Installing the VIPER conda environments
 
 We are now ready to use __CONDA__ to install the software packages which __VIPER__ is dependent on.
 
-1.	wget https://bitbucket.org/cfce/viper/get/master.tar.gz
-2.	tar -xf master.tar.gz
-3.	mv cfce-viper-XXXXX viper
-__NOTE__: the XXXXX refers to the latest changeset of viper, so it will differ
-4.	cd viper/envs
-5.	conda env create -f environment.yml -n viper
-6.	conda env create -f python2_environment.yml -n viper_py2
+1.	`wget https://bitbucket.org/cfce/viper/get/master.tar.gz`
+2.	`tar -xf master.tar.gz`
+3.	`mv cfce-viper-XXXXX viper`  
+__NOTE__: the XXXXX refers to the latest changeset of viper, so it will differ  
+4.	`cd viper/envs`
+5.	`conda env create -f environment.yml -n viper`
+6.	`conda env create -f python2_environment.yml -n viper_py2`
 
 __NOTE__: you will only have to install the VIPER conda environments once.
 
 ## DOWNLOADING the VIPER static reference files
 
 __VIPER__ is dependent on reference files which can be found for the supported species listed below:
-[hg19](https://www.dropbox.com/s/013myjyw5kguxcp/hg19.tar.gz)
-[mm9](https://www.dropbox.com/s/fo8kkq6xo6b8glv/mm9.tar.gz)
+[hg19](https://www.dropbox.com/s/013myjyw5kguxcp/hg19.tar.gz)  
+[mm9](https://www.dropbox.com/s/fo8kkq6xo6b8glv/mm9.tar.gz)  
 
 To unzip these files: 
-	tar -xzf hg19.tar.gz
+`tar -xzf hg19.tar.gz`
 OR
-	tar -xzf mm9.tar.gz
+`tar -xzf mm9.tar.gz`
 
 __BEST PRACTICE:__ we recommend that you download the reference files that you need and then untarring then in a directory called "VIPER_static".  So for example, suppose you make "VIPER_static" in you home directory then you would have the following directory structure:
->VIPER_static/
->hg19/
->mm9/
+	VIPER_static/
+		hg19/
+		mm9/
 
 __NOTE__: you will only have to download the static references once.
 

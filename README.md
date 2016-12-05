@@ -3,11 +3,20 @@
 
 ##Intro
 
-__VIPER__ is a comprehensive RNA-seq analysis tool built using snakemake which allows for ease of use and customization. We combine the use of etc..
+__VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home) which allows for ease of use, optimal speed, and a highly modular code that can be further added onto and customized by experienced users. VIPER combines the use of several dozen RNA-seq tools, suites, and packages to create a complete pipeline that takes RNA-seq analysis from raw sequencing data all the way through alignment, quality control, unsupervised analyses, differential expression, and downstream pathway analysis. In addition, VIPER has been outfitted with several recently published tools that allow for interrogation of immune and virus infiltrate. The results are compiled in a simple and highly visual report containing the key figures to explain the analysis, and then compiles all of the relevant files, tables, and pictures into an easy to navigate folder.
 
+Contents:
+1. [Anatomy of VIPER PROJECT](## Anatomy of a VIPER PROJECT)
+2. [Setting Up VIPER for individual use](## Getting Started)
+3. [Running VIPER](## Running VIPER
+4. [Setting Up VIPER for a server](#third-example)
+
+## Example
+## Example2
+## Third Example
 
 ## Anatomy of a VIPER PROJECT
-All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start life with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:
+All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:
 (We first lay out the directory structure and explain each element below)
 > PROJECT/
 > viper/  
@@ -315,27 +324,20 @@ __NOTE__: you will have to do this for every VIPER run/session.  Once you log-ou
 
 Next we will perform a __DRY-RUN__ to make sure that we setup the VIPER PROJECT directory correctly.  In your __PROJECT__ folder run the following command:
 
-`
-	snakemake --snakefile viper/viper.snakefile -n
-`  
+`snakemake --snakefile viper/viper.snakefile -n`  
 
 This will return a large output which basically outlines what VIPER is about to do. If no errors come back, then you will mostly see __GREEN__ and __YELLOW__ print outs.  If there are errors, then you will see some __RED__ print outs.
 
 __If there are no errors, then use the following command to run VIPER:__
 
-`
-	snakemake --snakefile viper/viper.snakefile
-`
+`snakemake --snakefile viper/viper.snakefile`
 
 *If there are errors, try to see what the error is about.  Was it a mistyped path?  Etc.  If all else fails, email the VIPER team (email address needed)*
 
 ### APPENDIX A: Dana-Farber CFCE Members
 If you are a member of Dana-Farber and have access to the CFCE server, you will already have many of the packages you need installed globally. There will be a config with the paths filled out located within the cfce folder of __VIPER__. Run the following command to obtain your config file with paths already filled out for the cfce.  
 
-`
-cp viper/cfce/cfce_config.yaml ./config.yaml
-`  
-
+`cp viper/cfce/cfce_config.yaml ./config.yaml`  
 
 
 ### APPENDIX B: Specific Replotting
@@ -345,31 +347,20 @@ To learn about how snakemake works, and some of the specifics of the following c
 
 The following are some useful commands for rerunning and adding to the download analysis without having to rerun the whole pipeline:
 
-`
-snakemake -s viper/viper.snakefile -n
-`  
+`snakemake -s viper/viper.snakefile -n`  
 
-`
-snakemake -s viper/viper.snakefile -j 24
-`
+`snakemake -s viper/viper.snakefile -j 24`
 
-`
-snakemake -s viper/viper.snakefile analysis/plots/heatmapSF_plot.pdf -f 
-`
+`snakemake -s viper/viper.snakefile analysis/plots/heatmapSF_plot.pdf -f `
   
-`
-snakemake -s viper/viper.snakefile analysis/plots/heatmapSS_plot.pdf -f 
-`
+`snakemake -s viper/viper.snakefile analysis/plots/heatmapSS_plot.pdf -f `
 
-`
-snakemake -s viper/viper.snakefile analysis/plots/pca_plot.pdf -f 
-`
+`snakemake -s viper/viper.snakefile analysis/plots/pca_plot.pdf -f `
 
 Adding comp columns will automatically make it generate new differential expressions analysis and adjust figures accordingly.
 
-`
-touch metasheet.csv
-`
+`touch metasheet.csv`  
+
 ### APPENDIX C: Deploying for a group of users- 
 NOTE: this section is by no means "the solution".  It is just the particular 
 solution that we deployed for our center.

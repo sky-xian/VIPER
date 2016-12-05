@@ -1,11 +1,11 @@
 
 # VIPER - Visualization Pipeline for RNA-seq
 
-## Introduction to VIPER
+## Introduction to VIPER:
 
 __VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home) which allows for ease of use, optimal speed, and a highly modular code that can be further added onto and customized by experienced users. VIPER combines the use of several dozen RNA-seq tools, suites, and packages to create a complete pipeline that takes RNA-seq analysis from raw sequencing data all the way through alignment, quality control, unsupervised analyses, differential expression, and downstream pathway analysis. In addition, VIPER has been outfitted with several recently published tools that allow for interrogation of immune and virus infiltrate. The results are compiled in a simple and highly visual report containing the key figures to explain the analysis, and then compiles all of the relevant files, tables, and pictures into an easy to navigate folder.
 
-## Anatomy of a VIPER PROJECT
+## Anatomy of a VIPER PROJECT:
 All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:
 (We first lay out the directory structure and explain each element below)
 > PROJECT/  
@@ -20,18 +20,18 @@ The config.yaml and metasheet.csv are configurations for your VIPER run (also ex
 
 After a successful __VIPER__ run, another 'analysis' folder is generated which contains all of the resulting output files.
 
-## Getting Started - Installation of certain parts necessary for an individual user
+## Getting Started - One time installation of components necessary for an individual user:
 __If you are looking to install for a system of users, we recommend you look at appendix C below.__
 
 Although included in this README are step-by-step instructions, it is assumed that the user has a basic understanding of the [nix command line interface](https://en.wikipedia.org/wiki/Command-line_interface).
 
-### Installing wget and git
+### Installing wget and git:
 
 To get some of the required software packages, we will use the command line tools called [wget](http://www.gnu.org/software/wget/) and [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).  *wget* is a popular tool for downloading things off of the internet.  *git* is a distributed version control system which we will use to checkout the VIPER code.
 
 __These tools are already pre-installed in most systems__, but if you are unsure whether or not you have *wget* enter `wget` and if the return is `wget: command not found`, then you will have to install *wget*.  Do likewise for *git*.
 
-### Installing Miniconda3
+### Installing Miniconda3:
 
 We will be using the [Miniconda3](http://conda.pydata.org/miniconda.html) package management system (aka __CONDA__) to manage all of the software packages that __VIPER__ is dependent on. 
 
@@ -48,7 +48,7 @@ Use following commands to retrieve and then __RUN__ the Minicoda3 installation s
 __NOTE__: you will only have to install Minicoda3 once.  
 __NOTE__: remember to close your terminal session and re-login
 
-## Installing the VIPER conda environments
+### Installing the VIPER conda environments:
 
 We are now ready to use __CONDA__ to install the software packages which __VIPER__ is dependent on.
 
@@ -62,7 +62,7 @@ __NOTE__: the XXXXX refers to the latest changeset of viper, so it will differ
 
 __NOTE__: you will only have to install the VIPER conda environments once.
 
-## DOWNLOADING the VIPER static reference files
+### DOWNLOADING the VIPER static reference files:
 
 __VIPER__ is dependent on reference files which can be found for the supported species listed below:  
 [hg19](https://www.dropbox.com/s/013myjyw5kguxcp/hg19.tar.gz)  
@@ -72,22 +72,22 @@ To unzip these files:
 `tar -xzf hg19.tar.gz` OR `tar -xzf mm9.tar.gz`
 
 __BEST PRACTICE:__ we recommend that you download the reference files that you need and then untarring then in a directory called "VIPER_static".  So for example, suppose you make "VIPER_static" in you home directory then you would have the following directory structure:
-> VIPER_static/
->		hg19/
->		mm9/
+> VIPER_static/  
+>		hg19/  
+>		mm9/  
 
 __NOTE__: you will only have to download the static references once.
 
-## Setting up your environment for a VIPER run
+## Setting up your PROJECT folder for a VIPER run:
 
 We are now ready to setup __VIPER__ within our __PROJECT__ folder.  
-If you haven't already, start by making your __PROJECT__ folder and changing into that directory.
+If you haven't already, start by making your __PROJECT__ folder and changing into that directory.  
 `mkdir PROJECT`  
 `cd PROJECT`  
 
 __NOTE__: remember, you can name your __PROJECT__ folder anything
 
-#### Linking the VIPER static reference files (optional best practice)
+#### Linking the VIPER static reference files (optional best practice):
 
 If you followed the __BEST PRACTICE__ of placing the reference files in a 
 directory called "VIPER_static" then you __should__ create a symbolic link to that directory and name it 'ref_files':  
@@ -97,8 +97,8 @@ __NOTE__: if VIPER_static is in your home directory, then the path would be ~/VI
 
 This is the recommended __BEST PRACTICE__ because it will ease setting up the __PARAMETERS__ and __PATHS__ in config.yaml described below.  If you don't choose to implement this __BEST PRACTICE__ then you can manually define the paths to the required files in config.yaml.
 
-#### DOWNLOADING the VIPER source code
-Within your __PROJECT__ directory, issue the following commands:
+#### DOWNLOADING the VIPER source code:
+Within your __PROJECT__ directory, issue the following commands:  
 1.	`wget https://bitbucket.org/cfce/viper/get/master.tar.gz`  
 2.	`tar -xf master.tar.gz`  
 3.	`mv cfce-viper-XXXXX viper`  
@@ -106,21 +106,19 @@ __NOTE__: the XXXXX refers to the latest changeset of viper, so it will differ
 
 __ADVANCED__: you may clone the latest version of [__VIPER__](https://bitbucket.org/cfce/viper) using git
 
-#### Setting up your 'data' directory (optional)
+#### Setting up your 'data' directory (optional):
 
 As mentioned above, we highly recommend that you pool your raw data into a directory called 'data' (within __PROJECT__).  
 
-__IF all of your data is already centrally stored__ in a directory called '/some/path/to/my/data/'.  Then all that you will need to do is:
+__IF all of your data is already centrally stored__ in a directory called '/some/path/to/my/data/', then symbollically link your data to your PROJECTS folder.  
 `cd PROJECT`  
 `ln -s /some/path/to/my/data/ ./data`  
-
 The 'ln -s' command creates a symbolic link from '/some/path/to/my/data/' and names it 'data'. Symbolic Links have been shown to be adequate when testing, if not, then please try one of the other solutions.
 
-__IF your files are not centrally stored__:
-* make a directory within __PROJECT__ called 'data'
-* and copy your raw files into data
+__IF your files are not centrally stored__:  
+- make a directory within __PROJECT__ called 'data' and copy your raw files into data
 
-##### Copying over the __META__ files:
+#### Copying over the __META__ files:
 
 The __META__ files (*config.yaml* and *metasheet.csv*) allow you to configure each run.  They are explained in much more detail below.  For now, we simply copy them from the viper source directory:
 ```
@@ -128,11 +126,11 @@ The __META__ files (*config.yaml* and *metasheet.csv*) allow you to configure ea
 	cp viper/config.yaml .
 	cp viper/metasheet.csv .
 ```
-__WE will explain how to edit and configure these files shortly below__
+__We will explain how to edit and configure these files shortly below__
 
 ##### What your PROJECT directory should look like (up to now):
 > PROJECT/  
-> ref_files/ *optional, but __BEST_PRACTICE__ is highly recommended*  
+> ref_files/ - optional, but __BEST_PRACTICE__ is highly recommended*  
 > viper/  
 > data/  - *optional*  
 > config.yaml  
@@ -143,7 +141,7 @@ __NOTE__: you will have to setup your PROJECT directory for each VIPER run.
 ## Configuring the META files: config.yaml
 The config.yaml file has three main sections. __PATHS__, __PARAMS__, __SAMPLES__:
 
-##### PATHS:
+#### PATHS:
 In this section, you will need to specify the location of the following static reference files.  
 
 __BEST PRACTICE:__ IF you followed the best practices of downloading the VIPER static reference files to a directory in your home directory named "VIPER_static" and then created a symbolic link to this directory (calling the link "ref_files") then you can __skip most__ of this section __As the default config.yaml ASSUMES that ref_file points contains the VIPER STATIC reference directories__ (i.e. anything that starts with ./ref_files can be skipped/ignored).  Simply make sure that your references are appropriate for your species/assembly.  The only parts you will need to be responsible for are downloading the ref_fasta file and generating the STAR index as these were too large to include in the static reference files. 
@@ -163,8 +161,8 @@ __NOTE:__ Even if you haven't followed the __BEST PRACTICE:__, once you've confi
 >ref_fasta: /some/path/to/humanhg19/rawgenome/hg19.fasta  
 >  -  Reference genome in a .fasta or .fa format
 >  -  __IMPORTANT__ Assemblies are not found within the VIPER_static reference files as they are prohibitively __LARGE__.  You can download genome assemblies here at [UCSC](http://hgdownload.cse.ucsc.edu/downloads.html)
->  -  __IMPORTANT__ You must also index the fasta file by issuing this command
->  -  samtools faidx [fasta file], e.g. samtools faidx hg19.fasta
+>  -  __IMPORTANT__ You must also index the fasta file by issuing this command  
+>  -  `samtools faidx [fasta file]`, e.g. samtools faidx hg19.fasta
 >
 >reference: hg19  
 >  -  What assembly (shortname) you are using, current options are hg19 and mm9
@@ -172,19 +170,19 @@ __NOTE:__ Even if you haven't followed the __BEST PRACTICE:__, once you've confi
 >star_index: /some/path/to/STAR/humanhg19/  
 >  -  star-index for the STAR aligner  
 >  -  __IMPORTANT__ STAR indices are not found within the VIPER_static reference files as they are prohibitively __LARGE__.  
->  -  You can generate on by running the following:
+>  -  You can generate one by running the following:  
+>  -  `STAR  --runMode genomeGenerate --runThreadN 24 --genomeDir /where/you/want/to_store/the/output -genomeFastaFiles /dir/to/hg19/hg19.fa`  
+>    - __runThreadN__ 24 means to use 24 cores (optional parameter)  
 >
->`STAR  --runMode genomeGenerate --runThreadN 24 --genomeDir /where/you/want/to_store/the/output -genomeFastaFiles /dir/to/hg19/hg19.fa`
->
->  - __runThreadN__ 24 means to use 24 cores (optional parameter)
 >star_rRNA_index: ./ref_files/hg19/humanhg38_ncrna/  
+> - Follow same instructions as for normal star-index
 > 
 > gene_annotation: viper/static/humanhg19.annot.csv  
 >  -  Path to annotation files (e.g. ENSEMBL\_ID, Gene Description, Go Terms, etc.).  This file can be generated by using [SCRIPT that Len needs to include].  Pre-made annotations for hg19 and mm9 can be found in viper/static (simply bunzip2 them).
 >  -  __Simply select the appropriate .annot.csv in viper/static appropriate for your species__
 
 
-##### PARAMS:
+#### PARAMS:
 
 This section holds parameters specific to your project design
 
@@ -200,10 +198,10 @@ This section holds parameters specific to your project design
 >RPKM\_threshold: 1.0  
 >  -  Minimum RPKM Value for a gene to be significant
 >
->min\_num\_samples\_expressing\_at\_threshold: 4
+>min\_num\_samples\_expressing\_at\_threshold: 4  
 >  -  Number of samples that need to have the minimum RPKM threshold for the gene to be significant
 >
->filter\_mirna: true
+>filter\_mirna: true  
 >  -  Filter out MicroRNA (RNA that start with "SNO" or "MIR")
 >
 >numgenes_plots: 1000  
@@ -212,7 +210,7 @@ This section holds parameters specific to your project design
 >num\_kmeans\_clust: 0,4  
 >  -  Parameter for the Sample-Feature Clustering Heatmap. VIPER will interpret this list of numbers as the types of SF heatmaps the user wants. 0 means hierarchical, 4 means kmean of 4, 0,4 means both a hierarchical and a 4 kmeans clustered heatmap
 > 
-> snp_scan_genome: false
+> snp_scan_genome: false  
 >  -  Boolean Flag {true | false} on whether to perform a genome-wide snp scan *IN ADDITION* to the snp scan done on chr6.
 >
 > cancer_type: "sarc"  
@@ -297,7 +295,7 @@ Make the *__metasheet__* file in excel, and save it as a .txt or .csv, It doesn�
 		-  Deseq: ”baseMeanA” refers to samples A, which follows condition 1 and “baseMeanB” refers to samples B which follows condition 2. logfc is B/A
 		-  Limma: Logfc refers to B/A
 
-## Running VIPER
+## Running VIPER:
 
 Now that we have setup our __PROJECT__ directory (downloading the 'viper' code directory, creating our 'data' directory, and configuring our config.yaml and metasheet.csv), __we are (finally!) ready to run VIPER.__
 
@@ -318,11 +316,11 @@ __If there are no errors, then use the following command to run VIPER:__
 
 *If there are errors, try to see what the error is about.  Was it a mistyped path?  Etc.  If all else fails, email the VIPER team (email address needed)*
 
-### APPENDIX A: Dana-Farber CFCE Members
+### APPENDIX A: Dana-Farber CFCE Members:
 If you are a member of Dana-Farber and have access to the CFCE server, you will already have many of the packages you need installed globally. Please see the [README within the CFCE folder of VIPER](https://bitbucket.org/cfce/viper/src/772915c62ff08ff951f813746d277fbe60f71a45/cfce/README_CFCE.md?at=master&fileviewer=file-view-default)
 
 
-### APPENDIX B: Specific Replotting
+### APPENDIX B: Specific Replotting:
 After you have run __VIPER__ in its entirety, you may want to go back and tweak your outputs. Maybe adding or subtracting metadata columns, differential expression columns, or maybe just doing a subset of your data. Below is a list of snakemake commands to run __VIPER__ to rerun some specifics for further downstream analysis tweaking. Note that __VIPER__ is built to automatically rerun downstream analysis if you adjust the *config* or the *metasheet*.
 
 To learn about how snakemake works, and some of the specifics of the following commands and others, look into the [snakemake documentation](https://bitbucket.org/snakemake/snakemake/wiki/Documentation)
@@ -344,7 +342,7 @@ Adding comp columns will automatically make it generate new differential express
 
 `touch metasheet.csv`  
 
-### APPENDIX C: Deploying for a group of users- 
+### APPENDIX C: Deploying for a group of users: 
 NOTE: this section is by no means "the solution".  It is just the particular solution that we deployed for our center.
 
 Problem1: The install instructions above applied to single users.  But suppose you work within a lab and you want all of your lab users to use VIPER.  You want a way to centralize your VIPER deployment so that everyone in your lab is using the same (updated) version of VIPER.
@@ -357,34 +355,36 @@ Solution: One solution to these problems is to install VIPER (as above) for one 
 
 Let's walk through this setup in more detail:
 
-## setting up a central viper user:
+### setting up a central viper user:
 1. on your machine, create a new user--e.g. 'viper'
 2. check out the latest VIPER code: e.g.
-   > /home/viper$ `git clone git@bitbucket.org:cfce/viper.git`
+   /home/viper$ `git clone git@bitbucket.org:cfce/viper.git`
 3. install miniconda and create the VIPER conda enviromentS, etc: 
    see "Installing VIPER and setting up your environment" above
-4. optional but recommended: create template config.yaml and metasheet.csv 
-   that will help your users run VIPER.  For example, in this template 
-   config.yaml, preset all of the paths that VIPER will need or comment 
-   out/in the options that will be commonly used in your lab.
+4. optional but recommended: create template config.yaml and metasheet.csv that will help your users run VIPER.  For example, in this template config.yaml, preset all of the paths that VIPER will need or comment out/in the options that will be commonly used in your lab.
 5. This is the key step: write a viper_env.bash script that looks like this:
-   >export CONDA_ROOT=/home/viper/local/miniconda3  
-   >export CONDA_ENVS_PATH=/home/viper/local/miniconda3/envs  
-   >export PATH=$CONDA_ENVS_PATH/viper/bin:$PATH  
-   >unset PYTHONPATH  
-
-   CONDA_ROOT is where you installed miniconda for user 'viper'  
-   CONDA_ENVS_PATH should simply be $CONDA_ROOT/envs  
-   PATH is overriding the user's PATH variable  
-   and the last command is to UNSET the user's PYTHONPATH, just in case they set it b/c we want them to use 'viper's CONDA PYTHONPATH.
+   ```
+   export CONDA_ROOT=/home/viper/local/miniconda3  
+   export CONDA_ENVS_PATH=/home/viper/local/miniconda3/envs  
+   export PATH=$CONDA_ENVS_PATH/viper/bin:$PATH  
+   unset PYTHONPATH  
+   ```
+   
+   - CONDA_ROOT is where you installed miniconda for user 'viper'  
+   - CONDA_ENVS_PATH should simply be $CONDA_ROOT/envs  
+   - PATH is overriding the user's PATH variable  
+   - and the last command is to UNSET the user's PYTHONPATH, just in case they set it b/c we want them to use 'viper's CONDA PYTHONPATH.
 6. So viper's home directory might look like this:  
    >config.yaml  
    >metasheet.csv  
    >viper/  
-   >viper_env.bash  
-7. The final step is to write a simple bash script, viperSetup.sh to copy /home/viper/* to the local directory, i.e.:
+   >viper_env.bash
+   
+7. The final step is to write a simple bash script: viperSetup.sh to copy /home/viper/* to the local directory, i.e.:
+   ```
    #!/bin/bash  
-   cp -r /home/viper/* .  
+   cp -r /home/viper/* .
+   ```
 8. Finally, as sudo, place viperSetup.sh into a place like /usr/local/bin  
 
 ##Setting up and Running VIPER with the initialization procedure
@@ -396,7 +396,7 @@ start using viper by doing the following:
 3. `PROJECT$ viperSetup.sh` #which will copy the central viper to the local dir
 4. `PROJECT$ source viper_env.bash` #which will take on the central viper's PATH
 5. `PROJECT$ source activate viper` #which will activate the viper conda env
-#This is where the user will have to define config.yaml and metasheet.csv
+\#This is where the user will have to define config.yaml and metasheet.csv
 6. `(viper) PROJECT$ snakemake -s viper/viper.snakefile -n` #to invoke a DRY-RUN
 7. `(viper) PROJECT$ snakemake -s viper/viper.snakefile #to` invoke VIPER
 

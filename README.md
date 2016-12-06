@@ -5,7 +5,18 @@
 
 __VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home) which allows for ease of use, optimal speed, and a highly modular code that can be further added onto and customized by experienced users. VIPER combines the use of several dozen RNA-seq tools, suites, and packages to create a complete pipeline that takes RNA-seq analysis from raw sequencing data all the way through alignment, quality control, unsupervised analyses, differential expression, and downstream pathway analysis. In addition, VIPER has been outfitted with several recently published tools that allow for interrogation of immune and virus infiltrate. The results are compiled in a simple and highly visual report containing the key figures to explain the analysis, and then compiles all of the relevant files, tables, and pictures into an easy to navigate folder.
 
-# Anatomy of a VIPER PROJECT:
+# Table of Contents
+1. [Anatomy of a VIPER PROJECT](#anatomy)  
+2. [Getting Started - One time Installation of components necessary for an individual user](#GettingStarted)  
+3. [Setting up a Project Folder for a VIPER Run](#SettingUpForProject)  
+	1. [The Config File](#config)  
+	2. [The Metasheet](#metasheet)  
+4. [Running VIPER](#RunningViper)
+5. [Appendix A: Dana-Farber Members](#DFmembers)
+6. [Appendix B: Specific VIPER Commands for Replotting](#replotting)
+7. [Setting up VIPER for a group of users or server](#serverSetup)
+
+# Anatomy of a VIPER PROJECT: <a name="anatomy"></a>
 All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:
 (We first lay out the directory structure and explain each element below)
 > PROJECT/  
@@ -20,7 +31,7 @@ The *config.yaml* and *metasheet.csv* are configurations for your VIPER run (als
 
 After a successful __VIPER__ run, another 'analysis' folder is generated which contains all of the resulting output files.
 
-# Getting Started - One time installation of components necessary for an individual user:
+# Getting Started - One time installation of components necessary for an individual user: <a name="GettingStarted"></a>
 __If you are looking to install for a system of users, we recommend you look at appendix C below. Note that this can also be a very useful step for individual users as well!__
 
 Although included in this README are step-by-step instructions, it is assumed that the user has a basic understanding of the [nix command line interface](https://en.wikipedia.org/wiki/Command-line_interface).
@@ -78,7 +89,7 @@ __BEST PRACTICE:__ we recommend that you download the reference files that you n
 
 __NOTE__: you will only have to download the static references once.
 
-# Setting up your PROJECT folder for a VIPER run:
+# Setting up your PROJECT folder for a VIPER run: <a name="SettingUpForProject"></a>
 
 We are now ready to setup __VIPER__ within our __PROJECT__ folder.  
 If you haven't already, start by making your __PROJECT__ folder and changing into that directory.  
@@ -139,7 +150,7 @@ __We will explain how to edit and configure these files shortly below__
 
 __NOTE__: you will have to setup your PROJECT directory for each VIPER run.
 
-## Configuring the META files: config.yaml
+## Configuring the META files: config.yaml <a name="config"></a>
 The config.yaml file has three main sections. __PATHS__, __PARAMS__, __SAMPLES__:
 
 #### PATHS:
@@ -268,7 +279,7 @@ samples:
 __IMPORTANT__: __You cannot mix Paired-end and Single-end samples within the same VIPER run as this will cause an ERROR__. If necessary, run all of one type of data first, followed by the net type of data after.
 
 
-## Configuring the META files: metasheet.csv
+## Configuring the META files: metasheet.csv <a name="metasheet"></a>
 
 Make the *__metasheet__* file in excel, and save it as a .txt or .csv, It doesn’t matter what it is named as long as it is called in the *__config__* in the spot marked “metasheet,” see the *__config__* section if confused. The format should be something like the following:
 
@@ -296,7 +307,7 @@ Make the *__metasheet__* file in excel, and save it as a .txt or .csv, It doesn�
 		-  Deseq: ”baseMeanA” refers to samples A, which follows condition 1 and “baseMeanB” refers to samples B which follows condition 2. logfc is B/A
 		-  Limma: Logfc refers to B/A
 
-## Running VIPER:
+# Running VIPER: <a name="RunningViper"></a>
 
 Now that we have setup our __PROJECT__ directory (downloading the 'viper' code directory, creating our 'data' directory, and configuring our config.yaml and metasheet.csv), __we are (finally!) ready to run VIPER.__
 
@@ -317,11 +328,11 @@ __If there are no errors, then use the following command to run VIPER:__
 
 *If there are errors, try to see what the error is about.  Was it a mistyped path?  Etc.  If all else fails, email the VIPER team (email address needed)*
 
-### APPENDIX A: Dana-Farber CFCE Members:
+### APPENDIX A: Dana-Farber CFCE Members: <a name="DFmembers"></a>
 If you are a member of Dana-Farber and have access to the CFCE server, you will already have many of the packages you need installed globally. Please see the [README within the CFCE folder of VIPER](https://bitbucket.org/cfce/viper/src/772915c62ff08ff951f813746d277fbe60f71a45/cfce/README_CFCE.md?at=master&fileviewer=file-view-default)
 
 
-### APPENDIX B: Specific Replotting:
+### APPENDIX B: Specific Replotting: <a name="replotting"></a>
 After you have run __VIPER__ in its entirety, you may want to go back and tweak your outputs. Maybe adding or subtracting metadata columns, differential expression columns, or maybe just doing a subset of your data. Below is a list of snakemake commands to run __VIPER__ to rerun some specifics for further downstream analysis tweaking. Note that __VIPER__ is built to automatically rerun downstream analysis if you adjust the *config* or the *metasheet*.
 
 To learn about how snakemake works, and some of the specifics of the following commands and others, look into the [snakemake documentation](https://bitbucket.org/snakemake/snakemake/wiki/Documentation)
@@ -343,7 +354,7 @@ Adding comp columns will automatically make it generate new differential express
 
 `touch metasheet.csv`  
 
-### APPENDIX C: Deploying for a group of users: 
+### APPENDIX C: Deploying for a group of users: <a name="serverSetup"></a>
 NOTE: this section is by no means "the solution".  It is just the particular solution that we deployed for our center.
 
 Problem1: The install instructions above applied to single users.  But suppose you work within a lab and you want all of your lab users to use VIPER.  You want a way to centralize your VIPER deployment so that everyone in your lab is using the same (updated) version of VIPER.
@@ -397,8 +408,8 @@ start using viper by doing the following:
 2. $ `cd PROJECT`
 3. PROJECT$ `viperSetup.sh` #which will copy the central viper to the local dir
 4. PROJECT$ `source viper_env.bash` #which will take on the central viper's PATH
-5. PROJECT$ `source activate viper` #which will activate the viper conda env
-\#This is where the user will have to define config.yaml and metasheet.csv
+5. PROJECT$ `source activate viper` #which will activate the viper conda env  
+\#This is where the user will have to define config.yaml and metasheet.csv  
 6. (viper) PROJECT$ `snakemake -s viper/viper.snakefile -n` #to invoke a DRY-RUN
-7. (viper) PROJECT$ `snakemake -s viper/viper.snakefile #to` invoke VIPER
+7. (viper) PROJECT$ `snakemake -s viper/viper.snakefile` #to invoke VIPER
 

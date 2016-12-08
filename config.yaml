@@ -1,4 +1,6 @@
 ---
+## Uncomment analysis token to use subanalysis output
+#analysis_token: all
 bed_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/UCSC/hg19/Annotation/Genes/hg19_genes.bed
 genome_lib_dir: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/STAR_Fusion/Hg19_CTAT_resource_lib
 gtf_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/human/Homo_sapiens/UCSC/hg19/Annotation/Genes/genes_with_ERCC.gtf

@@ -48,7 +48,7 @@ rule gene_body_cvg_qc:
         pypath="PYTHONPATH=%s" % config["python2_pythonpath"],
         ds_bam = lambda wildcards: "analysis/RSeQC/gene_body_cvg/" + wildcards.sample + "/" + wildcards.sample + ".ds.bam"
     shell:
-        "picard DownsampleSam I={input} O={params.ds_bam} P=$(samtools flagstat {input} | perl -e 'my $line = <STDIN>; chomp $line; my( $one, $two ) = ($line =~ /(\d+)\s+\+\s+(\d+)/); my $total = $one + $two;  my $one_M = $total < 1000000 ? 1 : (1000000 / $total); print sprintf(\"%.2f\",$one_M);') && "
+        "picard DownsampleSam I={input} O={params.ds_bam} P=$(samtools flagstat {input} | perl -e 'my $line = <STDIN>; chomp $line; my( $one, $two ) = ($line =~ /(\d+)\s+\+\s+(\d+)/); my $total = $one + $two;  my $one_M = $total < 1000000 ? 1 : (1000000 / $total); my $final_val = sprintf(\"%.2f\",$one_M); print $final_val > 0.00 ? $final_val : 0.01;') && "
         "samtools index {params.ds_bam} && "
         "{params.pypath} {config[python2]} {config[rseqc_path]}/geneBody_coverage.py -i {params.ds_bam} -r {config[bed_file]}"
         " -f png -o analysis/RSeQC/gene_body_cvg/{wildcards.sample}/{wildcards.sample}"

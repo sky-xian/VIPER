@@ -12,8 +12,7 @@ gene_annotation: viper/static/mm9.annot.csv.bz2
 #This is required only for PE data.
 #NOTE: in mbcf/mm9_ref.yaml, this was set to 
 
-#LEN: you need to change this!
-genome_lib_dir: ./ref_files/hg19/Hg19_CTAT_resource_lib
+genome_lib_dir: ./ref_files/mm9/UCSC_mm9_build/
 
 snpEff_conf: ./ref_files/mm9/snpEff/snpEff.config
 snpEff_db: NCBIm37.66

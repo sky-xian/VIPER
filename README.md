@@ -75,9 +75,9 @@ __NOTE__: you will only have to install the VIPER conda environments once.
 
 ### DOWNLOADING the VIPER static reference files:
 
-__VIPER__ is dependent on reference files which can be found for the supported species listed below:  
-[hg19](https://www.dropbox.com/s/013myjyw5kguxcp/hg19.tar.gz)  
-[mm9](https://www.dropbox.com/s/fo8kkq6xo6b8glv/mm9.tar.gz)  
+__VIPER__ is dependent on reference files which can be found for the supported species listed below:  [download link](https://www.dropbox.com/sh/8cqooj05i7rnyou/AAB-i4hHxQwqJDTXbzM_2JPua?dl=0)
+hg19
+mm9
 
 To unzip these files: 
 `tar -xzf hg19.tar.gz` OR `tar -xzf mm9.tar.gz`

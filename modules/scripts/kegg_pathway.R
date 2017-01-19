@@ -160,7 +160,7 @@ kegg_pathway_f<- function(deseq_file, numkeggpathways,kegg_dir,reference,temp_di
         theme(panel.grid.major.y=element_blank()) +
         theme(panel.grid.minor=element_blank()) +
         theme(axis.text.y=element_text(size=10)) +
-        theme(plot.title = element_text(size=20, margin = margin(10, 0, 20, 0)))
+        theme(plot.title = element_text(size=8, margin = margin(10, 0, 20, 0)))
     plot_list[[1]] = ggup                                                   
     
 
@@ -185,7 +185,7 @@ kegg_pathway_f<- function(deseq_file, numkeggpathways,kegg_dir,reference,temp_di
         theme(panel.grid.major.y=element_blank()) +
         theme(panel.grid.minor=element_blank()) +
         theme(axis.text.y=element_text(size=10)) +
-        theme(plot.title = element_text(size=20, margin = margin(10, 0, 20, 0)))
+        theme(plot.title = element_text(size=8, margin = margin(10, 0, 20, 0)))
     plot_list[[2]] = ggdown
 
     

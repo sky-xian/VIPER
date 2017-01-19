@@ -6,7 +6,8 @@ rule immunology_all:
 
 rule estimate_immune_abundance:
     input:
-        fpkm_collected="analysis/"+config["token"]+"/cufflinks/Cuff_Gene_Counts.csv"
+        #fpkm_collected="analysis/"+config["token"]+"/cufflinks/Cuff_Gene_Counts.csv"
+        fpkm_collected = _getCuffCounts(config)[1]
     output:
         "analysis/"+config["token"]+"/immunology/relative_abundance.txt",
         "analysis/"+config["token"]+"/immunology/output.pdf",

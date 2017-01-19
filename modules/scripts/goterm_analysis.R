@@ -110,7 +110,7 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, up
         theme(panel.grid.major.y=element_blank()) +
         theme(panel.grid.minor=element_blank()) +
         theme(axis.text.y=element_text(size=10)) +
-        theme(plot.title = element_text(size=20, margin = margin(10, 0, 20, 0)))
+        theme(plot.title = element_text(size=8, margin = margin(10, 0, 20, 0)))
     plot_list[[1]] = ggup
 
 
@@ -130,7 +130,7 @@ goterm_analysis_f <- function(deseq_file, adjpvalcutoff,numgoterms,reference, up
         theme(panel.grid.major.y=element_blank()) +
         theme(panel.grid.minor=element_blank()) +
         theme(axis.text.y=element_text(size=10)) +
-        theme(plot.title = element_text(size=20, margin = margin(10, 0, 20, 0)))
+        theme(plot.title = element_text(size=8, margin = margin(10, 0, 20, 0)))
     plot_list[[2]] = ggdown
 
 

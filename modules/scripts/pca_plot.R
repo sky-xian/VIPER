@@ -5,15 +5,31 @@
 # @date: May, 23, 2016
 #--------------------
 
-if( is.element("ggbiplot", installed.packages())){
-      suppressMessages(library(ggbiplot))
-} else {
-      suppressMessages(require("devtools"))
-      install_github("vangalamaheshh/ggbiplot")
-      suppressMessages(require(ggbiplot))
-}
+### Added these scripts to hardcoded supp_fns to avoid online communication issues
+#if( is.element("ggbiplot", installed.packages())){
+#      #suppressMessages(library(ggbiplot))
+#    library(ggbiplot)
+#} else {
+#      #suppressMessages(require("devtools"))
+#    require("devtools")
+#      install_github("vangalamaheshh/ggbiplot")
+#      #suppressMessages(require(ggbiplot))
+#    require(ggbiplot)
+#}
 
 options(error = function() traceback(2))
+
+library(ggplot2)
+library(plyr)
+library(scales)
+library(grid)
+library(ggrepel)
+suppressMessages(source('viper/modules/scripts/supp_fns.R'))
+
+#source("/mnt/cfce-stor1/home/mgc31/code/viperproject/viper/modules/scripts/supp_fns.R")
+#rpkmFile = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/test2_all/cufflinks/Cuff_Gene_Counts.filtered.csv"
+#metaFile = "/mnt/cfce-stor1/home/mgc31/code/viperproject/weinstock_test_metasheet.csv"
+#pca_out_dir = "/mnt/cfce-stor1/home/mgc31/code/viperproject/analysis/test2_all/plots/"
 
 pca_plot <- function(rpkmTable, annot, pca_out_dir) {
   rpkm.pca <- prcomp(t(rpkmTable), center = TRUE, scale. = TRUE)

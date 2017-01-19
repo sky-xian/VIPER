@@ -67,9 +67,9 @@ def get_sphinx_report(config):
     if SF_png_list:
         file_dict['sf_png_list'] = SF_png_list
     report = """
-========================================================================
+==========================================================================================
 VIPER: Visualization Pipeline for RNAseq - {sub_analysis_token}
-========================================================================
+==========================================================================================
 
 
 Alignment Summary
@@ -277,7 +277,7 @@ Gene-Ontology Annotation
     for comp in comps:
         report += "\n" + comp + "\n"
         report += "^" * len(comp) + "\n"
-        go_png = "analysis/" + config["token"] + "/plots/images/" + comp + "_goterm.png"
+        go_png = "analysis/" + config["token"] + "/plots/images/" + comp + "_goterm.up.png"
         if os.path.isfile(go_png):
             report += "\n\n\t.. image:: " + data_uri(go_png) + "\n"
         else:

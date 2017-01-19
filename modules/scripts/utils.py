@@ -27,7 +27,8 @@ def getTargetInfo(config):
                         _VirusSeq(config),
                         _immunology(config),
                         _copyMetaFiles(config),
-                        _CDR3(config)])
+                        _CDR3(config),
+                        _getGCTfile(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -46,6 +47,10 @@ def _getCuffCounts(config):
     else:
         cuff_files.append("analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv")
     return cuff_files
+
+def _getGCTfile(config):
+    GCT_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"]
+    return GCT_files
 
 def _getCuffIsoCounts(config):
     cuff_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Isoform_Counts.csv"]

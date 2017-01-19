@@ -45,6 +45,19 @@ rule generate_cuff_matrix:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -d -f {fpkm_files} 1>{output}" )
 
+
+rule generate_gct_file:
+    input:
+        rpkmFile = _getCuffCounts(config)[1],
+        force_run_upon_meta_change = config['metasheet'],
+        force_run_upon_config_change = config['config_file']
+    output:
+        "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"
+    message: "Outputting .GCT file from Raw Cuff Gene Counts File"
+    priority: 1
+    run:
+        shell( "Rscript viper/modules/scripts/GeneCountsToGCT.R {input.rpkmFile} {output}" )
+
 rule generate_cuff_isoform_matrix:
     input:
         cuff_gene_fpkms=expand( "analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking", sample=config["ordered_sample_list"] ),

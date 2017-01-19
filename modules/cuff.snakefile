@@ -40,7 +40,7 @@ rule generate_cuff_matrix:
     output:
         "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv"
     message: "Generating expression matrix using cufflinks counts"
-    priority: 3
+    priority: 1
     run:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -d -f {fpkm_files} 1>{output}" )

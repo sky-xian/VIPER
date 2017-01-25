@@ -1,4 +1,4 @@
-name: vipertest
+name: viper
 channels: !!python/tuple
 - bioconda
 - r

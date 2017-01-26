@@ -122,7 +122,7 @@ dependencies:
 - ecdsa=0.13=py35_0
 - fontconfig=2.11.1=6
 - freetype=2.5.5=1
-- glib=2.50.2=0
+- glib=2.50.2
 - gmp=6.1.0=0
 - gsl=2.2.1=0
 - harfbuzz=0.9.39=1

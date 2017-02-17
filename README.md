@@ -6,6 +6,7 @@
 __VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home) which allows for ease of use, optimal speed, and a highly modular code that can be further added onto and customized by experienced users. VIPER combines the use of several dozen RNA-seq tools, suites, and packages to create a complete pipeline that takes RNA-seq analysis from raw sequencing data all the way through alignment, quality control, unsupervised analyses, differential expression, and downstream pathway analysis. In addition, VIPER has been outfitted with several recently published tools that allow for interrogation of immune and virus infiltrate. The results are compiled in a simple and highly visual report containing the key figures to explain the analysis, and then compiles all of the relevant files, tables, and pictures into an easy to navigate folder.
 
 # Table of Contents
+0. [System Requirements](#requirements)
 1. [Anatomy of a VIPER PROJECT](#anatomy)  
 2. [Getting Started - One time Installation of components necessary for an individual user](#GettingStarted)  
 3. [Setting up a Project Folder for a VIPER Run](#SettingUpForProject)  
@@ -15,6 +16,15 @@ __VIPER__ is a comprehensive RNA-seq analysis tool built using [snakemake](https
 5. [Appendix A: Dana-Farber Members](#DFmembers)
 6. [Appendix B: Specific VIPER Commands for Replotting](#replotting)
 7. [Setting up VIPER for a group of users or server](#serverSetup)
+
+# System requirements:
+Some of the tools that VIPER uses, e.g. STAR and cufflinks are very memory intensive programs.  Therefore we recommend the following system requirements for VIPER:
+
+### Minimal system requirements:
+We recommend that you run VIPER on a server that has at least 30GB of ram.  This will allow for a single-threaded VIPER run (on human samples).
+
+### Recommended system requirements:
+We recommend that you have at least 128GB of ram and at least a 4-core CPU if you want to run VIPER in multi-threaded mode (which will speedup the workflow significantly).  Our own servers have 256GB of ram and 32 cores.
 
 # Anatomy of a VIPER PROJECT: <a name="anatomy"></a>
 All work in __VIPER__ is done in a __PROJECT__ directory, which is simply a directory to contain a single __VIPER__ analysis run.  __PROJECT__ directories can be named anything (and they usually start with a simple mkdir command, e.g. mkdir viper_for_thesis),  but what is CRITICAL about a __PROJECT__ directory is that you fill them with the following core components:

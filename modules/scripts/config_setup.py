@@ -38,7 +38,7 @@ def _addExecPaths(config):
     config["python2_pythonpath"] = os.path.join(conda_root, 'envs', 'viper_py2', 'lib', 'python2.7', 'site-packages')
     
     if not "python2" in config or not config["python2"]:
-        config["python2"] = conda_path + '/python-2.7.9-3/bin/python2.7'
+        config["python2"] = conda_path + '/python-2.7.13-0/bin/python2.7'
 
     if not "rseqc_path" in config or not config["rseqc_path"]:
         config["rseqc_path"] = conda_path + '/rseqc-2.6.2-0/bin'

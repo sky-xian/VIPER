@@ -14,6 +14,12 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
     ## Read in and Log Transform Data
     Exp_data = log2(rpkmTable+1)
     
+    ## Calc. spearman correlation and use values for column clustering before any other alterations
+    cordata <- cor(Exp_data, method="spearman")
+
+    coldistance = dist(t(as.matrix(cordata)), method = "euclidean")
+    colcluster = hclust(coldistance, method = "ward.D2")
+    
     ## Make SF (sample-feature) heatmap
     Exp_data <- apply(Exp_data,1,function(x) zscore(x))
 
@@ -27,12 +33,6 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
 
     ## Make annotation bars
     ha1 <- make_complexHeatmap_annotation(annot)
-
-    ## Calc. spearman correlation and use values for column clustering
-    cordata <- cor(Exp_data, method="spearman")
-
-    coldistance = dist(t(as.matrix(cordata)), method = "euclidean")
-    colcluster = hclust(coldistance, method = "ward.D2")
 
     ## Turn on rownames if less than 100 genes
     row_name_param = FALSE

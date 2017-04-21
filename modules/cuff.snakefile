@@ -21,21 +21,20 @@ rule run_cufflinks:
     input:
         "analysis/STAR/{sample}/{sample}.sorted.bam"
     output:
-        genes_cuff_out = protected("analysis/" + config["token"] + "/cufflinks/{sample}/{sample}.genes.fpkm_tracking"),
-        iso_cuff_out = protected("analysis/" + config["token"] + "/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking")
+        genes_cuff_out = protected("analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking"),
+        iso_cuff_out = protected("analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking")
     threads: 4
     message: "Running Cufflinks on {wildcards.sample}"
     params:
-        library_command=cuff_command,
-        token = config["token"]
+        library_command=cuff_command
     shell:
-        "cufflinks -o analysis/{params.token}/cufflinks/{wildcards.sample} -p {threads} -G {config[gtf_file]} {params.library_command} {input}"
-        " && mv analysis/{params.token}/cufflinks/{wildcards.sample}/genes.fpkm_tracking {output.genes_cuff_out}"
-        " && mv analysis/{params.token}/cufflinks/{wildcards.sample}/isoforms.fpkm_tracking {output.iso_cuff_out}"
+        "cufflinks -o analysis/cufflinks/{wildcards.sample} -p {threads} -G {config[gtf_file]} {params.library_command} {input}"
+        " && mv analysis/cufflinks/{wildcards.sample}/genes.fpkm_tracking {output.genes_cuff_out}"
+        " && mv analysis/cufflinks/{wildcards.sample}/isoforms.fpkm_tracking {output.iso_cuff_out}"
 
 rule generate_cuff_matrix:
     input:
-        cuff_gene_fpkms=expand( "analysis/" + config["token"] + "/cufflinks/{sample}/{sample}.genes.fpkm_tracking", sample=config["ordered_sample_list"] ),
+        cuff_gene_fpkms=expand( "analysis/cufflinks/{sample}/{sample}.genes.fpkm_tracking", sample=config["ordered_sample_list"] ),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -61,7 +60,7 @@ rule generate_gct_file:
 
 rule generate_cuff_isoform_matrix:
     input:
-        cuff_gene_fpkms=expand( "analysis/" + config["token"] + "/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking", sample=config["ordered_sample_list"] ),
+        cuff_gene_fpkms=expand( "analysis/cufflinks/{sample}/{sample}.isoforms.fpkm_tracking", sample=config["ordered_sample_list"] ),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:

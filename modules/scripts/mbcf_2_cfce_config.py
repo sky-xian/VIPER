@@ -60,10 +60,10 @@ def getSampleFiles( sampleInfo ):
     samples = {}
     for samplename, leftmate in sampleInfo.items():
         rightmate = leftmate.replace("_R1_","_R2_")
-        if os.path.isfile("./data/" + rightmate):
-            samples[samplename] = ["./data/" + leftmate, "./data/" + rightmate]
+        if os.path.isfile("data/" + rightmate):
+            samples[samplename] = ["data/" + leftmate, "data/" + rightmate]
         else:
-            samples[samplename] = ["./data/" + leftmate]
+            samples[samplename] = ["data/" + leftmate]
     
     return samples
 

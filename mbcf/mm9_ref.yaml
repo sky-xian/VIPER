@@ -6,7 +6,7 @@
 genome_lib_dir: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/STAR_Fusion/UCSC_mm9_build/
 
 #Reference files required
-star_index: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/UCSC/mm9/Sequence/STARIndex_with_ERCC/ 
+star_index: /zfs/cores/mbcf/mbcf-storage/devel/zth/reference/mouse/STAR/
 gtf_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/UCSC/mm9/Annotation/Genes/genes_with_ERCC.gtf
 bed_file: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/UCSC/mm9/Annotation/Genes/mm9_genes_with_ERCC.bed
 ref_fasta: /zfs/cores/mbcf/mbcf-storage/devel/umv/ref_files/mouse/Mus_musculus/UCSC/mm9/Sequence/WholeGenomeFasta/genome_with_ERCC.fa
@@ -21,7 +21,7 @@ reference: mm9
 gene_annotation: viper/static/mm9.annot.csv.bz2
 
 #software source paths required from user
-python2:
+python2: /zfs/cores/mbcf/mbcf-storage/devel/zth1/software/miniconda3/envs/viper_py2/bin/python2
 rseqc_path:
-picard_path:
-varscan_path:
+picard_path: /zfs/cores/mbcf/mbcf-storage/devel/zth1/software/miniconda3/envs/viper_py2/bin/picard
+varscan_path: /zfs/cores/mbcf/mbcf-storage/devel/zth1/software/miniconda3/envs/viper/bin/varscan

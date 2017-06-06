@@ -423,3 +423,5 @@ start using viper by doing the following:
 6. (viper) PROJECT$ `snakemake -s viper/viper.snakefile -n` #to invoke a DRY-RUN
 7. (viper) PROJECT$ `snakemake -s viper/viper.snakefile` #to invoke VIPER
 
+### APPENDIX D: installing and running CDR3 analysis with TRUST
+LEN TODO:

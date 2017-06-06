@@ -60,6 +60,9 @@ def _addExecPaths(config):
         config["token"] = config["analysis_token"]
     else:
         config["token"] = "summary_reports"
+
+    if not "trust_path" in config or not config["trust_path"]:
+        config["trust_path"] = os.path.join(conda_root, 'envs', 'viper_py2', 'bin', 'trust')
     
     return config
 

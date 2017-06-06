@@ -4,23 +4,35 @@
 rule cdr3_all:
     input:
         ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config['ordered_sample_list']],
-        ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-Locs.bam" for sample in config['ordered_sample_list']],
-        ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-unmapped.bam" for sample in config['ordered_sample_list']],
+        #["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-Locs.bam" for sample in config['ordered_sample_list']],
+        #["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-unmapped.bam" for sample in config['ordered_sample_list']],
 
+
+rule index_sortedBam:
+    """index the bam"""
+    input:
+        bam="analysis/STAR/{sample}/{sample}.sorted.bam",
+    output:
+        bai="analysis/STAR/{sample}/{sample}.sorted.bam.bai",
+    message:
+        "CDR3: indexing bam file"
+    shell:
+        "samtools index {input}"
 
 rule CDR3_TRUST:
     """perform CDR3 analysis using TRUST2"""
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
+        bai="analysis/STAR/{sample}/{sample}.sorted.bam.bai",
     output:
         fa="analysis/cdr3/{sample}/{sample}.sorted.bam.fa",
-        loc="analysis/cdr3/{sample}/{sample}.sorted.bam-Locs.bam",
-        umb="analysis/cdr3/{sample}/{sample}.sorted.bam-unmapped.bam",
+        #loc="analysis/cdr3/{sample}/{sample}.sorted.bam-Locs.bam",
+        #umb="analysis/cdr3/{sample}/{sample}.sorted.bam-unmapped.bam",
         log="analysis/cdr3/{sample}/{sample}_TRUST.log",
     params:
         outdir="analysis/cdr3/{sample}/",
         pypath="PYTHONPATH=%s" % config["python2_pythonpath"]
     message:
-        "CDR3: Performing CDR3 analysis using TRUST2"
+        "CDR3: Performing CDR3 analysis using TRUST"
     shell:
-        "{params.pypath} {config[python2]} viper/modules/scripts/TRUST2.py -f {input.bam} -o {params.outdir} -a > {output.log}"
+        "{params.pypath} {config[python2]} {config[trust_path]} -f {input.bam} -o {params.outdir} -a > {output.log}"

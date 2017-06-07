@@ -46,6 +46,7 @@ def get_sphinx_report(config):
     volcano_list = []
     SF_png_list = []
     virusseq_out = "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"
+    cdr_cpk_plot = "analysis/cdr3/CPK.png"
 
     for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:
@@ -310,4 +311,12 @@ Virus-Seq Module Output
     report += "\n\nThis report is generated using ViPeR version [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"
     return report + "\n"
+
+    if os.path.isfile(cdr_cpk_plot):
+        report += """
+CDR3 analysis (using trust v2.4.1)
+==================================
+"""
+        report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot) +"\n"
+
 

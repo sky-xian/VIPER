@@ -17,36 +17,57 @@ import sys
 from optparse import OptionParser
 
 def main():
-    usage = "USAGE: %prog -f [trust .fa output FILE_1] -f [trust .fa output FILE_2] ...-f [trust .fa output FILE_N]"
+    usage = "USAGE: %prog -f [trust .fa output FILE_1] -f [trust .fa output FILE_2] ...-f [trust .fa output FILE_N]\n -d [directory of output file DIR_1] -d [directory of output file DIR_2]...."
     optparser = OptionParser(usage=usage)
     optparser.add_option("-f", "--files", action="append", help="list of trust .fa files")
+    optparser.add_option("-d", "--dirs", action="append", help="list of trust output directories")
     (options, args) = optparser.parse_args(sys.argv)
 
-    if not options.files:
+    if not options.files and not options.dirs:
         optparser.print_help()
         sys.exit(-1)
 
-    #TRY to infer the SAMPLE NAMES--SAMPLE.sorted.bam.fa
-    sampleIDs=[f.strip().split("/")[-1].split('.')[0] for f in options.files]
-    #print(sampleIDs)
+    #COLLATE the files and dir files into one big list
+    _trustFiles = []
+    if options.files:
+        _trustFiles = options.files
+    if options.dirs:
+        for d in options.dirs:
+            ls = [os.path.join(d, f) for f in os.listdir(d)]
+            _trustFiles.extend(ls)
     
     print(",".join(["SampleID","AssemblyCount","TotalCount","CPK"]))
 
-    for (i, trust_f) in enumerate(options.files):
-        #get totalCount -- NOTE: assuming no header!!
-        f = open(trust_f)
-        tmp = f.readline().strip().split("+")
-        #first num of 4th field
-        totalCount = int(tmp[3].split("=")[1].split("-")[0])
-        f.close()
-
-        #calc: numLines
-        #ref: https://stackoverflow.com/questions/845058/how-to-get-line-count-cheaply-in-python
-        num_lines = sum(1 for line in open(trust_f))
-        assemblyCount = num_lines / 2.0
+    #CHECK for valid files
+    _trustFiles = list(filter(lambda f: f.endswith(".fa"), _trustFiles))
+    for (i, trust_f) in enumerate(_trustFiles):
+        #NOTE: handle header
+        num_lines = 0
+        skip_ct = 0
+        totalCount = 0
+        sampleID = None
         
-        CPK = (assemblyCount*1000)/totalCount
-        print(",".join([sampleIDs[i], "%.1f" %assemblyCount, str(totalCount), "%.2f" % CPK]))
+        f = open(trust_f)
+        for l in f:
+            num_lines += 1
+            if l.startswith("#"): #skip comment
+                skip_ct += 1
+            else:
+                tmp = l.strip().split("+")                
+                #is totalCount set?
+                if not totalCount:
+                    totalCount = int(tmp[3].split("=")[1].split("-")[0])
+                #did we get sampleId
+                if not sampleID:
+                    firstElm = tmp[0][1:] #skip the > in front
+                    sampleID = firstElm.split('.')[0]
+        #finish reading the file
+        f.close()
+        #good reading? --otherwise skip
+        if totalCount: 
+            assemblyCount = (num_lines - skip_ct) / 2.0
+            CPK = (assemblyCount*1000)/totalCount
+            print(",".join([sampleID, "%.1f" %assemblyCount, str(totalCount), "%.2f" % CPK]))
 
 if __name__=='__main__':
     main()

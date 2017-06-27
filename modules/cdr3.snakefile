@@ -40,6 +40,9 @@ rule calc_CPK:
     NOTE: CPK = (# lines /2) *1000 / (first number of est_lib_size)
     """
     input:
+        #NOTE: cdr3_calc_cpk.py has been modified to take directories, but
+        #because snakemake inputs need links to outputs, we keep the longer
+        #files-as-input call
         cdr_files = expand("analysis/cdr3/{sample}/{sample}.sorted.bam.fa", sample=config["ordered_sample_list"]),
     output:
         "analysis/cdr3/CPK.csv"

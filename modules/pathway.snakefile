@@ -26,6 +26,8 @@ rule goterm_analysis:
         numgoterms = config["numgoterms"],
         reference = config["reference"]
     message: "Creating Goterm Analysis plots for Differential Expressions for {wildcards.comparison}"
+    benchmark:
+        "benchmarks/" + config["token"] + "/{comparison}.goterm_analysis.txt"
     shell:
         "Rscript viper/modules/scripts/goterm_analysis.R {input.deseq} {params.gotermadjpvalcutoff} "
         "{params.numgoterms} {params.reference} {params.up_csv} {params.down_csv} {params.plot} {params.up_png} {params.down_png} && "
@@ -51,6 +53,8 @@ rule kegg_analysis:
         reference = config["reference"],
         temp_dir = "analysis/" + config["token"] + "/diffexp/{comparison}/temp/"
     message: "Creating Kegg Pathway Analysis for Differential Expressions for {wildcards.comparison}"
+    benchmark:
+        "benchmarks/" + config["token"] + "/{comparison}.kegg_analysis.txt"
     shell:
         "mkdir -p {params.temp_dir} && "
         "Rscript viper/modules/scripts/kegg_pathway.R {input.deseq} "

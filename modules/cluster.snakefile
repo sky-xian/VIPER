@@ -23,6 +23,8 @@ rule pca_plot:
     params:
         pca_out_dir = "analysis/" + config["token"] + "/plots/"
     message: "Generating PCA plots"
+    benchmark:
+        "benchmarks/" + config["token"] + "/pca_plot.txt"
     shell:
         #"mkdir -p {output.pca_out_dir} && Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_out_dir} "
         " Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.pca_out_dir} "
@@ -38,6 +40,8 @@ rule heatmapSS_plot:
     message: "Generating Sample-Sample Heatmap"
     params:
         ss_out_dir = "analysis/" + config["token"] + "/plots/"
+    benchmark:
+        "benchmarks/" + config["token"] + "/heatmapSS_plot.txt"
     shell:
         "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
         "{input.annotFile} {params.ss_out_dir} "
@@ -55,6 +59,8 @@ rule heatmapSF_plot:
         num_kmeans_clust = config["num_kmeans_clust"],
         sf_out_dir = "analysis/" + config["token"] + "/plots/"
     message: "Generating Sample-Feature heatmap"
+    benchmark:
+        "benchmarks/" + config["token"] + "/heatmapSF_plot.txt"
     shell:
         "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} "
         "{input.annotFile} {params.num_kmeans_clust} {params.sf_out_dir} "

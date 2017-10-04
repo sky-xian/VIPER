@@ -20,6 +20,8 @@ rule limma_and_deseq:
         s2 = lambda wildcards: ",".join(config['comps'][wildcards.comparison]['treat']),
         gene_annotation = config['gene_annotation']
     message: "Running differential expression analysis using limma and deseq for {wildcards.comparison}"
+    benchmark:
+        "benchmarks/" + config["token"] + "/{comparison}.limma_and_deseq.txt"
     shell:
         "Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" " 
         "{output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} "
@@ -37,6 +39,8 @@ rule deseq_limma_fc_plot:
         out_csv = "analysis/" + config["token"] + "/diffexp/{comparison}/deseq_limma_fc_corr.csv",
         out_png = "analysis/" + config["token"] + "/diffexp/{comparison}/deseq_limma_fc_corr.png"
     message: "Creatting deseq-limma correlation plot for {wildcards.comparison}"
+    benchmark:
+        "benchmarks/" + config["token"] + "/{comparison}.deseq_limma_fc_plot.txt"
     shell:
         "Rscript viper/modules/scripts/deseq_limma_fc_corr.R {input.deseq} {input.limma} {output.out_csv} {output.out_png}"
 
@@ -50,6 +54,8 @@ rule fetch_DE_gene_list:
         csv="analysis/" + config["token"] + "/diffexp/de_summary.csv",
         png="analysis/" + config["token"] + "/diffexp/de_summary.png"
     message: "Creating Differential Expression summary"
+    benchmark:
+        "benchmarks/" + config["token"] + "/fetch_DE_gene_list.txt"
     run:
         deseq_file_string = ' -f '.join(input.deseq_file_list)
         shell("perl viper/modules/scripts/get_de_summary_table.pl -f {deseq_file_string} 1>{output.csv}")
@@ -66,6 +72,8 @@ rule volcano_plot:
         plot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}_volcano.pdf",
         png = "analysis/" + config["token"] + "/plots/images/{comparison}_volcano.png"
     message: "Creating volcano plots for Differential Expressions for {wildcards.comparison}"
+    benchmark:
+        "benchmarks/" + config["token"] + "/{comparison}.volcano_plot.txt"
     shell:
         "Rscript viper/modules/scripts/volcano_plot.R {input.deseq} {output.plot} {output.png}"
 

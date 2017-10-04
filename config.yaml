@@ -27,7 +27,7 @@ gene_annotation: viper/static/humanhg19.annot.csv
 
 ## Sample-Sample Heatmap params
 RPKM_threshold: 1.0
-min_num_samples_expressing_at_threshold: 4
+min_num_samples_expressing_at_threshold: 1
 
 ## Filters out "SNO" and "MIR" RNA, options are [true,false]
 filter_mirna: true

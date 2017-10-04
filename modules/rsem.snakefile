@@ -19,6 +19,8 @@ rule rsem_align:
         rsem_genes_out = protected("analysis/RSEM/{sample}/{sample}.genes.results")
     threads: 8
     message: "Running RSEM on {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}/{sample}.rsem_align.txt"
     params:
         sample_name = lambda wildcards: wildcards.sample,
         stranded = "--strand-specific" if config["stranded"] else "",
@@ -35,6 +37,8 @@ rule rsem_iso_matrix:
     output:
         rsem_iso_matrix = "analysis/" + config["token"] + "/RSEM/tpm_iso_matrix.csv"
     message: "Running RSEM matrix generation rule for isoforms"
+    benchmark:
+        "benchmarks/" + config["token"] + "/rsem_iso_matrix.txt"
     run:
         args = " -f ".join( input.rsem_iso_files )
         shell("perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_iso_matrix}")
@@ -47,6 +51,8 @@ rule rsem_gene_matrix:
     output:
         rsem_gene_matrix = "analysis/" + config["token"] + "/RSEM/tpm_gene_matrix.csv"
     message: "Running RSEM matrix generation rule for genes"
+    benchmark:
+        "benchmarks/" + config["token"] + "/rsem_gene_matrix.txt"
     run:
         args = " -f ".join( input.rsem_gene_files )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_gene_matrix}" )

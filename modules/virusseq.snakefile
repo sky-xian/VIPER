@@ -28,6 +28,8 @@ rule virusseq_map:
         prefix=lambda wildcards: "analysis/virusseq/{sample}/STAR/{sample}.virus.".format(sample=wildcards.sample),
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
     message: "Mapping unmapped reads to hg19Virus"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_map.txt"
     threads: 8
     shell:
         "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[virusseq_index]}"
@@ -52,6 +54,8 @@ rule virusseq_cuff:
     params:
         library_command=cuff_command
     message: "Running Cufflinks on viral-mapped reads"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_cuff.txt"
     shell:
         "cufflinks -o analysis/virusseq/{wildcards.sample} -p {threads} -G {config[virusseq_gtf_file]} {params.library_command} {input} && mv analysis/virusseq/{wildcards.sample}/transcripts.gtf analysis/virusseq/{wildcards.sample}/{wildcards.sample}.virusseq.transcripts.gtf"
 
@@ -60,6 +64,8 @@ rule virusseq_filterTranscripts:
         "analysis/virusseq/{sample}/{sample}.virusseq.transcripts.gtf"
     output:
         "analysis/virusseq/{sample}/{sample}.virusseq.filtered.gtf"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_filterTranscripts.txt"
     shell:
         "viper/modules/scripts/virusseq_filterTranscripts.py -f {input} > {output}"
 
@@ -70,6 +76,8 @@ rule virusseq_table:
     output:
         table="analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
     message: "Generating virusseq output table"
+    benchmark:
+        "benchmarks/" + config["token"] + "/virusseq_table.txt"
     run:
         fpkms = " -f ".join(input.filteredFPKMs)
         counts = " -c ".join(input.readCounts)
@@ -81,6 +89,8 @@ rule virusseq_summarize:
     output:
         "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
     message: "Summarizing virusseq output"
+    benchmark:
+        "benchmarks/" + config["token"] + "/virusseq_summarize.txt"
     shell:
         "viper/modules/scripts/virusseq_summarize.py -f {input} > {output}"
 
@@ -90,6 +100,8 @@ rule virusseq_bamToBdg:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam",
     output:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bg"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_bamToBdg.txt"
     shell:
         "bedtools genomecov -bg -split -ibam {input} -g {config[virusseq_chrom_len]} > {output}"
 
@@ -99,6 +111,8 @@ rule virusseq_sortBdg:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bg"
     output:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.sorted.bg"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_sortBdg.txt"
     shell:
         "bedSort {input} {output}"
 
@@ -109,6 +123,8 @@ rule virusseq_bdgToBw:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.sorted.bg"
     output:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bw"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_bdgToBw.txt"
     shell:
         "bedGraphToBigWig {input} {config[virusseq_chrom_len]} {output}"
 
@@ -118,6 +134,8 @@ rule virusseq_SJtab2JunctionsBed:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.SJ.out.tab"
     output:
         "analysis/virusseq/{sample}/STAR/{sample}.virus.junctions.bed"
+    benchmark:
+        "benchmarks/{sample}/{sample}.virusseq_SJtab2JunctionsBed.txt"
     shell:
         "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"
 
@@ -128,6 +146,8 @@ rule virusseq_gen_cuff_isoform_matrix:
     output:
         "analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv",
     message: "Generating expression matrix using cufflinks isoform counts"
+    benchmark:
+        "benchmarks/" + config["token"] + "/virusseq_gen_cuff_isoform_matrix.txt"
     priority: 3
     params:
         #What to call our col 0

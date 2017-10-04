@@ -45,6 +45,8 @@ rule run_STAR:
         keepPairs = _keepPairs
     threads: 8
     message: "Running STAR Alignment on {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_STAR.txt"
     shell:
         "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_index]}"
         " --sjdbGTFfile {config[gtf_file]}"
@@ -71,6 +73,8 @@ rule generate_STAR_report:
         gene_counts="analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
     priority: 3
+    benchmark:
+        "benchmarks/" + config["token"] + "/generate_STAR_report.txt"
     run:
         log_files = " -l ".join( input.star_log_files )
         count_files = " -f ".join( input.star_gene_count_files )
@@ -91,6 +95,8 @@ rule batch_effect_removal_star:
         datatype = "star"
     message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
     priority: 2
+    benchmark:
+        "benchmarks/" + config["token"] + "/batch_effect_removal_star.txt"
     shell:
         "Rscript viper/modules/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} "
         "{params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput} "
@@ -106,6 +112,8 @@ rule run_STAR_fusion:
     log:
         "analysis/STAR_Fusion/{sample}/{sample}.star_fusion.log"
     message: "Running STAR fusion on {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_STAR_fusion.txt"
     shell:
         "STAR-Fusion --chimeric_junction analysis/STAR/{wildcards.sample}/{wildcards.sample}.Chimeric.out.junction "
         "--genome_lib_dir {config[genome_lib_dir]} --output_dir analysis/STAR_Fusion/{wildcards.sample} >& {log}"
@@ -123,6 +131,8 @@ rule run_STAR_fusion_report:
         csv="analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.csv",
         png="analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.png"
     message: "Generating STAR fusion report"
+    benchmark:
+        "benchmarks/" + config["token"] + "/run_STAR_fusion_report.txt"
     shell:
         "python viper/modules/scripts/STAR_Fusion_report.py -f {input.sf_list} 1>{output.csv} "
         "&& Rscript viper/modules/scripts/STAR_Fusion_report.R {output.csv} {output.png}"
@@ -140,6 +150,8 @@ rule run_rRNA_STAR:
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
     threads: 8
     message: "Running rRNA STAR for {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_rRNA_STAR.txt"
     shell:
         "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_rRNA_index]}"
         " --readFilesIn {input} --readFilesCommand zcat --outFileNamePrefix {params.prefix}."
@@ -158,6 +170,8 @@ rule generate_rRNA_STAR_report:
         csv="analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.csv",
         png="analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.png"
     message: "Generating STAR rRNA report"
+    benchmark:
+        "benchmarks/" + config["token"] + "/run_rRNA_STAR_report.txt"
     run:
         log_files = " -l ".join( input.star_log_files )
         shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
@@ -169,5 +183,7 @@ rule align_SJtab2JunctionsBed:
         "analysis/STAR/{sample}/{sample}.SJ.out.tab"
     output:
         "analysis/STAR/{sample}/{sample}.junctions.bed"
+    benchmark:
+        "benchmarks/{sample}/{sample}.align_SJtab2JunctionsBed.txt"
     shell:
         "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"

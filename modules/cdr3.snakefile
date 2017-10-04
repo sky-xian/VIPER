@@ -22,5 +22,7 @@ rule CDR3_TRUST:
         pypath="PYTHONPATH=%s" % config["python2_pythonpath"]
     message:
         "CDR3: Performing CDR3 analysis using TRUST2"
+    benchmark:
+        "benchmarks/{sample}/{sample}.CDR3_TRUST.txt"
     shell:
         "{params.pypath} {config[python2]} viper/modules/scripts/TRUST2.py -f {input.bam} -o {params.outdir} -a > {output.log}"

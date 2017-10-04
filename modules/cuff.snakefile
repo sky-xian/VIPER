@@ -27,6 +27,8 @@ rule run_cufflinks:
     message: "Running Cufflinks on {wildcards.sample}"
     params:
         library_command=cuff_command
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_cufflinks.txt"
     shell:
         "cufflinks -o analysis/cufflinks/{wildcards.sample} -p {threads} -G {config[gtf_file]} {params.library_command} {input}"
         " && mv analysis/cufflinks/{wildcards.sample}/genes.fpkm_tracking {output.genes_cuff_out}"
@@ -41,6 +43,8 @@ rule generate_cuff_matrix:
         "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv"
     message: "Generating expression matrix using cufflinks counts"
     priority: 1
+    benchmark:
+        "benchmarks/" + config["token"] + "/generate_cuff_matrix.txt"
     run:
         fpkm_files= " -f ".join( input.cuff_gene_fpkms )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -c -d -f {fpkm_files} 1>{output}" )
@@ -55,6 +59,8 @@ rule generate_gct_file:
         "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"
     message: "Outputting .GCT file from Raw Cuff Gene Counts File"
     priority: 1
+    benchmark:
+        "benchmarks/" + config["token"] + "/generate_gct_file.txt"
     run:
         shell( "Rscript viper/modules/scripts/GeneCountsToGCT.R {input.rpkmFile} {output}" )
 
@@ -70,6 +76,8 @@ rule generate_cuff_isoform_matrix:
     params:
         #What to call our col 0
         iid="Transcript_ID"
+    benchmark:
+        "benchmarks/" + config["token"] + "/generate_cuff_isoform_matrix.txt"
     run:
         fpkm_files= " -f ".join(input.cuff_gene_fpkms)
         shell("viper/modules/scripts/cuff_collect_fpkm.py -n {params.iid} -f {fpkm_files} > {output}")
@@ -86,6 +94,8 @@ rule batch_effect_removal_cufflinks:
         datatype = "cufflinks"
     message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
     priority: 2
+    benchmark:
+        "benchmarks/" + config["token"] + "/batch_effect_removal_cufflinks.txt"
     shell:
         "Rscript viper/modules/scripts/batch_effect_removal.R {input.cuffmat} {input.annotFile} {params.batch_column} "
         "{params.datatype} {output.cuffcsvoutput} {output.cuffpdfoutput} "
@@ -99,5 +109,7 @@ rule fpkm_plot:
     output:
         fpkm_png = "analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"
     message: "Plot gene counts at various fpkm cutoffs"
+    benchmark:
+        "benchmarks/" + config["token"] + "/fpkm_plot.txt"
     shell:
         "Rscript viper/modules/scripts/fpkm_plot.R {input.cuffmat} {output.fpkm_png}"

@@ -11,7 +11,8 @@
 
 def getTargetInfo(config):
     targetFiles = []
-    targetFiles.extend([_getSTARcounts(config),
+    targetFiles.extend([_getSTARaligns(config),
+                        _getSTARcounts(config),
                         _convertSJoutToBed(config),
                         _getCuffCounts(config), 
                         _getCuffIsoCounts(config), 
@@ -30,6 +31,16 @@ def getTargetInfo(config):
                         _CDR3(config),
                         _getGCTfile(config)])
     return targetFiles
+
+def _getSTARaligns(config):
+    """ensure that bam and indexes are built"""
+    #STAR alignment sorted.bam file
+    ls = ["analysis/STAR/"+sample+"/"+sample+".sorted.bam" for sample in config['ordered_sample_list']]
+
+    #and the indexes which in a separate rule
+    for sample in config['ordered_sample_list']:
+        ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam.bai")
+    return ls
 
 ## Returns proper count files for with and without batch effect correction
 def _getSTARcounts(config):

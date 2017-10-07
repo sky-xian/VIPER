@@ -42,7 +42,7 @@ rule generate_cuff_matrix:
     output:
         "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv"
     message: "Generating expression matrix using cufflinks counts"
-    priority: 1
+    #priority: 1
     benchmark:
         "benchmarks/" + config["token"] + "/generate_cuff_matrix.txt"
     run:
@@ -58,7 +58,7 @@ rule generate_gct_file:
     output:
         "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"
     message: "Outputting .GCT file from Raw Cuff Gene Counts File"
-    priority: 1
+    #priority: 1
     benchmark:
         "benchmarks/" + config["token"] + "/generate_gct_file.txt"
     run:
@@ -72,7 +72,7 @@ rule generate_cuff_isoform_matrix:
     output:
         "analysis/" + config["token"] + "/cufflinks/Cuff_Isoform_Counts.csv"
     message: "Generating expression matrix using cufflinks isoform counts"
-    priority: 3
+    #priority: 3
     params:
         #What to call our col 0
         iid="Transcript_ID"
@@ -93,7 +93,7 @@ rule batch_effect_removal_cufflinks:
         batch_column="batch",
         datatype = "cufflinks"
     message: "Removing batch effect from Cufflinks Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
-    priority: 2
+    #priority: 2
     benchmark:
         "benchmarks/" + config["token"] + "/batch_effect_removal_cufflinks.txt"
     shell:

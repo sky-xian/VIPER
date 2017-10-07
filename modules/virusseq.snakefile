@@ -148,7 +148,7 @@ rule virusseq_gen_cuff_isoform_matrix:
     message: "Generating expression matrix using cufflinks isoform counts"
     benchmark:
         "benchmarks/" + config["token"] + "/virusseq_gen_cuff_isoform_matrix.txt"
-    priority: 3
+    #priority: 3
     params:
         #What to call our col 0
         iid="Transcript_ID"

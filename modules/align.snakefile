@@ -45,6 +45,7 @@ rule run_STAR:
         keepPairs = _keepPairs
     threads: 8
     message: "Running STAR Alignment on {wildcards.sample}"
+    priority: 10
     benchmark:
         "benchmarks/{sample}/{sample}.run_STAR.txt"
     shell:
@@ -58,8 +59,19 @@ rule run_STAR:
         "  --outSAMunmapped Within {params.keepPairs}"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
         " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
-        " && samtools index {output.bam}"
+        #" && samtools index {output.bam}"
 
+rule index_bam:
+    """INDEX the {sample}.sorted.bam file"""
+    input:
+        "analysis/STAR/{sample}/{sample}.sorted.bam"
+    output:
+        "analysis/STAR/{sample}/{sample}.sorted.bam.bai"
+    message: "Indexing {wildcards.sample}.sorted.bam"
+    benchmark:
+        "benchmarks/{sample}/{sample}.index_bam.txt"
+    shell:
+        "samtools index {input}"
 
 rule generate_STAR_report:
     input:
@@ -72,7 +84,7 @@ rule generate_STAR_report:
         png="analysis/" + config["token"] + "/STAR/STAR_Align_Report.png",
         gene_counts="analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
-    priority: 3
+    #priority: 3
     benchmark:
         "benchmarks/" + config["token"] + "/generate_STAR_report.txt"
     run:
@@ -94,7 +106,7 @@ rule batch_effect_removal_star:
         batch_column="batch",
         datatype = "star"
     message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
-    priority: 2
+    #priority: 2
     benchmark:
         "benchmarks/" + config["token"] + "/batch_effect_removal_star.txt"
     shell:

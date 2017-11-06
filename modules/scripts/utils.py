@@ -159,10 +159,12 @@ def _copyMetaFiles(config):
 
 def _CDR3(config):
     cdr3_targets = []
-    if ('cdr3_analysis' in config and config['cdr3_analysis'] == True and config['reference'] == 'hg19'):
-        #LEN: Do we need to tokenize these results??--can bams be reanalyzed?
-        cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]
-        cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-Locs.bam" for sample in config["ordered_sample_list"]])
-        cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-unmapped.bam" for sample in config["ordered_sample_list"]])
-
+    if ('cdr3_analysis' in config and config['cdr3_analysis'] == True):
+        #CHECK for valid setting--i.e. config[reference] = {hg19 or hg38}
+        if (config['reference'] == 'hg19' or config['reference'] == 'hg38'):
+            cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]
+            cdr3_targets.extend(["analysis/cdr3/CPK.csv"])
+            cdr3_targets.extend(["analysis/cdr3/CPK.png"])
+        else:
+            print("WARNING: cdr3 (Trust) analysis skipped because reference is not a valid entry, hg19 or hg38")
     return cdr3_targets

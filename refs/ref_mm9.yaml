@@ -1,8 +1,9 @@
 #Reference files required
-star_index: /data/static_libraries/STAR/mm9/
+#star_index: /path/to/STAR/mm9/
+#ref_fasta: /path/to/assembly/UCSC_MM9/rawgenome/mm9.fasta
+
 gtf_file: ./ref_files/mm9/mm9.refseq.gtf
 bed_file: ./ref_files/mm9/refseqGenesMm9.bed
-ref_fasta: /data/static_libraries/assembly/UCSC_MM9/rawgenome/mm9.fasta
 star_rRNA_index: ./ref_files/mm9/STAR_index_rRNA_SA_5/
 
 #Reference organism; possible value - hg19, mm9 etc.
@@ -10,8 +11,6 @@ reference: mm9
 gene_annotation: viper/static/mm9.annot.csv.bz2
 #STAR-Fusion
 #This is required only for PE data.
-#NOTE: in mbcf/mm9_ref.yaml, this was set to 
-
 genome_lib_dir: ./ref_files/mm9/UCSC_mm9_build/
 
 snpEff_conf: ./ref_files/mm9/snpEff/snpEff.config

@@ -13,7 +13,7 @@ import yaml
 import os, sys, subprocess
 
 def updateConfig(config):
-    ref_info = _getRefInfo()
+    ref_info = _getRefInfo(config)
     for k,v in ref_info.items():
         config[k] = v
     config["config_file"] = "config.yaml" # trick to force rules on config change
@@ -25,8 +25,8 @@ def updateConfig(config):
     config = _addExecPaths(config)
     return config
 
-def _getRefInfo():
-    with open("ref.yaml","r") as ref_file:
+def _getRefInfo(config):
+    with open(config['ref'],"r") as ref_file:
         ref_info = yaml.safe_load(ref_file)
     return ref_info
 

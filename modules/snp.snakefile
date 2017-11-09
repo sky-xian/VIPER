@@ -14,6 +14,8 @@ _HLA_regions = {'hg19':"chr6:28477797-33448354", 'mm9':'chr17:34111604-36221194'
 rule call_snps_hla:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
+        #TO insure we're indexed before this rule executes
+        bai="analysis/STAR/{sample}/{sample}.sorted.bam.bai",
         ref_fa=config["ref_fasta"],
     output:
         protected("analysis/snp/{sample}/{sample}.snp.hla.txt")

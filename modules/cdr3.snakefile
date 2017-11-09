@@ -7,17 +7,6 @@ rule cdr3_all:
         ["analysis/cdr3/CPK.csv"],
         ["analysis/cdr3/CPK.png"],
 
-rule index_sortedBam:
-    """index the bam"""
-    input:
-        bam="analysis/STAR/{sample}/{sample}.sorted.bam",
-    output:
-        bai="analysis/STAR/{sample}/{sample}.sorted.bam.bai",
-    message:
-        "CDR3: indexing bam file"
-    shell:
-        "samtools index {input}"
-
 rule CDR3_TRUST:
     """perform CDR3 analysis using TRUST2"""
     input:

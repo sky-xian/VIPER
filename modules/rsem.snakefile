@@ -8,12 +8,11 @@
 # @date: Aug, 09, 2016
 #---------------------------
 
-def getFastq(wildcards):
-    return config["samples"][wildcards.sample]
+_logfile = "analysis/logs/rsem.txt"
 
-rule rsem_align:
+rule rsem:
     input:
-        getFastq
+        bam="analysis/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam"
     output:
         rsem_transcript_out = protected("analysis/RSEM/{sample}/{sample}.isoforms.results"),
         rsem_genes_out = protected("analysis/RSEM/{sample}/{sample}.genes.results")
@@ -21,14 +20,13 @@ rule rsem_align:
     message: "Running RSEM on {wildcards.sample}"
     benchmark:
         "benchmarks/{sample}/{sample}.rsem_align.txt"
+    log: _logfile
     params:
         sample_name = lambda wildcards: wildcards.sample,
         stranded = "--strand-specific" if config["stranded"] else "",
         paired_end = "--paired-end" if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ""
     shell:
-        "{config[rsem_path]}/rsem-calculate-expression {params.stranded} --num-threads {threads} --star --star-gzipped-read-file "
-        "{params.paired_end} {input} "
-        "{config[rsem_ref]} analysis/RSEM/{params.sample_name}/{params.sample_name} " 
+        "rsem-calculate-expression -p {threads} {params.stranded} {params.paired_end} --bam --no-bam-output --estimate-rspd --append-names {input} {config[rsem_ref]} analysis/RSEM/{params.sample_name}/{params.sample_name} > {log}"
        
 rule rsem_iso_matrix:
     input:
@@ -42,7 +40,6 @@ rule rsem_iso_matrix:
     run:
         args = " -f ".join( input.rsem_iso_files )
         shell("perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_iso_matrix}")
-
 
 rule rsem_gene_matrix:
     input:

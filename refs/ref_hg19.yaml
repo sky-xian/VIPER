@@ -1,7 +1,6 @@
 #Reference files required
-#ref_fasta: /path/to/assembly/humanhg19/rawgenome/hg19.fasta
-#star_index: /path/to/STAR/humanhg19/
-
+ref_fasta: ./ref_files/hg19/assembly/hg19.fasta
+star_index: ./ref_files/hg19/STAR/humanhg19/
 gtf_file: ./ref_files/hg19/Hg19_CTAT_resource_lib/ref_annot.gtf
 bed_file: ./ref_files/hg19/refseqGenesHg19.bed
 star_rRNA_index: ./ref_files/hg19/humanhg38_ncrna/
@@ -18,6 +17,8 @@ snpEff_db: hg19
 
 virusseq_index: ./ref_files/hg19/virusseq/STAR_hg19Virus
 virusseq_gtf_file: ./ref_files/hg19/virusseq/hg19Virus_refGene_RIS.gtf
+
+rsem_ref: ./ref_files/hg19/RSEM/hg19
 
 #software source paths in case user needs to over-ride
 #python2: 

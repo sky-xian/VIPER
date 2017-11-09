@@ -52,9 +52,10 @@ def _addExecPaths(config):
         config["varscan_path"] = 'varscan'
    
     # update RSEM executable only if rsem_ref key has value from user
-    if "rsem_ref" in config and config["rsem_ref"]:
-        config["rsem_path"] = conda_root + '/envs/rsem/bin'
-        config["seurat_path"] = conda_root + '/envs/seurat/bin' 
+    # DISABLING--looking to remove
+    # if "rsem_ref" in config and config["rsem_ref"]:
+    #     config["rsem_path"] = conda_root + '/envs/rsem/bin'
+    #     config["seurat_path"] = conda_root + '/envs/seurat/bin' 
 
     if "analysis_token" in config and config["analysis_token"]:
         config["token"] = config["analysis_token"]

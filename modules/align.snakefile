@@ -32,7 +32,7 @@ rule run_STAR:
         getFastq
     output:
         bam=protected("analysis/STAR/{sample}/{sample}.sorted.bam"),
-        counts="analysis/STAR/{sample}/{sample}.counts.tab",
+        counts="analysis/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam",
         log_file="analysis/STAR/{sample}/{sample}.Log.final.out",
         #COOL hack: {{sample}} is LEFT AS A WILDCARD
         unmapped_reads = expand( "analysis/STAR/{{sample}}/{{sample}}.Unmapped.out.{mate}", mate=_mates),
@@ -58,11 +58,11 @@ rule run_STAR:
         " --outSAMattrRGline {params.readgroup}"
         " --outSAMtype BAM SortedByCoordinate"
         " --limitBAMsortRAM 45000000000"
-        " --quantMode GeneCounts"
+        " --quantMode TranscriptomeSAM"
         " --outReadsUnmapped Fastx"
         " --outSAMunmapped Within {params.keepPairs}"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
-        " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
+
 
 rule index_bam:
     """INDEX the {sample}.sorted.bam file"""

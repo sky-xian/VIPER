@@ -34,12 +34,13 @@ def getTargetInfo(config):
 
 def _getSTARaligns(config):
     """ensure that bam and indexes are built"""
-    #STAR alignment sorted.bam file
-    ls = ["analysis/STAR/"+sample+"/"+sample+".sorted.bam" for sample in config['ordered_sample_list']]
+    #STAR alignment sorted.bam file, its index, and transcript count
+    ls = []
 
-    #and the indexes which in a separate rule
     for sample in config['ordered_sample_list']:
+        ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam")
         ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam.bai")
+
     return ls
 
 ## Returns proper count files for with and without batch effect correction

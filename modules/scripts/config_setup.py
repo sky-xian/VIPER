@@ -18,7 +18,7 @@ def updateConfig(config):
         config[k] = v
     config["config_file"] = "config.yaml" # trick to force rules on config change
 	
-    for k in ["RPKM_threshold","min_num_samples_expressing_at_threshold", 
+    for k in ["TPM_threshold","min_num_samples_expressing_at_threshold", 
                 "numgenes_plots","num_kmeans_clust","filter_mirna"]:
         config[k] = str(config[k])
 

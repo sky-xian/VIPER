@@ -145,7 +145,10 @@ sub get_seurat_header {
     my( $files, $meta_info ) = @_;
     my @header = ();
     foreach my $file( @$files ) {
-        push @header, $$meta_info{ $file };
+	#BUG FIX: filenames are NOT sample names-
+	#need to parse out sample names
+	my $tmp = (split(/\./, $file))[0];
+        push @header, $tmp;
     }
-    return @header;      
+    return @header;
 }

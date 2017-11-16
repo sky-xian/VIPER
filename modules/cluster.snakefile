@@ -9,11 +9,11 @@
 # @date: July, 1st, 2016
 #----------------------------------------
 
-from scripts.utils import _getProcessedCuffCounts
+from scripts.utils import _getProcessedGeneCounts
 
 rule pca_plot:
     input:
-        rpkmFile = _getProcessedCuffCounts(config),
+        tpmFile = _getProcessedGeneCounts(config),
         annotFile = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -26,12 +26,11 @@ rule pca_plot:
     benchmark:
         "benchmarks/" + config["token"] + "/pca_plot.txt"
     shell:
-        #"mkdir -p {output.pca_out_dir} && Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {output.pca_out_dir} "
-        " Rscript viper/modules/scripts/pca_plot.R {input.rpkmFile} {input.annotFile} {params.pca_out_dir} "
+        "Rscript viper/modules/scripts/pca_plot.R {input.tpmFile} {input.annotFile} {params.pca_out_dir}"
 
 rule heatmapSS_plot:
     input:
-        rpkmFile = _getProcessedCuffCounts(config),
+        tpmFile = _getProcessedGeneCounts(config),
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -43,13 +42,13 @@ rule heatmapSS_plot:
     benchmark:
         "benchmarks/" + config["token"] + "/heatmapSS_plot.txt"
     shell:
-        "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.rpkmFile} "
+        "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSS_plot.R {input.tpmFile} "
         "{input.annotFile} {params.ss_out_dir} "
 
 
 rule heatmapSF_plot:
     input:
-        rpkmFile = _getProcessedCuffCounts(config),
+        tpmFile = _getProcessedGeneCounts(config),
         annotFile=config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
@@ -62,5 +61,5 @@ rule heatmapSF_plot:
     benchmark:
         "benchmarks/" + config["token"] + "/heatmapSF_plot.txt"
     shell:
-        "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.rpkmFile} "
+        "mkdir -p analysis/{config[token]}/plots/images && Rscript viper/modules/scripts/heatmapSF_plot.R {input.tpmFile} "
         "{input.annotFile} {params.num_kmeans_clust} {params.sf_out_dir} "

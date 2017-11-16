@@ -14,8 +14,8 @@ def getTargetInfo(config):
     targetFiles.extend([_getSTARaligns(config),
                         _getSTARcounts(config),
                         _convertSJoutToBed(config),
-                        _getCuffCounts(config), 
-                        _getCuffIsoCounts(config), 
+                        _getGeneCounts(config), 
+                        _getIsoCounts(config), 
                         _fusionOutput(config), 
                         _insertSizeOutput(config), 
                         _rRNAmetrics(config), 
@@ -45,31 +45,36 @@ def _getSTARaligns(config):
 
 ## Returns proper count files for with and without batch effect correction
 def _getSTARcounts(config):
-    STAR_out_files = ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"] if config["batch_effect_removal"] == True else ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"]
+    STAR_out_files = ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"] if config["batch_effect_removal"] else ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"]
     return STAR_out_files
 
 def _convertSJoutToBed(config):
     ls = ["analysis/STAR/"+sample+"/"+sample+".junctions.bed" for sample in config['ordered_sample_list']]
     return ls
 
-def _getCuffCounts(config):
-    cuff_files = ["analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"]
-    if config["batch_effect_removal"] == True:
-        cuff_files.append("analysis/" + config["token"] + "/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
+#NEED to re-jig this as this is largely redundant w/ _getGCTfile
+def _getGeneCounts(config):
+    ls = ["analysis/" + config["token"] + "/plots/gene_counts.tpm.png"]
+    if config["batch_effect_removal"]:
+        ls.append("analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv")
     else:
-        cuff_files.append("analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv")
-    return cuff_files
+        ls.append("analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv")
+    return ls
 
 def _getGCTfile(config):
-    GCT_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"]
-    return GCT_files
+    ls = []
+    if config["batch_effect_removal"]:
+        ls.append("analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv")
+    else:
+        ls.append("analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv")
+    return ls
 
-def _getCuffIsoCounts(config):
-    cuff_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Isoform_Counts.csv"]
-    return cuff_files
+def _getIsoCounts(config):
+    iso_files = ["analysis/" + config["token"] + "/rsem/iso_tpm_matrix.csv"]
+    return iso_files
 
-def _getProcessedCuffCounts(config):
-    return "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.filtered.csv"
+def _getProcessedGeneCounts(config):
+    return "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.filtered.csv"
 
 def _fusionOutput(config):
     fusion_out = []
@@ -108,7 +113,7 @@ def _DE(config):
 
 def _SNP(config):
     snp_files = ["analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png"]
-    if ('snp_scan_genome' in config and config['snp_scan_genome'] == True):
+    if ('snp_scan_genome' in config and config['snp_scan_genome']):
         snp_files.extend([["analysis/snp/" + sample + "/" + sample + ".snp.genome.vcf", 
             "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]])
     return snp_files
@@ -137,7 +142,7 @@ def _pathway(config):
 
 def _VirusSeq(config):
     virus_seq_targets = []
-    if ('virus_dna_scan' in config and config['virus_dna_scan'] == True and config['reference'] == 'hg19'):
+    if ('virus_dna_scan' in config and config['virus_dna_scan'] and config['reference'] == 'hg19'):
         virus_seq_targets = ["analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"]
         virus_seq_targets.extend(["analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv"])
         virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
@@ -160,7 +165,7 @@ def _copyMetaFiles(config):
 
 def _CDR3(config):
     cdr3_targets = []
-    if ('cdr3_analysis' in config and config['cdr3_analysis'] == True):
+    if ('cdr3_analysis' in config and config['cdr3_analysis']):
         #CHECK for valid setting--i.e. config[reference] = {hg19 or hg38}
         if (config['reference'] == 'hg19' or config['reference'] == 'hg38'):
             cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]

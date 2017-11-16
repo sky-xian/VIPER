@@ -8,6 +8,8 @@
 # @date: Aug, 09, 2016
 #---------------------------
 
+from scripts.utils import _getGCTfile
+
 _logfile = "analysis/logs/rsem.txt"
 
 rule rsem:
@@ -114,3 +116,33 @@ rule rsem_filter_gene_ct_matrix:
         "--out_file {output.filtered_tpm} "
         "--sample_names {params.sample_names} "
 
+rule batch_effect_removal_rsem:
+    input:
+        gene_cts = "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv",
+        annotFile = config["metasheet"]
+    output:
+        rsemcsvoutput="analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv",
+        rsempdfoutput="analysis/" + config["token"] + "/rsem/rsem_combat_qc.pdf"
+    params:
+        batch_column="batch",
+        datatype = "rsem"
+    message: "Removing batch effect from Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
+    #priority: 2
+    benchmark:
+        "benchmarks/" + config["token"] + "/batch_effect_removal_rsem.txt"
+    shell:
+        "Rscript viper/modules/scripts/batch_effect_removal.R {input.gene_cts} {input.annotFile} {params.batch_column} "
+        "{params.datatype} {output.rsemcsvoutput} {output.rsempdfoutput} "
+        " && mv {input.gene_cts} analysis/{config[token]}/rsemlinks/without_batch_correction_rsem_gene_ct_matrix.csv "
+
+rule tpm_plot:
+    input:
+        tpm_mat = _getGCTfile(config),
+        annotFile = config["metasheet"]
+    output:
+        tpm_png = "analysis/" + config["token"] + "/plots/gene_counts.tpm.png"
+    message: "Plot gene counts at various tpm cutoffs"
+    benchmark:
+        "benchmarks/" + config["token"] + "/rsem_tpm_plot.txt"
+    shell:
+        "Rscript viper/modules/scripts/fpkm_plot.R {input.tpm_mat} {output.tpm_png}"

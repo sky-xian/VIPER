@@ -24,11 +24,11 @@ rule target:
     message: "Compiling all output"        
 
 include: "./modules/align.snakefile"         # rules specific to STAR and Fusion
-include: "./modules/cuff.snakefile"          # cufflinks' and fpkm plot rules
+#include: "./modules/cuff.snakefile"          # cufflinks' and fpkm plot rules
 include: "./modules/readQC.snakefile"        # RSeQC and Picard rules 
 include: "./modules/file_format.snakefile"   # bam to bigwig
 include: "./modules/snp.snakefile"           # variant calling rules
-include: "./modules/preprocess.snakefile"    # preprocess rules for cleaning data up 
+#include: "./modules/preprocess.snakefile"    # preprocess rules for cleaning data up 
 include: "./modules/cluster.snakefile"       # PCA, Heatmaps (Sample-Sample & Sample-Feature)
 include: "./modules/DE.snakefile"            # DESeq2, Limma and volcano plot rules
 include: "./modules/pathway.snakefile"       # GO and KEGG rules

@@ -138,6 +138,10 @@ VIPER.  This how-to will show you the steps.
       virusseq$ cat hg38.refseq.noChrM.gtf virusSeq.gtf > hg38virus.refseq.gtf
    f. USE the GTF built in the previous step to build a STAR index:
       virusseq$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles hg38virus.fa --sjdbGTFfile hg38.refseq.noChrM.gtf &
+   g. make the hg38.virus.chrom.sizes file:
+      use the base hg38.chrom.sizes, but replace the chrM entry with:
+      chrM    645825
+      #where there is a tab to separate the columns
 
 TODO:
 11. update ref.yaml:

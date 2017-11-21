@@ -3,11 +3,12 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
-from scripts.utils import _getSTARcounts
+from scripts.utils import _getGCTfile
 
 rule limma_and_deseq:
     input:
-        counts = _getSTARcounts(config)[0]
+        #counts = _getGCTfile(config)
+        rsem_files = expand("analysis/rsem/{sample}/{sample}.genes.processed.txt", sample=config["ordered_sample_list"]),
     output:
         limma = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.limma.csv",
         deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
@@ -22,13 +23,17 @@ rule limma_and_deseq:
     message: "Running differential expression analysis using limma and deseq for {wildcards.comparison}"
     benchmark:
         "benchmarks/" + config["token"] + "/{comparison}.limma_and_deseq.txt"
-    shell:
-        "Rscript viper/modules/scripts/DEseq.R \"{input.counts}\" \"{params.s1}\" \"{params.s2}\" " 
-        "{output.limma} {output.deseq} {output.limma_annot} {output.deseq_annot} "
-        "{output.deseqSum} {params.gene_annotation} "
-        # ridiculous hack for singletons (Mahesh Vangala)
-        "&& touch {output.limma} "
-        "&& touch {output.limma_annot}"
+    run:
+        rsem_files = ",".join(input.rsem_files)
+        names = ",".join(config["ordered_sample_list"])
+        shell("Rscript viper/modules/scripts/DEseq.R \"{rsem_files}\" "
+              "\"{names}\" "
+              "\"{params.s1}\" \"{params.s2}\" {output.limma} {output.deseq} "
+              "{output.limma_annot} {output.deseq_annot} {output.deseqSum} "
+              "{params.gene_annotation} "
+              # ridiculous hack for singletons (Mahesh Vangala)
+              "&& touch {output.limma} "
+              "&& touch {output.limma_annot}")
 
 
 rule deseq_limma_fc_plot:

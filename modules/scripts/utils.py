@@ -12,7 +12,6 @@
 def getTargetInfo(config):
     targetFiles = []
     targetFiles.extend([_getSTARaligns(config),
-                        _getSTARcounts(config),
                         _convertSJoutToBed(config),
                         _getGeneCounts(config), 
                         _getIsoCounts(config), 
@@ -42,11 +41,6 @@ def _getSTARaligns(config):
         ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam.bai")
 
     return ls
-
-## Returns proper count files for with and without batch effect correction
-def _getSTARcounts(config):
-    STAR_out_files = ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"] if config["batch_effect_removal"] else ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"]
-    return STAR_out_files
 
 def _convertSJoutToBed(config):
     ls = ["analysis/STAR/"+sample+"/"+sample+".junctions.bed" for sample in config['ordered_sample_list']]

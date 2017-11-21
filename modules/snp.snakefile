@@ -3,7 +3,10 @@
 # vim: syntax=python tabstop=4 expandtab
 # coding: utf-8
 
-_HLA_regions = {'hg19':"chr6:28477797-33448354", 'mm9':'chr17:34111604-36221194'}
+#TEMP HACK- adding hg38; permanent soln- move to ref.yaml
+_HLA_regions = {'hg38':"chr6:28477797-33448354", 
+                'hg19':"chr6:28477797-33448354", 
+                'mm9':'chr17:34111604-36221194'}
 
 #call snps from the samples
 #NOTE: lots of duplicated code below!--ONE SET for chr6 (default) and another
@@ -80,7 +83,7 @@ rule snpEff_annot:
     benchmark:
         "benchmarks/{sample}/{sample}.snpEff_annot.txt"
     shell:
-        "snpEff -Xmx2G -stats {output.vcf_stats} -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output.vcf_annot}"
+        "snpEff -Xmx4G -stats {output.vcf_stats} -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output.vcf_annot}"
 
 
 

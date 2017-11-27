@@ -76,31 +76,28 @@ rule index_bam:
     shell:
         "samtools index {input}"
 
-rule generate_STAR_report:
+rule plot_STAR_alignments:
     input:
         star_log_files=expand( "analysis/STAR/{sample}/{sample}.Log.final.out", sample=config["ordered_sample_list"] ),
-        star_gene_count_files=expand( "analysis/STAR/{sample}/{sample}.counts.tab", sample=config["ordered_sample_list"] ),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
         csv="analysis/" + config["token"] + "/STAR/STAR_Align_Report.csv",
         png="analysis/" + config["token"] + "/STAR/STAR_Align_Report.png",
-        gene_counts="analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
     #priority: 3
     benchmark:
         "benchmarks/" + config["token"] + "/generate_STAR_report.txt"
     run:
         log_files = " -l ".join( input.star_log_files )
-        count_files = " -f ".join( input.star_gene_count_files )
         shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
         shell( "Rscript viper/modules/scripts/map_stats.R {output.csv} {output.png}" )
-        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -f {count_files} 1>{output.gene_counts}" )
+
 
 
 rule batch_effect_removal_star:
     input:
-        starmat = "analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv",
+        starmat = "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv",
         annotFile = config["metasheet"]
     output:
         starcsvoutput="analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv",
@@ -132,8 +129,8 @@ rule run_STAR_fusion:
     shell:
         "STAR-Fusion --chimeric_junction analysis/STAR/{wildcards.sample}/{wildcards.sample}.Chimeric.out.junction "
         "--genome_lib_dir {config[genome_lib_dir]} --output_dir analysis/STAR_Fusion/{wildcards.sample} >& {log}"
-        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final {output[0]}"
-        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final.abridged {output[1]}"
+        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_predictions.tsv {output[0]}"
+        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_predictions.abridged.tsv {output[1]}"
         " && touch {output[1]}" # For some sample, final.abridged is created but not .final file; temp hack before further investigate into this
 
 
@@ -173,8 +170,18 @@ rule run_rRNA_STAR:
         "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
         "  --limitBAMsortRAM 45000000000"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
-        " && samtools index {output.bam}"
 
+rule index_STAR_rRNA_bam:
+    """INDEX the STAR_rRNA/{sample}.sorted.bam file"""
+    input:
+        "analysis/STAR_rRNA/{sample}/{sample}.sorted.bam"
+    output:
+        "analysis/STAR_rRNA/{sample}/{sample}.sorted.bam.bai"
+    message: "Indexing STAR_rRNA {wildcards.sample}.sorted.bam"
+    benchmark:
+        "benchmarks/{sample}/{sample}.index_STAR_rRNA_bam.txt"
+    shell:
+        "samtools index {input}"
 
 rule generate_rRNA_STAR_report:
     input:

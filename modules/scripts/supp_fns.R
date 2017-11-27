@@ -1,5 +1,6 @@
 ######Some supplemental fns that are used by heatmap_plot*.R and cluster_plot.R
 #BASED on heatmap_supp_funcs.R written by Henry Long
+library(methods)
 
 zscore = function(x){
     y=(x-mean(x))/sd(x)

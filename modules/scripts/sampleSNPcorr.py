@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """Script to calculate SNP correlations among samples.
 
 Method Corr: let samples S1 and S2 have a set of common snps C.  M is the 
@@ -64,11 +64,11 @@ def main():
                 snps2 = snp[s2]
                 common = set(snps1.keys()).intersection(set(snps2.keys()))
                 ct = sum([1 for s in common if snps1[s] == snps2[s]])
-                #print "%s:%s %.8f" % (s1, s2, float(ct)/(len(common)+.001))
+                #print("%s:%s %.8f" % (s1, s2, float(ct)/(len(common)+.001)))
                 corr = float(ct)/(len(common)+.001)
                 corrMat[i].append(corr)
 
-    #print corrMat
+    #print(corrMat)
     #header:
     print("\t".join(["Samples"]+samplesLs))
     for (i,row) in enumerate(corrMat):

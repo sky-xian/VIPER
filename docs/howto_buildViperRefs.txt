@@ -90,7 +90,7 @@ VIPER.  This how-to will show you the steps.
 
 7. RSEM transcriptome:
    ref: https://github.com/bli25ucb/RSEM_tutorial
-   NOTE: need to use ensembl GTF (not the gtf you made in step #3)
+   NOTE: need to use ensembl GTF (NOT the gtf you made in step #3)
    1. $ wget ftp://ftp.ensembl.org/pub/release-86/gtf/homo_sapiens/Homo_sapiens.GRCh38.86.chr.gtf.gz
    2. $ gunzip Homo_sapiens.GRCh38.86.chr.gtf.gz
    3. FIX the GTF in step #2 using viper/modules/scripts/tools/processEnsemblGtf.py
@@ -132,16 +132,18 @@ VIPER.  This how-to will show you the steps.
    c. RE-ASSEMBLE your FASTA into a virus assembly:
       cat chr1.fa chr2.fa chr3.fa ... chrM.fa > hg38.virus.fa
       #AGAIN NOTE: chrM.fa is the virusseq chrM.fa
-   d. remove chrM annotations from your gtf (built in step #3)-
-      virusseq$ grep -v chrM ../hg38.refseq.gtf > hg38.refseq.noChrM.gtf
+   d. remove chrM annotations from your ENSEMBL gtf (built in step#7):
+      virusseq$ grep -v chrM ../hg38.ensembl.gtf > hg38.ensembl.noChrM.gtf
    e. compose a new gtf using the virusseq GTF (viper/static/virusseq/virusSeq.gtf)
-      virusseq$ cat hg38.refseq.noChrM.gtf virusSeq.gtf > hg38virus.refseq.gtf
+      virusseq$ cat hg38.ensembl.noChrM.gtf virusSeq.rsem.gtf > hg38virus.ensembl.gtf
    f. USE the GTF built in the previous step to build a STAR index:
-      virusseq$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles hg38virus.fa --sjdbGTFfile hg38.refseq.noChrM.gtf &
+      virusseq$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles hg38virus.fa --sjdbGTFfile hg38Virus.ensembl.gtf &
    g. make the hg38.virus.chrom.sizes file:
       use the base hg38.chrom.sizes, but replace the chrM entry with:
       chrM    645825
       #where there is a tab to separate the columns
+   h. build a RSEM db:
+      virusseq$ rsem-prepare-reference -p 8 --gtf hg38Virus.ensembl.gtf --star hg38virus.fa ./hg38_virusseq_rsem_ref/hg38.virusseq
 
 TODO:
 11. update ref.yaml:

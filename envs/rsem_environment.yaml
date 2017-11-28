@@ -1,6 +1,0 @@
-name: rsem
-channels:
-- bioconda
-dependencies:
-- rsem=1.2.28
-- star=2.5.1b=0

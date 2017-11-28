@@ -138,8 +138,8 @@ def _VirusSeq(config):
     virus_seq_targets = []
     if ('virus_dna_scan' in config and config['virus_dna_scan'] and config['reference'] == 'hg19'):
         virus_seq_targets = ["analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"]
-        virus_seq_targets.extend(["analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv"])
-        virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
+        virus_seq_targets.extend(["analysis/" + config["token"] + "/virusseq/virusseq_Isoform_Counts.csv"])
+        virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.genes" for sample in config["ordered_sample_list"]])
         virus_seq_targets.extend(["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.Aligned.sortedByCoord.out.bw" for sample in config['ordered_sample_list']])
         virus_seq_targets.extend(["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.junctions.bed" for sample in config['ordered_sample_list']])
     return virus_seq_targets

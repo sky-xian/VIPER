@@ -1,14 +1,16 @@
-#Stub file
+#Virusseq module
+_logfile = "analysis/logs/virusseq.txt"
+
 rule virusseq_all:
     input:
-        ["analysis/virusseq/"+sample+"/"+sample+".virusseq.transcripts.gtf" for sample in config['ordered_sample_list']],
-        ["analysis/virusseq/"+sample+"/"+sample+".virusseq.filtered.gtf" for sample in config['ordered_sample_list']],
+        ["analysis/virusseq/"+sample+"/rsem/"+sample+".virusseq.genes.results" for sample in config['ordered_sample_list']],
+        ["analysis/virusseq/"+sample+"/"+sample+".virusseq.filtered.genes" for sample in config['ordered_sample_list']],
         #GENERATE .bw for each of the alignments
         ["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.Aligned.sortedByCoord.out.bw" for sample in config['ordered_sample_list']],
         ["analysis/virusseq/"+sample+"/STAR/"+sample+".virus.junctions.bed" for sample in config['ordered_sample_list']],
         "analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
         "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv",
-        "analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv",
+        "analysis/" + config["token"] + "/virusseq/virusseq_Isoform_Counts.csv",
 
 
 def getUnmappedReads(wildcards):
@@ -21,9 +23,9 @@ rule virusseq_map:
     input:
         getUnmappedReads
     output:
-        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam",
-        "analysis/virusseq/{sample}/STAR/{sample}.virus.ReadsPerGene.out.tab",
-        "analysis/virusseq/{sample}/STAR/{sample}.virus.SJ.out.tab"
+        bam="analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam",
+        counts="analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.toTranscriptome.out.bam",
+        sjtab="analysis/virusseq/{sample}/STAR/{sample}.virus.SJ.out.tab"
     params:
         prefix=lambda wildcards: "analysis/virusseq/{sample}/STAR/{sample}.virus.".format(sample=wildcards.sample),
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
@@ -33,37 +35,62 @@ rule virusseq_map:
     threads: 8
     shell:
         "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[virusseq_index]}"
-        " --sjdbGTFfile {config[virusseq_gtf_file]}"
         "  --readFilesIn {input} --outFileNamePrefix {params.prefix}"
         "  --outSAMstrandField intronMotif"
-        # STRANDED information DROPPED
-        #"  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
         "  --outSAMmode Full --outSAMattributes All --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
-        "  --limitBAMsortRAM 45000000000 --quantMode GeneCounts"
+        "  --limitBAMsortRAM 45000000000 --quantMode TranscriptomeSAM"
 
-if( config["stranded"] ):
-    cuff_command="--library-type " + config["library_type"]
-
-rule virusseq_cuff:
+rule virusseq_rsem:
+    """Quantify virusseq transcripts using RSEM"""
     input:
-        "analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam"
+        bam="analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.toTranscriptome.out.bam"
     output:
-        "analysis/virusseq/{sample}/{sample}.virusseq.transcripts.gtf",
-        "analysis/virusseq/{sample}/isoforms.fpkm_tracking"
-    threads: 4
-    params:
-        library_command=cuff_command
-    message: "Running Cufflinks on viral-mapped reads"
+        rsem_transcript_out = protected("analysis/virusseq/{sample}/rsem/{sample}.virusseq.isoforms.results"),
+        rsem_genes_out = protected("analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.results")
+    threads: 8
+    message: "Running virusseq RSEM on {wildcards.sample}"
     benchmark:
-        "benchmarks/{sample}/{sample}.virusseq_cuff.txt"
+        "benchmarks/{sample}/{sample}.virusseq_rsem.txt"
+    log: _logfile
+    params:
+        sample_name = lambda wildcards: wildcards.sample,
+        stranded = "--strand-specific" if config["stranded"] else "",
+        paired_end = "--paired-end" if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ""
     shell:
-        "cufflinks -o analysis/virusseq/{wildcards.sample} -p {threads} -G {config[virusseq_gtf_file]} {params.library_command} {input} && mv analysis/virusseq/{wildcards.sample}/transcripts.gtf analysis/virusseq/{wildcards.sample}/{wildcards.sample}.virusseq.transcripts.gtf"
+        "rsem-calculate-expression -p {threads} {params.stranded} {params.paired_end} --bam --no-bam-output --estimate-rspd --append-names {input} {config[virusseq_rsem_ref]} analysis/virusseq/{params.sample_name}/rsem/{params.sample_name}.virusseq > {log}"
+
+rule virusseq_processRsem:
+    """Remove duplicated gene_ids from rsem results"""
+    input: 
+        "analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.results"
+    output:
+        "analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.processed.txt"
+    message: "Processing the RSEM gene.results output"
+    benchmark: 
+        "benchmarks/{sample}/{sample}.virusseq_processRsem.txt"
+    run:
+        shell("viper/modules/scripts/rsem_process_genes.py -f {input} 1> {output}")
+
+rule virusseq_annoteRsem:
+    """Add chr, start, end to rsem results (additional cols)"""
+    input: 
+        "analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.processed.txt"
+    output:
+        "analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.annot.txt"
+    message: "Annotating the RSEM gene.results output"
+    benchmark: 
+        "benchmarks/{sample}/{sample}.virusseq_annotateRsem.txt"
+    params:
+        gtf=config['virusseq_ucsc_gtf']
+    run:
+        shell("viper/modules/scripts/virusseq_annotate_rsem.py -b {input} -g {params.gtf} 1> {output}")
 
 rule virusseq_filterTranscripts:
+    """Filter for potential viral transcripts, i.e. on chrM and TPM > 0.0"""
     input:
-        "analysis/virusseq/{sample}/{sample}.virusseq.transcripts.gtf"
+        "analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.annot.txt"
     output:
-        "analysis/virusseq/{sample}/{sample}.virusseq.filtered.gtf"
+        "analysis/virusseq/{sample}/{sample}.virusseq.filtered.genes"
     benchmark:
         "benchmarks/{sample}/{sample}.virusseq_filterTranscripts.txt"
     shell:
@@ -71,17 +98,15 @@ rule virusseq_filterTranscripts:
 
 rule virusseq_table:
     input:
-        filteredFPKMs = expand("analysis/virusseq/{sample}/{sample}.virusseq.filtered.gtf", sample=config["ordered_sample_list"]),
-        readCounts = expand("analysis/virusseq/{sample}/STAR/{sample}.virus.ReadsPerGene.out.tab", sample=config["ordered_sample_list"])
+        filteredTPMs = expand("analysis/virusseq/{sample}/{sample}.virusseq.filtered.genes", sample=config["ordered_sample_list"]),
     output:
         table="analysis/" + config["token"] + "/virusseq/virusseq_table.csv",
     message: "Generating virusseq output table"
     benchmark:
         "benchmarks/" + config["token"] + "/virusseq_table.txt"
     run:
-        fpkms = " -f ".join(input.filteredFPKMs)
-        counts = " -c ".join(input.readCounts)
-        shell("viper/modules/scripts/virusseq_table.py -f {fpkms} -c {counts} > {output}")
+        tpms = " -f ".join(input.filteredTPMs)
+        shell("viper/modules/scripts/virusseq_table.py -f {tpms} > {output}")
 
 rule virusseq_summarize:
     input:
@@ -137,21 +162,18 @@ rule virusseq_SJtab2JunctionsBed:
     benchmark:
         "benchmarks/{sample}/{sample}.virusseq_SJtab2JunctionsBed.txt"
     shell:
-        "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"
+        "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} >{output}"
 
-rule virusseq_gen_cuff_isoform_matrix:
-    """Collect all of the virusseq isoform fpkms"""
+rule virusseq_rsem_isoform_matrix:
+    """Collect all of the virusseq isoform tpms"""
     input:
-        cuff_gene_fpkms=expand( "analysis/virusseq/{sample}/isoforms.fpkm_tracking", sample=config["ordered_sample_list"] ),
+        rsem_iso=expand( "analysis/virusseq/{sample}/rsem/{sample}.virusseq.isoforms.results", sample=config["ordered_sample_list"] ),
     output:
-        "analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv",
-    message: "Generating expression matrix using cufflinks isoform counts"
+        "analysis/" + config["token"] + "/virusseq/virusseq_Isoform_Counts.csv"
+    message: "Generating expression matrix using isoform counts"
     benchmark:
-        "benchmarks/" + config["token"] + "/virusseq_gen_cuff_isoform_matrix.txt"
-    #priority: 3
-    params:
-        #What to call our col 0
-        iid="Transcript_ID"
+        "benchmarks/" + config["token"] + "/virusseq_rsem_isoform_matrix.txt"
     run:
-        fpkm_files= " -f ".join(input.cuff_gene_fpkms)
-        shell("viper/modules/scripts/cuff_collect_fpkm.py -n {params.iid} -f {fpkm_files} > {output}")
+        rsem_files= " -f ".join(input.rsem_iso)
+        shell("viper/modules/scripts/virusseq_rsem_collect_tpm.py -f {rsem_files} > {output}")
+    

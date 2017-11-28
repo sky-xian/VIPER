@@ -7,9 +7,9 @@ import sys
 from optparse import OptionParser
 
 def main():
-    usage = "USAGE: %prog -f rsem.genes.rselgs"
+    usage = "USAGE: %prog -f rsem.genes.results"
     optparser = OptionParser(usage=usage)
-    optparser.add_option("-f", "--file", help="virusseq gtf file")
+    optparser.add_option("-f", "--file", help="file to process")
     (options, args) = optparser.parse_args(sys.argv)
 
     if not options.file:

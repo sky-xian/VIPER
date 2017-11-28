@@ -1,6 +1,7 @@
 ---
 metasheet: metasheet.csv
-ref: ref.yaml
+ref: viper/ref.yaml
+assembly: 'hg19'
 
 ref_fasta: /path/to/assembly/rawgenome/assembly.fasta
 star_index: /path/to/STAR/index

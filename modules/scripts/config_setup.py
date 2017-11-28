@@ -13,11 +13,8 @@ import yaml
 import os, sys, subprocess
 
 def updateConfig(config):
-    ref_info = _getRefInfo(config)
-    for k,v in ref_info.items():
-        config[k] = v
-    config["config_file"] = "config.yaml" # trick to force rules on config change
-	
+    loadRef(config)
+    config["config_file"] = "config.yaml" # trick to force rules on config change	
     for k in ["TPM_threshold","min_num_samples_expressing_at_threshold", 
                 "numgenes_plots","num_kmeans_clust","filter_mirna"]:
         config[k] = str(config[k])
@@ -25,11 +22,21 @@ def updateConfig(config):
     config = _addExecPaths(config)
     return config
 
-def _getRefInfo(config):
-    with open(config['ref'],"r") as ref_file:
-        ref_info = yaml.safe_load(ref_file)
-    return ref_info
-
+#------------------------------------------------------------------------------
+# CHIPS-like refs file
+#-----------------------------------------------------------------------------
+def loadRef(config):
+    """Adds the static reference paths found in config['ref']
+    NOTE: if the elm is already defined, then we DO NOT clobber the value
+    """
+    f = open(config['ref'])
+    ref_info = yaml.safe_load(f)
+    f.close()
+    #print(ref_info[config['assembly']])
+    for (k,v) in ref_info[config['assembly']].items():
+        #NO CLOBBERING what is user-defined!
+        if k not in config:
+            config[k] = v
 
 def _addExecPaths(config):
     conda_root = subprocess.check_output('conda info --root',shell=True).decode('utf-8').strip()

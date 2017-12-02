@@ -19,31 +19,14 @@ def getUnmappedReads(wildcards):
         ls.append("analysis/STAR/%s/%s.Unmapped.out.mate2" % (wildcards.sample, wildcards.sample))
     return ls
 
-rule virusseq_map:
+rule virusseq_rsem:
+    """CALL RSEM directly from the raw fastq files
+    NOTE: this differs from how the sample-rsem analysis is done--where,
+    for efficiency sake, we MAP the FASTQ and then input the 
+    .Aligned.toTranscriptome.bam to RSEM"""
+
     input:
         getUnmappedReads
-    output:
-        bam="analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.sortedByCoord.out.bam",
-        counts="analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.toTranscriptome.out.bam",
-        sjtab="analysis/virusseq/{sample}/STAR/{sample}.virus.SJ.out.tab"
-    params:
-        prefix=lambda wildcards: "analysis/virusseq/{sample}/STAR/{sample}.virus.".format(sample=wildcards.sample),
-        readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
-    message: "Mapping unmapped reads to hg19Virus"
-    benchmark:
-        "benchmarks/{sample}/{sample}.virusseq_map.txt"
-    threads: 8
-    shell:
-        "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[virusseq_index]}"
-        "  --readFilesIn {input} --outFileNamePrefix {params.prefix}"
-        "  --outSAMstrandField intronMotif"
-        "  --outSAMmode Full --outSAMattributes All --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
-        "  --limitBAMsortRAM 45000000000 --quantMode TranscriptomeSAM"
-
-rule virusseq_rsem:
-    """Quantify virusseq transcripts using RSEM"""
-    input:
-        bam="analysis/virusseq/{sample}/STAR/{sample}.virus.Aligned.toTranscriptome.out.bam"
     output:
         rsem_transcript_out = protected("analysis/virusseq/{sample}/rsem/{sample}.virusseq.isoforms.results"),
         rsem_genes_out = protected("analysis/virusseq/{sample}/rsem/{sample}.virusseq.genes.results")
@@ -57,7 +40,7 @@ rule virusseq_rsem:
         stranded = "--strand-specific" if config["stranded"] else "",
         paired_end = "--paired-end" if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ""
     shell:
-        "rsem-calculate-expression -p {threads} {params.stranded} {params.paired_end} --bam --no-bam-output --estimate-rspd --append-names {input} {config[virusseq_rsem_ref]} analysis/virusseq/{params.sample_name}/rsem/{params.sample_name}.virusseq > {log}"
+        "rsem-calculate-expression -p {threads} {params.stranded} {params.paired_end} --star --estimate-rspd --append-names {input} {config[virusseq_rsem_ref]} analysis/virusseq/{params.sample_name}/rsem/{params.sample_name}.virusseq > {log}"
 
 rule virusseq_processRsem:
     """Remove duplicated gene_ids from rsem results"""

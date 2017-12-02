@@ -39,6 +39,7 @@ def _getSTARaligns(config):
     for sample in config['ordered_sample_list']:
         ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam")
         ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam.bai")
+    ls.append("analysis/" + config['token'] + "/STAR/STAR_Align_Report.png")
 
     return ls
 

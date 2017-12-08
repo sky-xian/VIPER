@@ -65,7 +65,7 @@ rule rsem_gene_process:
         "analysis/rsem/{sample}/{sample}.genes.processed.txt"
     message: "Processing the RSEM genes.results output"
     benchmark: 
-        "benchmark/" + config["token"] + "/rsem_gene_process.txt"
+        "benchmarks/" + config["token"] + "/rsem_gene_process.txt"
     run:
         shell("viper/modules/scripts/rsem_process_genes.py -f {input} 1> {output}")
 

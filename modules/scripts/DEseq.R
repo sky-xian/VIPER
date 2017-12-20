@@ -25,6 +25,10 @@ limma_and_deseq_f <- function(arg_rsem, arg_names, arg_s1, arg_s2, limma, deseq,
     rsem_files = strsplit(arg_rsem,",")[[1]]
     names = strsplit(arg_names,",")[[1]]
     names(rsem_files) <- names
+
+    #HERE we select out the sample/cols that are related to the analysis
+    rsem_files <- rsem_files[names(rsem_files) %in% c(treatlist,ctrllist)]
+    
     #how to use tximport
     #ref: http://bioconductor.org/packages/release/bioc/vignettes/tximport/inst/doc/tximport.html
     txi.deseq <- tximport(rsem_files, type = "rsem")
@@ -47,7 +51,7 @@ limma_and_deseq_f <- function(arg_rsem, arg_names, arg_s1, arg_s2, limma, deseq,
         dds <- dds[rowSums(counts(dds)) > 0, ]
         dds <- DESeq(dds)
         res <- results(dds)
-	 
+        
         #Get summary stats
         summary <- c(sum(res$padj<0.05 & res$log2FoldChange>0.0, na.rm=TRUE),
                      sum(res$padj<0.05 & res$log2FoldChange>0.5, na.rm=TRUE),

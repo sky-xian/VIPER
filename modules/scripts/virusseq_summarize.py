@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Script to summarize the virusseq results--outputs to stdout: AS CSV
-SampleID, TranscriptID, Counts, TPM
+SampleID, TranscriptID, Counts, FPKM
 """
 
 import os
@@ -18,15 +18,15 @@ def main():
         sys.exit(-1)
 
     f=open(options.file)
-    #header
-    tmp = f.readline().strip()
-    print(tmp)
-
+    #BURN
+    tmp = f.readline()
     #RELYING on the table file already being sorted!
     lastID = ''
+    #print header
+    print(",".join(["SampleID","TranscriptID","Counts","FPKM"]))
     for l in f:
         tmp = l.strip().split(',')
-        #TPM - only one sig. digit
+        #FPKM - only one sig. digit
         tmp[-1] = "%.1f" % float(tmp[-1])
         if tmp[0] != lastID:
             #NEW SET

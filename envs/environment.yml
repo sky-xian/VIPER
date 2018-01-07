@@ -35,6 +35,9 @@ dependencies:
 - r-readr
 - r-calibrate
 
+#gsea.snakefile
+- bioconductor-clusterprofiler
+
 #file_format.snakefile
 - bedtools
 - ucsc-bedsort

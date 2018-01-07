@@ -28,7 +28,8 @@ def getTargetInfo(config):
                         _immunology(config),
                         _copyMetaFiles(config),
                         _CDR3(config),
-                        _getGCTfile(config)])
+                        _getGCTfile(config),
+                        _gsea(config)])
     return targetFiles
 
 def _getSTARaligns(config):
@@ -169,3 +170,14 @@ def _CDR3(config):
         else:
             print("WARNING: cdr3 (Trust) analysis skipped because reference is not a valid entry, hg19 or hg38")
     return cdr3_targets
+
+def _gsea(config):
+    gsea_targets = []
+    if config["comparisons"]:
+        for comp in config["comparisons"]:
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.txt" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_list.txt" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.barplot.png" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp))
+
+    return gsea_targets

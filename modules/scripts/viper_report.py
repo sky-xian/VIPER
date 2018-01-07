@@ -45,6 +45,7 @@ def get_sphinx_report(config):
     pca_png_list = []
     volcano_list = []
     SF_png_list = []
+    gsea_list = []
     virusseq_out = "analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"
     cdr_cpk_plot = "analysis/cdr3/CPK.png"
 
@@ -61,12 +62,18 @@ def get_sphinx_report(config):
     for SF_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/heatmapSF_*_plot.png")):
         SF_png_list.append(data_uri(SF_plot))
 
+    for comp in comps:
+        gsea_list.append(data_uri("./analysis/%s/diffexp/%s/%s.gene_set.enrichment.barplot.png" % (config["token"], comp, comp)))
+        gsea_list.append(data_uri("./analysis/%s/diffexp/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp)))
+
     if pca_png_list:
         file_dict['pca_png_list'] = pca_png_list
     if volcano_list:
         file_dict['volcano_png_list'] = volcano_list
     if SF_png_list:
         file_dict['sf_png_list'] = SF_png_list
+    if gsea_list:
+        file_dict['gsea_png_list'] = gsea_list
     report = """
 ==========================================================================================
 VIPER: Visualization Pipeline for RNAseq - {sub_analysis_token}
@@ -301,6 +308,21 @@ KEGG-Pathway Analysis
             if token:
                 report += "\n" + "More pathway plots such as, " + token + " - can be found at " + cur_path + ".\n"    
 
+#------------------------------------------------------------------------------
+# GSEA section
+#------------------------------------------------------------------------------
+    report += """
+GSEA
+====
+    Gene Set Enrichment Analysis was performed on the significant differentially expressed genes using the clusterProfiler R package
+"""
+    if 'gsea_png_list' in file_dict:
+        report += "\n\n\t.. image:: " + "\n\n\t.. image:: ".join(file_dict['gsea_png_list'][:]) + "\n"
+    report += "\n"
+
+#------------------------------------------------------------------------------
+# Virusseq section
+#------------------------------------------------------------------------------
     if os.path.isfile(virusseq_out):
         report += """
 Virus-Seq Module Output

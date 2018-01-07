@@ -38,3 +38,4 @@ include: "./modules/virusseq.snakefile"      # Virusseq rules
 include: "./modules/immunology.snakefile"    # Immunology module rules
 include: "./modules/final_report.snakefile"  # rules for HTML report 
 include: "./modules/cdr3.snakefile"          # CDR3 Analysis module
+include: "./modules/gsea.snakefile"          # GSEA Analysis module

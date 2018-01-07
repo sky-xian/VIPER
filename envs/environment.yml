@@ -253,4 +253,5 @@ dependencies:
 - reportlab=3.3.0=py35_0
 - tk=8.5.18=0
 - xz=5.2.2=1
-
+#gsea module
+- bioconductor-clusterprofiler

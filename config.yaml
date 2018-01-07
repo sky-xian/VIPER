@@ -50,6 +50,8 @@ numkeggpathways: 5
 #Uncomment the following line to perform a TRUST (cdr3) analysis.  refer to README.md
 cdr3_analysis: false
 
+#Path to gene set enrichment db
+gsea_db: viper/static/gsea/msigdb.v6.1.symbols.gmt
 
 samples:
   #FOR SINGLE-END samples

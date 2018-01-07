@@ -28,7 +28,8 @@ def getTargetInfo(config):
                         _immunology(config),
                         _copyMetaFiles(config),
                         _CDR3(config),
-                        _getGCTfile(config)])
+                        _getGCTfile(config),
+                        _gsea(config)])
     return targetFiles
 
 ## Returns proper count files for with and without batch effect correction
@@ -155,3 +156,14 @@ def _CDR3(config):
         cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-unmapped.bam" for sample in config["ordered_sample_list"]])
 
     return cdr3_targets
+
+def _gsea(config):
+    gsea_targets = []
+    if config["comparisons"]:
+        for comp in config["comparisons"]:
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.txt" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_list.txt" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.barplot.png" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp))
+
+    return gsea_targets

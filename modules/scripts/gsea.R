@@ -1,8 +1,12 @@
 #Script to run enricher fn on most significantly diffexp genes
 
 suppressMessages(library("clusterProfiler"))
+suppressMessages(library(ggplot2))
 
 gsea <- function(deseqTable, gsea_db, comp_title, out_path) {
+   #Constant used to determine how many of the top hits to use
+   N <- 10
+
    #get set of significant diffexp genes--threshold 0.05
    genes <- deseqTable[deseqTable$padj < 0.05,]
 
@@ -38,8 +42,19 @@ gsea <- function(deseqTable, gsea_db, comp_title, out_path) {
    png(paste0(out_path, ".gene_set.enrichment.dotplot.png"), width = 8, height = 8, unit="in",res=300)
    #NOTE: if I just did dotplot(...), the png doesn't get saved.  
    #I need the print(p)
-   p2<-dotplot(egmt, x="count", font.size=6, title=comp_title)
-   print(p2)
+   
+   topResults = egmt@result[1:N,]
+   #NOTE: the $GeneRatio is an character array, e.g. "120/1317" we want to
+   #convert those to float.  This might be non-canonical, but we're simply
+   #evaluating them and saving them to a new col, GeneRatios 
+   #NOTE: GeneRatio = original char expr, GeneRatios = evaluated!
+   topResults$GeneRatios <- apply(as.array(topResults$GeneRatio), 1, function(expr) eval(parse(text=expr)))
+
+   p <- ggplot(topResults, aes(x = reorder(topResults$Description, topResults$Count), y = topResults$Count)) +
+           geom_point(aes(size = GeneRatios)) + theme_bw(base_size=10) + coord_flip() +
+           labs(y="Counts", x="Gene Sets") +
+           ggtitle("bar")
+   print(p)
    junk <- dev.off()
    
    #---------------------------------------------------------------------------

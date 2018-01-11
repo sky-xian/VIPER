@@ -62,8 +62,7 @@ def get_sphinx_report(config):
         SF_png_list.append(data_uri(SF_plot))
 
     for comp in comps:
-        gsea_list.append(data_uri("./analysis/%s/diffexp/%s/%s.gene_set.enrichment.barplot.png" % (config["token"], comp, comp)))
-        gsea_list.append(data_uri("./analysis/%s/diffexp/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp)))
+        gsea_list.append(data_uri("./analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp)))
 
     if pca_png_list:
         file_dict['pca_png_list'] = pca_png_list

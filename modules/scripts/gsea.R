@@ -53,7 +53,7 @@ gsea <- function(deseqTable, gsea_db, comp_title, out_path) {
    p <- ggplot(topResults, aes(x = reorder(topResults$Description, topResults$Count), y = topResults$Count)) +
            geom_point(aes(size = GeneRatios)) + theme_bw(base_size=10) + coord_flip() +
            labs(y="Counts", x="Gene Sets") +
-           ggtitle("bar")
+           ggtitle(comp_title)
    print(p)
    junk <- dev.off()
    
@@ -89,7 +89,7 @@ gsea <- function(deseqTable, gsea_db, comp_title, out_path) {
    #for the top 10 hits, generate a (gene set) enrichment plot
    top_hits<- rownames(summary(egmt)[1:10,])
    for (gene_set in top_hits) {
-      print(gene_set)
+      #print(gene_set)
       png(paste0(out_path, ".gsea.", gene_set,"%02d.png"), width = 8, height = 8, unit="in",res=300)
       p2<-gseaplot(gsea_result, gene_set)
       print(p2)

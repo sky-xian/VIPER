@@ -175,9 +175,8 @@ def _gsea(config):
     gsea_targets = []
     if config["comparisons"]:
         for comp in config["comparisons"]:
-            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.txt" % (config["token"], comp, comp))
-            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_list.txt" % (config["token"], comp, comp))
-            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.barplot.png" % (config["token"], comp, comp))
-            gsea_targets.append("analysis/%s/diffexp/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/gsea/%s/%s.gene_set.enrichment.txt" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/gsea/%s/%s.gene_list.txt" % (config["token"], comp, comp))
+            gsea_targets.append("analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp))
 
     return gsea_targets

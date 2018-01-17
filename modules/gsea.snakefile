@@ -11,13 +11,12 @@ rule gsea:
     input:
         deseq = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.deseq.csv",
     output:
-        gene_list = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gene_list.txt",
-        gsea = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gene_set.enrichment.txt",
-        barplot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gene_set.enrichment.barplot.png",
-        dotplot = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}.gene_set.enrichment.dotplot.png",
+        gene_list = "analysis/" + config["token"] + "/gsea/{comparison}/{comparison}.gene_list.txt",
+        gsea = "analysis/" + config["token"] + "/gsea/{comparison}/{comparison}.gene_set.enrichment.txt",
+        dotplot = "analysis/" + config["token"] + "/gsea/{comparison}/{comparison}.gene_set.enrichment.dotplot.png",
     params:
         db = config["gsea_db"],
-        out_path = "analysis/" + config["token"] + "/diffexp/{comparison}/{comparison}",
+        out_path = "analysis/" + config["token"] + "/gsea/{comparison}/{comparison}",
         title = "{comparison}"
     message: "Running Gene Set Enrichment Analysis on {wildcards.comparison}"
     shell:

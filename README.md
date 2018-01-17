@@ -423,5 +423,13 @@ start using viper by doing the following:
 6. (viper) PROJECT$ `snakemake -s viper/viper.snakefile -n` #to invoke a DRY-RUN
 7. (viper) PROJECT$ `snakemake -s viper/viper.snakefile` #to invoke VIPER
 
-### APPENDIX D: installing and running CDR3 analysis with TRUST
+##APPENDIX D: Running VIPER in a cluster
+VIPER can be run on cluster systems which use a common filesystem for all compute-nodes (e.g. Sun Grid Engine) using the native [snakemake support](http://snakemake.readthedocs.io/en/latest/executable.html#cluster-execution) for these systems.  A separate "--cluster" parameter is given to the snakemake call to pass-along all of the relevant qsub commands, e.g.:
+`snakemake -s viper/viper.snakefile -cluster "qsub {threads}" -j 32`
+
+where -j determines the number of jobs to submit.
+
+Please see your local cluster documentation as well as the snakemake documentation for more information.
+
+##APPENDIX X: installing and running CDR3 analysis with TRUST
 LEN TODO:

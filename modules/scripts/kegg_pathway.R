@@ -124,7 +124,7 @@ kegg_pathway_f<- function(deseq_file, numkeggpathways,kegg_dir,reference,temp_di
     }
     
     # Read in the list of made png files
-    png_files <- list.files(temp_dir, pattern=glob2rx("*.pathview.png"))
+    png_files <- list.files(temp_dir, pattern=glob2rx("*.png"))
     if (reference == "hg19") { file.rename(paste0(temp_dir,png_files), paste0(kegg_dir, newnames, ".png")) } else { file.rename(paste0(temp_dir, png_files), paste0(kegg_dir, png_files)) }
     # Repeat for xml files
     xml_files <- list.files(temp_dir, pattern=glob2rx("*.xml"))

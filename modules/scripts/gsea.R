@@ -50,9 +50,9 @@ gsea <- function(deseqTable, gsea_db, comp_title, out_path) {
    #NOTE: GeneRatio = original char expr, GeneRatios = evaluated!
    topResults$GeneRatios <- apply(as.array(topResults$GeneRatio), 1, function(expr) eval(parse(text=expr)))
 
-   p <- ggplot(topResults, aes(x = reorder(topResults$Description, topResults$Count), y = topResults$Count)) +
-           geom_point(aes(size = GeneRatios)) + theme_bw(base_size=10) + coord_flip() +
-           labs(y="Counts", x="Gene Sets") +
+   p <- ggplot(topResults, aes(x = reorder(topResults$Description, -log(topResults$qvalue)), y = -log(topResults$qvalue))) +
+           geom_point(aes(size = Count)) + theme_bw(base_size=10) + coord_flip() +
+           labs(y="-Log(qvalue)", x="Gene Sets") +
            ggtitle(comp_title)
    print(p)
    junk <- dev.off()

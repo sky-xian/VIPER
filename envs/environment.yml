@@ -75,3 +75,7 @@ dependencies:
 
 #tools
 - bioconductor-biomart
+
+#misc.
+#BUG: missing libSM.so.6
+- xorg-libsm

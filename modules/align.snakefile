@@ -158,6 +158,7 @@ rule run_rRNA_STAR:
         log_file="analysis/STAR_rRNA/{sample}/{sample}.Log.final.out"
     params:
         stranded=rRNA_strand_command,
+        gz_support=gz_command,
         prefix=lambda wildcards: "analysis/STAR_rRNA/{sample}/{sample}".format(sample=wildcards.sample),
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
     threads: 8
@@ -165,10 +166,14 @@ rule run_rRNA_STAR:
     benchmark:
         "benchmarks/{sample}/{sample}.run_rRNA_STAR.txt"
     shell:
-        "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_rRNA_index]}"
-        " --readFilesIn {input} --readFilesCommand zcat --outFileNamePrefix {params.prefix}."
-        "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
-        "  --limitBAMsortRAM 45000000000"
+        "STAR --runMode alignReads --runThreadN {threads}"
+        " --genomeDir {config[star_rRNA_index]}"
+        " --readFilesIn {input} {params.gz_support}"
+        " --outFileNamePrefix {params.prefix}."
+        " --outSAMmode Full --outSAMattributes All {params.stranded}"
+        " --outSAMattrRGline {params.readgroup}"
+        " --outSAMtype BAM SortedByCoordinate"
+        " --limitBAMsortRAM 45000000000"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
 
 rule index_STAR_rRNA_bam:

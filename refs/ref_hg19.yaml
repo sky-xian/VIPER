@@ -1,6 +1,6 @@
 #Reference files required
-#ref_fasta: /path/to/assembly/humanhg19/rawgenome/hg19.fasta
-#star_index: /path/to/STAR/humanhg19/
+ref_fasta: ./ref_files/hg19/assembly/hg19.fasta
+star_index: ./ref_files/hg19/STAR/humanhg19/
 
 gtf_file: ./ref_files/hg19/Hg19_CTAT_resource_lib/ref_annot.gtf
 bed_file: ./ref_files/hg19/refseqGenesHg19.bed

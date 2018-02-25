@@ -42,6 +42,9 @@ numgoterms: 5
 ## Number of KEGG pathways in plot (note there is no cutoff herre because the KEGG module takes in full population statistics)
 numkeggpathways: 5
 
+#GSEA analysis- perform gsea analysis
+gsea_analysis: false
+
 #Path to gene set enrichment db
 gsea_db: viper/static/gsea/msigdb.v6.1.symbols.gmt
 

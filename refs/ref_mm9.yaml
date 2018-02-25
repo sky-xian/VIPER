@@ -1,6 +1,6 @@
 #Reference files required
-#star_index: /path/to/STAR/mm9/
-#ref_fasta: /path/to/assembly/UCSC_MM9/rawgenome/mm9.fasta
+ref_fasta: ./ref_files/mm9/assembly/mm9.fasta
+star_index: ./ref_files/mm9/STAR/mm9/
 
 gtf_file: ./ref_files/mm9/mm9.refseq.gtf
 bed_file: ./ref_files/mm9/refseqGenesMm9.bed

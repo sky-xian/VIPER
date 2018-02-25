@@ -10,7 +10,8 @@ library_type: 'fr-firststrand'
 
 ##PARAMS
 ## Sample-Sample Heatmap params
-TPM_threshold: 1.0
+#TPM_threshold: 1.0
+RPKM_threshold: 1.0
 min_num_samples_expressing_at_threshold: 1
 
 ## Filters out "SNO" and "MIR" RNA, options are [true,false]

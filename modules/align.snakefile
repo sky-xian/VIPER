@@ -32,7 +32,7 @@ rule run_STAR:
         getFastq
     output:
         bam=protected("analysis/STAR/{sample}/{sample}.sorted.bam"),
-        counts="analysis/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam",
+        counts="analysis/STAR/{sample}/{sample}.counts.tab",
         log_file="analysis/STAR/{sample}/{sample}.Log.final.out",
         #COOL hack: {{sample}} is LEFT AS A WILDCARD
         unmapped_reads = expand( "analysis/STAR/{{sample}}/{{sample}}.Unmapped.out.{mate}", mate=_mates),
@@ -58,11 +58,11 @@ rule run_STAR:
         " --outSAMattrRGline {params.readgroup}"
         " --outSAMtype BAM SortedByCoordinate"
         " --limitBAMsortRAM 45000000000"
-        " --quantMode TranscriptomeSAM"
+        " --quantMode GeneCounts"
         " --outReadsUnmapped Fastx"
         " --outSAMunmapped Within {params.keepPairs}"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
-
+        " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
 
 rule index_bam:
     """INDEX the {sample}.sorted.bam file"""
@@ -76,28 +76,30 @@ rule index_bam:
     shell:
         "samtools index {input}"
 
-rule plot_STAR_alignments:
+rule generate_STAR_report:
     input:
         star_log_files=expand( "analysis/STAR/{sample}/{sample}.Log.final.out", sample=config["ordered_sample_list"] ),
+        star_gene_count_files=expand( "analysis/STAR/{sample}/{sample}.counts.tab", sample=config["ordered_sample_list"] ),
         force_run_upon_meta_change = config['metasheet'],
         force_run_upon_config_change = config['config_file']
     output:
         csv="analysis/" + config["token"] + "/STAR/STAR_Align_Report.csv",
         png="analysis/" + config["token"] + "/STAR/STAR_Align_Report.png",
+        gene_counts="analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
     #priority: 3
     benchmark:
         "benchmarks/" + config["token"] + "/generate_STAR_report.txt"
     run:
         log_files = " -l ".join( input.star_log_files )
+        count_files = " -f ".join( input.star_gene_count_files )
         shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
         shell( "Rscript viper/modules/scripts/map_stats.R {output.csv} {output.png}" )
-
-
+        shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -f {count_files} 1>{output.gene_counts}" )
 
 rule batch_effect_removal_star:
     input:
-        starmat = "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv",
+        starmat = "analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv",
         annotFile = config["metasheet"]
     output:
         starcsvoutput="analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv",

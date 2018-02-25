@@ -12,9 +12,12 @@
 def getTargetInfo(config):
     targetFiles = []
     targetFiles.extend([_getSTARaligns(config),
+                        _getSTARcounts(config),
                         _convertSJoutToBed(config),
-                        _getGeneCounts(config), 
-                        _getIsoCounts(config), 
+                        #_getGeneCounts(config), 
+                        #_getIsoCounts(config), 
+                        _getCuffCounts(config),
+                        _getCuffIsoCounts(config),
                         _fusionOutput(config), 
                         _insertSizeOutput(config), 
                         _rRNAmetrics(config), 
@@ -44,33 +47,45 @@ def _getSTARaligns(config):
 
     return ls
 
+## Returns proper count files for with and without batch effect correction
+def _getSTARcounts(config):
+    STAR_out_files = ["analysis/" + config["token"] + "/STAR/batch_corrected_STAR_Gene_Counts.csv"] if config["batch_effect_removal"] == True else ["analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"]
+    return STAR_out_files
+
 def _convertSJoutToBed(config):
     ls = ["analysis/STAR/"+sample+"/"+sample+".junctions.bed" for sample in config['ordered_sample_list']]
     return ls
 
-#NEED to re-jig this as this is largely redundant w/ _getGCTfile
-def _getGeneCounts(config):
-    ls = ["analysis/" + config["token"] + "/plots/gene_counts.tpm.png"]
-    if config["batch_effect_removal"]:
-        ls.append("analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv")
+def _getCuffCounts(config):
+    cuff_files = ["analysis/" + config["token"] + "/plots/gene_counts.fpkm.png"]
+    if config["batch_effect_removal"] == True:
+        cuff_files.append("analysis/" + config["token"] + "/cufflinks/batch_corrected_Cuff_Gene_Counts.csv")
     else:
-        ls.append("analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv")
-    return ls
+        cuff_files.append("analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv")
+    return cuff_files
+
+# #NEED to re-jig this as this is largely redundant w/ _getGCTfile
+# def _getGeneCounts(config):
+#     ls = ["analysis/" + config["token"] + "/plots/gene_counts.tpm.png"]
+#     if config["batch_effect_removal"]:
+#         ls.append("analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv")
+#     else:
+#         ls.append("analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv")
+#     return ls
 
 def _getGCTfile(config):
-    ls = []
-    if config["batch_effect_removal"]:
-        ls.append("analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv")
-    else:
-        ls.append("analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv")
-    return ls
+    GCT_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"]
+    return GCT_files
 
-def _getIsoCounts(config):
-    iso_files = ["analysis/" + config["token"] + "/rsem/iso_tpm_matrix.csv"]
-    return iso_files
+def _getCuffIsoCounts(config):
+    cuff_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Isoform_Counts.csv"]
+    return cuff_files
 
-def _getProcessedGeneCounts(config):
-    return "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.filtered.csv"
+def _getProcessedCuffCounts(config):
+    return "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.filtered.csv"
+
+# def _getProcessedGeneCounts(config):
+#     return "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.filtered.csv"
 
 def _fusionOutput(config):
     fusion_out = []

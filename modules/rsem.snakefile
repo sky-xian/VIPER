@@ -10,11 +10,14 @@
 
 from scripts.utils import _getGCTfile
 
+def getFastq(wildcards):
+    return config["samples"][wildcards.sample]
+
 _logfile = "analysis/logs/rsem.txt"
 
 rule rsem:
     input:
-        bam="analysis/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam"
+        getFastq
     output:
         rsem_transcript_out = protected("analysis/rsem/{sample}/{sample}.isoforms.results"),
         rsem_genes_out = protected("analysis/rsem/{sample}/{sample}.genes.results")
@@ -26,32 +29,36 @@ rule rsem:
     params:
         sample_name = lambda wildcards: wildcards.sample,
         stranded = "--strand-specific" if config["stranded"] else "",
-        paired_end = "--paired-end" if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else ""
+        paired_end = "--paired-end" if len(config["samples"][config["ordered_sample_list"][0]]) == 2 else "",
+        gz_support="--star-gzipped-read-file" if config["samples"][config["ordered_sample_list"][0]][0][-3:] == '.gz' else ""
     shell:
-        "rsem-calculate-expression -p {threads} {params.stranded} {params.paired_end} --bam --no-bam-output --estimate-rspd --append-names {input} {config[rsem_ref]} analysis/rsem/{params.sample_name}/{params.sample_name} > {log}"
-       
-rule rsem_iso_tpm_matrix:
+        "rsem-calculate-expression -p {threads} {params.stranded}"
+        " {params.paired_end} --star {params.gz_support}"
+        " --estimate-rspd --append-names {input} {config[rsem_ref]}"
+        " analysis/rsem/{params.sample_name}/{params.sample_name} > {log}"
+
+rule rsem_iso_matrix:
     input:
         rsem_iso_files = expand( "analysis/rsem/{sample}/{sample}.isoforms.results", sample=config["ordered_sample_list"] ),
         metasheet = config['metasheet']
     output:
-        rsem_iso_matrix = "analysis/" + config["token"] + "/rsem/iso_tpm_matrix.csv"
+        rsem_iso_matrix = "analysis/" + config["token"] + "/rsem/tpm_iso_matrix.csv"
     message: "Running RSEM matrix generation rule for isoforms"
     benchmark:
-        "benchmarks/" + config["token"] + "/rsem_iso_tpm_matrix.txt"
+        "benchmarks/" + config["token"] + "/rsem_iso_matrix.txt"
     run:
         args = " -f ".join( input.rsem_iso_files )
         shell("perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_iso_matrix}")
 
-rule rsem_gene_tpm_matrix:
+rule rsem_gene_matrix:
     input:
         rsem_gene_files = expand( "analysis/rsem/{sample}/{sample}.genes.results", sample=config["ordered_sample_list"] ),
         metasheet = config["metasheet"]
     output:
-        rsem_gene_matrix = "analysis/" + config["token"] + "/rsem/gene_tpm_matrix.csv"
-    message: "Running RSEM matrix generation rule for gene tpms"
+        rsem_gene_matrix = "analysis/" + config["token"] + "/rsem/tpm_gene_matrix.csv"
+    message: "Running RSEM matrix generation rule for genes"
     benchmark:
-        "benchmarks/" + config["token"] + "/rsem_gene_tpm_matrix.txt"
+        "benchmarks/" + config["token"] + "/rsem_gene_matrix.txt"
     run:
         args = " -f ".join( input.rsem_gene_files )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl --column 5 --metasheet {input.metasheet} --header -f {args} 1>{output.rsem_gene_matrix}" )

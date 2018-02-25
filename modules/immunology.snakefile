@@ -1,4 +1,4 @@
-from scripts.utils import _getGCTfile
+from scripts.utils import _getCuffCounts
 
 rule immunology_all:
     input:
@@ -8,7 +8,7 @@ rule immunology_all:
 
 rule estimate_immune_abundance:
     input:
-        tpm_collected = _getGCTfile(config)
+        fpkm_collected = _getCuffCounts(config)[1]
     output:
         "analysis/"+config["token"]+"/immunology/relative_abundance.txt",
         "analysis/"+config["token"]+"/immunology/output.pdf",
@@ -19,4 +19,4 @@ rule estimate_immune_abundance:
     benchmark:
         "benchmarks/"+config["token"]+"estimate_immune_abundance.txt"
     run:
-        shell( "Rscript viper/modules/scripts/immunology.R {input.tpm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/{params.token}/immunology/", cancer_type=config["cancer_type"])
+        shell( "Rscript viper/modules/scripts/immunology.R {input.fpkm_collected} {cancer_type} --staticdir=viper/static/immunology --outdir=`pwd`/analysis/{params.token}/immunology/", cancer_type=config["cancer_type"])

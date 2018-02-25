@@ -14,7 +14,8 @@ heatmapSS_plot <- function(rpkmTable,annot, ss_out_dir) {
     ## Read in and Log Transform Data
     Exp_data <- log2(rpkmTable+1)
     #CHECK: DROP cols that are all 0s
-    Exp_data <- Exp_data[, -(which(colSums(Exp_data) == 0))]
+    #LEN: on reverting, this line was causing the entire matrix to drop out
+    #Exp_data <- Exp_data[, -(which(colSums(Exp_data) == 0))]
 
     ## Calc. spearman correlation
     cordata <- cor(Exp_data, method="spearman")

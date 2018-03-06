@@ -32,7 +32,8 @@ def getTargetInfo(config):
                         _copyMetaFiles(config),
                         _CDR3(config),
                         _getGCTfile(config),
-                        _gsea(config)])
+                        _gsea(config),
+                        _rsem(config)])
     return targetFiles
 
 def _getSTARaligns(config):
@@ -146,9 +147,10 @@ def _bw(config):
 
 def _pathway(config):
     path_files = []
-    path_files.extend([["analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".goterm.done",
-                        "analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".kegg.done"] 
-        for comp in config["comparisons"]])
+    if 'kegg_analysis' in config and config['kegg_analysis']:
+        for comp in config["comparisons"]:
+            path_files.append("analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".goterm.done")
+            path_files.append("analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".kegg.done")
     return path_files
 
 def _VirusSeq(config):
@@ -195,3 +197,18 @@ def _gsea(config):
             gsea_targets.append("analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp))
 
     return gsea_targets
+
+def _rsem(config):
+    rsem_targets = []
+    if ('rsem_analysis' in config and config['rsem_analysis']):
+        for sample in config['ordered_sample_list']:
+            rsem_targets.append("analysis/rsem/%s/%s.isoforms.results" % (sample,sample))
+            rsem_targets.append("analysis/rsem/%s/%s.genes.results" % (sample,sample))
+            rsem_targets.append("analysis/rsem/%s/%s.genes.processed.txt" % (sample,sample))
+            
+        rsem_targets.append("analysis/%s/rsem/tpm_iso_matrix.csv" % config['token'])
+        rsem_targets.append("analysis/%s/rsem/tpm_gene_matrix.csv" % config['token'])
+        rsem_targets.append("analysis/%s/rsem/rsem_gene_ct_matrix.csv" % config['token'])
+        rsem_targets.append("analysis/%s/rsem/rsem_gene_ct_matrix.filtered.csv" % config['token'])
+        rsem_targets.append("analysis/%s/plots/gene_counts.tpm.png" % config['token'])
+    return rsem_targets

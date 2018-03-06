@@ -114,14 +114,6 @@ rule rsem_filter_gene_ct_matrix:
         "--numgenes {config[numgenes_plots]} "
         "--out_file {output.filtered_tpm} "
         "--sample_names {params.sample_names} "
-        "Rscript viper/modules/scripts/rsem_filter_gene_ct_matrix.R "
-        "--tpm_file {input.tpmFile} "
-        "--min_samples {config[min_num_samples_expressing_at_threshold]} "
-        "--TPM_cutoff {config[TPM_threshold]} "
-        "--filter_miRNA {config[filter_mirna]} "
-        "--numgenes {config[numgenes_plots]} "
-        "--out_file {output.filtered_tpm} "
-        "--sample_names {params.sample_names} "
 
 rule batch_effect_removal_rsem:
     input:
@@ -144,7 +136,8 @@ rule batch_effect_removal_rsem:
 
 rule tpm_plot:
     input:
-        tpm_mat = _getGCTfile(config),
+        #TODO: handle batch_effect correction
+        tpm_mat = "analysis/" + config['token'] + "/rsem/rsem_gene_ct_matrix.filtered.csv",
         annotFile = config["metasheet"]
     output:
         tpm_png = "analysis/" + config["token"] + "/plots/gene_counts.tpm.png"

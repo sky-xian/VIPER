@@ -159,7 +159,7 @@ def _CDR3(config):
 
 def _gsea(config):
     gsea_targets = []
-    if ('gsea_analysis' in config and config['gsea_analysis'].upper() != 'FALSE' and config['gsea_db'] and config["comparisons"]):
+    if ('gsea_analysis' in config and config['gsea_analysis'] and config['gsea_db'] and config["comparisons"]):
         for comp in config["comparisons"]:
             gsea_targets.append("analysis/%s/gsea/%s/%s.gene_set.enrichment.txt" % (config["token"], comp, comp))
             gsea_targets.append("analysis/%s/gsea/%s/%s.gene_list.txt" % (config["token"], comp, comp))

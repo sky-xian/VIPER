@@ -11,10 +11,13 @@
 
 def getTargetInfo(config):
     targetFiles = []
-    targetFiles.extend([_getSTARcounts(config),
+    targetFiles.extend([_getSTARaligns(config),
+                        _getSTARcounts(config),
                         _convertSJoutToBed(config),
-                        _getCuffCounts(config), 
-                        _getCuffIsoCounts(config), 
+                        #_getGeneCounts(config), 
+                        #_getIsoCounts(config), 
+                        _getCuffCounts(config),
+                        _getCuffIsoCounts(config),
                         _fusionOutput(config), 
                         _insertSizeOutput(config), 
                         _rRNAmetrics(config), 
@@ -29,8 +32,21 @@ def getTargetInfo(config):
                         _copyMetaFiles(config),
                         _CDR3(config),
                         _getGCTfile(config),
-                        _gsea(config)])
+                        _gsea(config),
+                        _rsem(config)])
     return targetFiles
+
+def _getSTARaligns(config):
+    """ensure that bam and indexes are built"""
+    #STAR alignment sorted.bam file, its index, and transcript count
+    ls = []
+
+    for sample in config['ordered_sample_list']:
+        ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam")
+        ls.append("analysis/STAR/"+sample+"/"+sample+".sorted.bam.bai")
+    ls.append("analysis/" + config['token'] + "/STAR/STAR_Align_Report.png")
+
+    return ls
 
 ## Returns proper count files for with and without batch effect correction
 def _getSTARcounts(config):
@@ -49,6 +65,15 @@ def _getCuffCounts(config):
         cuff_files.append("analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.csv")
     return cuff_files
 
+# #NEED to re-jig this as this is largely redundant w/ _getGCTfile
+# def _getGeneCounts(config):
+#     ls = ["analysis/" + config["token"] + "/plots/gene_counts.tpm.png"]
+#     if config["batch_effect_removal"]:
+#         ls.append("analysis/" + config["token"] + "/rsem/batch_corrected_rsem_gene_ct_matrix.csv")
+#     else:
+#         ls.append("analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.csv")
+#     return ls
+
 def _getGCTfile(config):
     GCT_files = ["analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.gct"]
     return GCT_files
@@ -59,6 +84,9 @@ def _getCuffIsoCounts(config):
 
 def _getProcessedCuffCounts(config):
     return "analysis/" + config["token"] + "/cufflinks/Cuff_Gene_Counts.filtered.csv"
+
+# def _getProcessedGeneCounts(config):
+#     return "analysis/" + config["token"] + "/rsem/rsem_gene_ct_matrix.filtered.csv"
 
 def _fusionOutput(config):
     fusion_out = []
@@ -97,7 +125,7 @@ def _DE(config):
 
 def _SNP(config):
     snp_files = ["analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png"]
-    if ('snp_scan_genome' in config and config['snp_scan_genome'] == True):
+    if ('snp_scan_genome' in config and config['snp_scan_genome']):
         snp_files.extend([["analysis/snp/" + sample + "/" + sample + ".snp.genome.vcf", 
             "analysis/snp/" + sample + "/" + sample + ".snpEff.annot.vcf"] for sample in config["ordered_sample_list"]])
     return snp_files
@@ -119,14 +147,15 @@ def _bw(config):
 
 def _pathway(config):
     path_files = []
-    path_files.extend([["analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".goterm.done",
-                        "analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".kegg.done"] 
-        for comp in config["comparisons"]])
+    if 'kegg_analysis' in config and config['kegg_analysis']:
+        for comp in config["comparisons"]:
+            path_files.append("analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".goterm.done")
+            path_files.append("analysis/" + config["token"] + "/diffexp/" + comp + "/" + comp + ".kegg.done")
     return path_files
 
 def _VirusSeq(config):
     virus_seq_targets = []
-    if ('virus_dna_scan' in config and config['virus_dna_scan'] == True and config['reference'] == 'hg19'):
+    if ('virus_dna_scan' in config and config['virus_dna_scan'] and config['reference'] == 'hg19'):
         virus_seq_targets = ["analysis/" + config["token"] + "/virusseq/virusseq_summary.csv"]
         virus_seq_targets.extend(["analysis/" + config["token"] + "/virusseq/virusseq_Cuff_Isoform_Counts.csv"])
         virus_seq_targets.extend(["analysis/virusseq/" + sample + "/" + sample + ".virusseq.filtered.gtf" for sample in config["ordered_sample_list"]])
@@ -149,12 +178,14 @@ def _copyMetaFiles(config):
 
 def _CDR3(config):
     cdr3_targets = []
-    if ('cdr3_analysis' in config and config['cdr3_analysis'] == True and config['reference'] == 'hg19'):
-        #LEN: Do we need to tokenize these results??--can bams be reanalyzed?
-        cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]
-        cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-Locs.bam" for sample in config["ordered_sample_list"]])
-        cdr3_targets.extend(["analysis/cdr3/"+sample+"/"+sample+".sorted.bam-unmapped.bam" for sample in config["ordered_sample_list"]])
-
+    if ('cdr3_analysis' in config and config['cdr3_analysis']):
+        #CHECK for valid setting--i.e. config[reference] = {hg19 or hg38}
+        if (config['reference'] == 'hg19' or config['reference'] == 'hg38'):
+            cdr3_targets = ["analysis/cdr3/"+sample+"/"+sample+".sorted.bam.fa" for sample in config["ordered_sample_list"]]
+            cdr3_targets.extend(["analysis/cdr3/CPK.csv"])
+            cdr3_targets.extend(["analysis/cdr3/CPK.png"])
+        else:
+            print("WARNING: cdr3 (Trust) analysis skipped because reference is not a valid entry, hg19 or hg38")
     return cdr3_targets
 
 def _gsea(config):
@@ -166,3 +197,18 @@ def _gsea(config):
             gsea_targets.append("analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp))
 
     return gsea_targets
+
+def _rsem(config):
+    rsem_targets = []
+    if ('rsem_analysis' in config and config['rsem_analysis']):
+        for sample in config['ordered_sample_list']:
+            rsem_targets.append("analysis/rsem/%s/%s.isoforms.results" % (sample,sample))
+            rsem_targets.append("analysis/rsem/%s/%s.genes.results" % (sample,sample))
+            rsem_targets.append("analysis/rsem/%s/%s.genes.processed.txt" % (sample,sample))
+            
+        rsem_targets.append("analysis/%s/rsem/tpm_iso_matrix.csv" % config['token'])
+        rsem_targets.append("analysis/%s/rsem/tpm_gene_matrix.csv" % config['token'])
+        rsem_targets.append("analysis/%s/rsem/rsem_gene_ct_matrix.csv" % config['token'])
+        rsem_targets.append("analysis/%s/rsem/rsem_gene_ct_matrix.filtered.csv" % config['token'])
+        rsem_targets.append("analysis/%s/plots/gene_counts.tpm.png" % config['token'])
+    return rsem_targets

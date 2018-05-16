@@ -87,8 +87,8 @@ sub get_matrix {
 			chomp $line;
 			if( $$options{ 'cufflinks' } ) {
 				my @array_of_vals = split( "\t", $line );
-				#my( $gene_id, $fpkm ) = ( $array_of_vals[ 0 ], $array_of_vals[ 9 ] );
-				my( $gene_id, $fpkm ) = ( $array_of_vals[ 4 ], $array_of_vals[ 9 ] );
+				#PARSE cufflinks output- take gene_id and FPKM
+				my( $gene_id, $fpkm ) = ( $array_of_vals[ 3 ], $array_of_vals[ 9 ] );
 				if( not substr( $gene_id, 0, 2 ) eq '__' ) {
 					if( $$options{ 'remove_ERCC_ids' } && $gene_id =~ /ERCC\-00\d\d\d/ ) {
 						# do nothing
@@ -145,7 +145,10 @@ sub get_seurat_header {
     my( $files, $meta_info ) = @_;
     my @header = ();
     foreach my $file( @$files ) {
-        push @header, $$meta_info{ $file };
+	#BUG FIX: filenames are NOT sample names-
+	#need to parse out sample names
+	my $tmp = (split(/\./, $file))[0];
+        push @header, $tmp;
     }
-    return @header;      
+    return @header;
 }

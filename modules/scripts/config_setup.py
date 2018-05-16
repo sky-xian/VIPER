@@ -13,11 +13,8 @@ import yaml
 import os, sys, subprocess
 
 def updateConfig(config):
-    ref_info = _getRefInfo(config)
-    for k,v in ref_info.items():
-        config[k] = v
-    config["config_file"] = "config.yaml" # trick to force rules on config change
-	
+    loadRef(config)
+    config["config_file"] = "config.yaml" # trick to force rules on config change	
     for k in ["RPKM_threshold","min_num_samples_expressing_at_threshold", 
                 "numgenes_plots","num_kmeans_clust","filter_mirna"]:
         config[k] = str(config[k])
@@ -25,11 +22,21 @@ def updateConfig(config):
     config = _addExecPaths(config)
     return config
 
-def _getRefInfo(config):
-    with open(config['ref'],"r") as ref_file:
-        ref_info = yaml.safe_load(ref_file)
-    return ref_info
-
+#------------------------------------------------------------------------------
+# CHIPS-like refs file
+#-----------------------------------------------------------------------------
+def loadRef(config):
+    """Adds the static reference paths found in config['ref']
+    NOTE: if the elm is already defined, then we DO NOT clobber the value
+    """
+    f = open(config['ref'])
+    ref_info = yaml.safe_load(f)
+    f.close()
+    #print(ref_info[config['assembly']])
+    for (k,v) in ref_info[config['assembly']].items():
+        #NO CLOBBERING what is user-defined!
+        if k not in config:
+            config[k] = v
 
 def _addExecPaths(config):
     conda_root = subprocess.check_output('conda info --root',shell=True).decode('utf-8').strip()
@@ -38,11 +45,9 @@ def _addExecPaths(config):
     config["python2_pythonpath"] = os.path.join(conda_root, 'envs', 'viper_py2', 'lib', 'python2.7', 'site-packages')
     
     if not "python2" in config or not config["python2"]:
-        #config["python2"] = conda_path + '/python-2.7.13-0/bin/python2.7'
         config["python2"] = os.path.join(conda_root, 'envs', 'viper_py2', 'bin', 'python2.7')
 
     if not "rseqc_path" in config or not config["rseqc_path"]:
-        #config["rseqc_path"] = conda_path + '/rseqc-2.6.2-0/bin'
         config["rseqc_path"] = os.path.join(conda_root, 'envs', 'viper_py2', 'bin')
 
     if not "picard_path" in config or not config["picard_path"]:
@@ -51,15 +56,13 @@ def _addExecPaths(config):
     if not "varscan_path" in config or not config["varscan_path"]:
         config["varscan_path"] = 'varscan'
    
-    # update RSEM executable only if rsem_ref key has value from user
-    if "rsem_ref" in config and config["rsem_ref"]:
-        config["rsem_path"] = conda_root + '/envs/rsem/bin'
-        config["seurat_path"] = conda_root + '/envs/seurat/bin' 
-
     if "analysis_token" in config and config["analysis_token"]:
         config["token"] = config["analysis_token"]
     else:
         config["token"] = "summary_reports"
+
+    if not "trust_path" in config or not config["trust_path"]:
+        config["trust_path"] = os.path.join(conda_root, 'envs', 'viper_py2', 'bin', 'trust')
     
     return config
 

@@ -241,6 +241,7 @@ This section holds parameters specific to your project design
 > - Tells VIPER to perform a TIMER analysis which will generate an estimate of immune cell type abundances in your cancer samples.  
 > - __NOTE__: Your samples must be one of the following TCGA cancer types:  
 > - Cancer types available {'kich', 'blca', 'brca', 'cesc', 'gbm', 'hnsc', 'kirp', 'lgg', 'lihc', 'luad', 'lusc', 'prad', 'sarc', 'pcpg', 'paad', 'tgct', 'ucec', 'ov', 'skcm', 'dlbc', 'kirc', 'acc', 'meso', 'thca', 'uvm', 'ucs', 'thym', 'esca', 'stad', 'read', 'coad', 'chol'}  
+> - See https://cistrome.shinyapps.io/timer/ ('Cancer Type') drop-down for type descriptions.
 > - To ENABLE: uncomment and put in your sample's TCGA cancer type.  
 > - To DISABLE: Comment out if not needed or set to 'False'! (default)  
 >
@@ -432,3 +433,6 @@ VIPER can be run on cluster systems which use a common filesystem for all comput
 where -j determines the number of jobs to submit.
 
 Please see your local cluster documentation as well as the snakemake documentation for more information.
+
+##APPENDIX X: installing and running CDR3 analysis with TRUST
+LEN TODO:

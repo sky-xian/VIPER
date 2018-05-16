@@ -19,6 +19,8 @@ rule filter_cuff_matrix:
     params:
         sample_names = " ".join(config["ordered_sample_list"])
     message: "Generating Pre-processed Cuff RPKM matrix file"
+    benchmark:
+        "benchmarks/" + config["token"] + "/filter_cuff_matrix.txt"
     shell:
         "Rscript viper/modules/scripts/filter_cuff_matrix.R "
         "--rpkm_file {input.rpkmFile} "

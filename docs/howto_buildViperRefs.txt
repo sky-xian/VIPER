@@ -1,0 +1,148 @@
+Problem: You have an assembly or species which is not currently supported on
+VIPER.  This how-to will show you the steps.
+
+1. Getting the assembly:
+   a. Goto: http://hgdownload.soe.ucsc.edu/downloads.html
+      select species
+      Try to download whole genome FASTA (ie. not broken up by chrom)
+      OTHERWISE you'll have to compose the chromosome fasta-s into a assembly
+      EXAMPLE:
+      (viper) lentaing@CFCE2:~/viper/ref_files/hg38/assembly$ wget --timestamping http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+
+   b. INDEX the assembly-
+      IN the viper environment:
+      (viper) lentaing@CFCE2:~/viper/ref_files/hg38/assembly$ samtools faidx hg38.fa
+
+2. Build hg38.refseqGenes.bed
+   STEPS:
+      1. goto http://genome.ucsc.edu/
+      2. click Tables, clade: mammals, genome: Human, assembly: hg38,
+         groups: Genes and Gene Prediction tracks, track: Refseq Genes
+         table: refGene
+         output format: bed
+         SAVE that file as hg38.bed
+
+         NOTE: hg38.bed uses REF_SEQ IDs instead of geneNames so we need
+               to convert the REF_SEQ IDs to geneNames
+      3. on the ucsc table browser, dump another table w/ gene names by doing-
+         a. follow STEP #1 but in output format:
+            "selected fields from primary and related tables"
+         b. THEN:
+            choose name, name2 as the field (along w/ chr, start, end)
+            and get the output
+            SAVE as hg38.names.bed
+      4. use the script viper/modules/scripts/tools/convertRefseq2Hugo_bed.py
+         ./convertRefSeq2Hugo.py -b hg38.bed -l hf38.names.bed >hg38.refseqGenes.bed
+
+3. Build hg38.refseq.gtf
+   STEPS:
+      1. goto http://genome.ucsc.edu/
+      2. click Tables, clade: mammals, genome: Human, assembly: hg38,
+         groups: Genes and Gene Prediction tracks, track: Refseq Genes
+         table: refGene
+         output format: gtf
+         save this as hg38.gtf
+      3. use the script viper/modules/scripts/tools/convertRefseq2Hugo_gtf.py
+         NOTE: you are using hg38.names.bed from the previous step (step #2)
+         convertRefseq2Hugo_gtf.py -g hg38.gtf -l hg38.names.bed > hg38.refseq.gtf
+
+4. BUILDING the STAR index:
+   a. (viper) lentaing@CFCE2:~/viper/ref_files/hg38$ mkdir STAR
+   b. (viper) lentaing@CFCE2:~/viper/ref_files/hg38$ nohup time STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles assembly/hg38.fa --sjdbGTFfile hg38.refseq.gtf > nohup.STARindex.out &
+
+5. Build humanhg19.annot.csv.bz2:
+   STEPS:
+      1. use gtf2annot_bm.R generate an annotation FROM biomart-dataset:
+         /mnt/cfce-stor1/home/lentaing/viper/weinstock/newrun/gtf2annot/src/
+         $ Rscript gtf2annot_bm.R hsapiens_gene_ensembl hg38.output.csv
+
+         #Where hsapiens_gene_ensembl is the biomart dataset for your species,
+         #see below
+         1a: on determining which biomaRt dataset to use-
+             ref: https://www.bioconductor.org/packages//2.7/bioc/vignettes/biomaRt/inst/doc/biomaRt.pdf
+             search "2 Selecting a BioMart database and dataset"
+             a. source activate viper
+             b. R
+             c. > library("biomaRt")
+                > ensembl = useMart("ensembl")
+                > listDatasets(ensembl)
+                #NOTE: you might have to scroll up to see your dataset names--
+                make sure you choose the dataset name, eg.
+                "hsapiens_gene_ensembl"
+      2. use toUpper to uppercase GeneNames because biomart doesn't do that
+         /mnt/cfce-stor1/home/lentaing/viper/weinstock/newrun/gtf2annot/src/
+         $ ./toUpper.py -f hg38.output.csv > hg38.upper.csv
+      3. consolidateGo.py-- one gene per row (i.e. before this, each row was
+         a gene-GoTerm association)
+         $ ./consolidateGo.py -f hg38.upper.csv > hg38.annot.csv
+      4. bzip results:
+      	 $ bzip2 hg38.annot.csv
+
+6. snpEff annotation db:
+   STEPS:
+      1. copy viper/modules/scripts/tools/snpEff.config into your current dir
+      	 snpEff$ cp viper/modules/scripts/tools/snpEff.config .
+      2. Find the snpEff db associated with your species/assembly:
+      	 (viper) snpEff$ snpEff databases | grep Homo_sapiens 
+	 #Look for the URL pointing to a zip file for that DB
+      3. Download the file given by the URL
+      4. unzip the zip file
+
+7. RSEM transcriptome:
+   ref: https://github.com/bli25ucb/RSEM_tutorial
+   NOTE: need to use ensembl GTF (not the gtf you made in step #3)
+   1. $ wget ftp://ftp.ensembl.org/pub/release-86/gtf/homo_sapiens/Homo_sapiens.GRCh38.86.chr.gtf.gz
+   2. $ gunzip Homo_sapiens.GRCh38.86.chr.gtf.gz
+   3. FIX the GTF in step #2 using viper/modules/scripts/tools/processEnsemblGtf.py
+      ./processEnsemblGtf.py -f Homo_sapiens.GRCh38.86.chr.gtf > hg38.ensembl.gtf
+   4. BUILD the RSEM transcriptome:
+      (viper) $ nohup rsem-prepare-reference -p 8 --gtf hg38.ensembl.gtf --star assembly/hg38.fa ./rsem/hg38 &
+      #NOTE: assembly/hg38.fa is THE FASTA file and ./rsem/hg38 is the output dir
+
+8. STAR_rRNA:
+   0. HOW to find the ENSEMBL non-coding RNA FASTA file:
+      The ftp URL follows this pattern:
+      ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/
+      where release-86 is the ensembl version
+      	    and homo_sapiens is species
+   1. download the ncrna.fa.gz file:
+      Example:
+      hg38_ncrna$ wget ftp://ftp.ensembl.org/pub/release-82/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+   2. unzip it:
+      hg38_ncrna$ gunzip Homo_sapiens.GRCh38.ncrna.fa.gz
+   3. BUILD the STAR index for this FASTA:
+      hg38$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR_ncrna/ --genomeFastaFiles Homo_sapiens.GRCh38.ncrna.fa --limitGenomeGenerateRAM 45000000000  &
+
+      #NOTE: STAR_ncrna is your output directory
+
+9. star_fusion: ***NOTE: only relevant for HUMAN and MOUSE
+   *ref: https://github.com/STAR-Fusion/STAR-Fusion/wiki
+   a. GOTO: https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/
+   b. unzip the file
+   c. FIX the gtf using viper/modules/scripts/tools/fixSTAR-FusionGtf.py
+      $ ./fixSTAR-FusionGtf.py -f ./ctat_genome_lib_build_dir/ref_annot.gtf > ref_annot.fixed.gtf
+   d. replace ctat_genome_lib_build_dir/ref_annot.gtf with ref_annot.fixed.gtf:
+      ctat_genome_lib_build_dir$ cp ref_annot.gtf ref_annot.gtf.bak
+      $ mv ref_annot.fixed.gtf ctat_genome_lib_build_dir/ref_annot.gtf
+
+10 virusseq:
+   a. BREAK up FASTA files into different chromosomes (if it isn't already)
+      So you end up with a directory containing files like, chr1, chr2,...,chrY
+   b. replace the chrM with virusseq chrM (found in viper/static/virusseq)
+   c. RE-ASSEMBLE your FASTA into a virus assembly:
+      cat chr1.fa chr2.fa chr3.fa ... chrM.fa > hg38.virus.fa
+      #AGAIN NOTE: chrM.fa is the virusseq chrM.fa
+   d. remove chrM annotations from your gtf (built in step #3)-
+      virusseq$ grep -v chrM ../hg38.refseq.gtf > hg38.refseq.noChrM.gtf
+   e. compose a new gtf using the virusseq GTF (viper/static/virusseq/virusSeq.gtf)
+      virusseq$ cat hg38.refseq.noChrM.gtf virusSeq.gtf > hg38virus.refseq.gtf
+   f. USE the GTF built in the previous step to build a STAR index:
+      virusseq$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles hg38virus.fa --sjdbGTFfile hg38.refseq.noChrM.gtf &
+   g. make the hg38.virus.chrom.sizes file:
+      use the base hg38.chrom.sizes, but replace the chrM entry with:
+      chrM    645825
+      #where there is a tab to separate the columns
+
+TODO:
+11. update ref.yaml:
+    

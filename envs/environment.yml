@@ -7,8 +7,8 @@ dependencies:
 #GENERAL
 - snakemake
 - samtools
-- python=3.5.2
-- r=3.3.2
+- python>=3.5.2
+- r>=3.4.1
 
 #align.snakefile
 - star>=2.5.3a
@@ -79,3 +79,4 @@ dependencies:
 #misc.
 #BUG: missing libSM.so.6
 - xorg-libsm
+- cairo>=1.14.10

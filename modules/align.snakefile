@@ -131,8 +131,8 @@ rule run_STAR_fusion:
     shell:
         "STAR-Fusion --chimeric_junction analysis/STAR/{wildcards.sample}/{wildcards.sample}.Chimeric.out.junction "
         "--genome_lib_dir {config[genome_lib_dir]} --output_dir analysis/STAR_Fusion/{wildcards.sample} >& {log}"
-        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_predictions.tsv {output[0]}"
-        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_predictions.abridged.tsv {output[1]}"
+        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final {output[0]}"
+        " && mv analysis/STAR_Fusion/{wildcards.sample}/star-fusion.fusion_candidates.final.abridged {output[1]}"
         " && touch {output[1]}" # For some sample, final.abridged is created but not .final file; temp hack before further investigate into this
 
 

@@ -25,9 +25,9 @@ def printFusionInfo( file_list ):
         df = pd.read_table(cur_file, index_col=False)
         sample = re.sub("\..*", "", os.path.basename(cur_file))
         df["Sample"] = sample
-        df["TotalReads"] = df["JunctionReadCount"] + df["SpanningFragCount"]
-        df["FusionName"] = df["#FusionName"]
-        main_df = main_df.append(df[["Sample","FusionName","JunctionReadCount","SpanningFragCount","TotalReads","SpliceType", "LeftGene", "LeftBreakpoint", "RightGene", "RightBreakpoint"]])
+        df["TotalReads"] = df["JunctionReads"] + df["SpanningFrags"]
+        df["FusionName"] = df["#fusion_name"]
+        main_df = main_df.append(df[["Sample","FusionName","JunctionReads","SpanningFrags","TotalReads","Splice_type", "LeftGene", "LeftBreakpoint", "RightGene", "RightBreakpoint"]])
     print(main_df.to_csv(header=True, index=False))
 
 if __name__ == "__main__":

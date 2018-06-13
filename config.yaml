@@ -1,6 +1,7 @@
 ---
 metasheet: metasheet.csv
-ref: ref.yaml
+ref: viper/ref.yaml
+assembly: 'hg19'
 
 ## Is your library stranded? options are [true, false]
 stranded: true
@@ -10,7 +11,7 @@ library_type: 'fr-firststrand'
 ##PARAMS
 ## Sample-Sample Heatmap params
 RPKM_threshold: 1.0
-min_num_samples_expressing_at_threshold: 4
+min_num_samples_expressing_at_threshold: 1
 
 ## Filters out "SNO" and "MIR" RNA, options are [true,false]
 filter_mirna: true
@@ -38,6 +39,7 @@ goterm_adjpval_cutoff: 0.1
 ## Number of GOterms in plot
 numgoterms: 5
 ## Number of KEGG pathways in plot (note there is no cutoff herre because the KEGG module takes in full population statistics)
+kegg_analysis: false
 numkeggpathways: 5
 
 #GSEA analysis- perform gsea analysis
@@ -52,6 +54,10 @@ gsea_db: viper/static/gsea/msigdb.v6.1.symbols.gmt
 
 #Uncomment the following line to perform a TRUST (cdr3) analysis.  refer to README.md
 cdr3_analysis: false
+
+#Perform RSEM analysis
+rsem_analysis: false
+TPM_threshold: 1.0
 
 samples:
   #FOR SINGLE-END samples

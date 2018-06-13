@@ -30,6 +30,8 @@ rule bam_to_bigwig:
     params:
         "analysis/bam2bw/{sample}/{sample}"
     message: "Converting {wildcards.sample} bam to bigwig"
+    benchmark:
+        "benchmarks/{sample}/{sample}.bam_to_bigwig.txt"
     shell:
         "bedtools genomecov -bg -split -ibam {input.bam} -g {input.chrom_size} 1> {params}.bg"
         " && bedSort {params}.bg {params}.sorted.bg"

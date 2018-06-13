@@ -45,19 +45,36 @@ rule run_STAR:
         keepPairs = _keepPairs
     threads: 8
     message: "Running STAR Alignment on {wildcards.sample}"
+    priority: 10
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_STAR.txt"
     shell:
-        "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_index]}"
-        " --sjdbGTFfile {config[gtf_file]}"
-        " --readFilesIn {input} {params.gz_support} --outFileNamePrefix {params.prefix}."
-        "  --outSAMstrandField intronMotif"
-        "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
-        "  --limitBAMsortRAM 45000000000 --quantMode GeneCounts"
-        "  --outReadsUnmapped Fastx"
-        "  --outSAMunmapped Within {params.keepPairs}"
+        "STAR --runMode alignReads --runThreadN {threads}"
+        " --genomeDir {config[star_index]}"
+        " --readFilesIn {input} {params.gz_support}" 
+        " --outFileNamePrefix {params.prefix}."
+        " --outSAMstrandField intronMotif"
+        " --outSAMmode Full --outSAMattributes All {params.stranded}"
+        " --outSAMattrRGline {params.readgroup}"
+        " --outSAMtype BAM SortedByCoordinate"
+        " --limitBAMsortRAM 45000000000"
+        " --quantMode GeneCounts"
+        " --outReadsUnmapped Fastx"
+        " --outSAMunmapped Within {params.keepPairs}"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
         " && mv {params.prefix}.ReadsPerGene.out.tab {output.counts}"
-        " && samtools index {output.bam}"
 
+rule index_bam:
+    """INDEX the {sample}.sorted.bam file"""
+    input:
+        "analysis/STAR/{sample}/{sample}.sorted.bam"
+    output:
+        "analysis/STAR/{sample}/{sample}.sorted.bam.bai"
+    message: "Indexing {wildcards.sample}.sorted.bam"
+    benchmark:
+        "benchmarks/{sample}/{sample}.index_bam.txt"
+    shell:
+        "samtools index {input}"
 
 rule generate_STAR_report:
     input:
@@ -70,14 +87,15 @@ rule generate_STAR_report:
         png="analysis/" + config["token"] + "/STAR/STAR_Align_Report.png",
         gene_counts="analysis/" + config["token"] + "/STAR/STAR_Gene_Counts.csv"
     message: "Generating STAR report"
-    priority: 3
+    #priority: 3
+    benchmark:
+        "benchmarks/" + config["token"] + "/generate_STAR_report.txt"
     run:
         log_files = " -l ".join( input.star_log_files )
         count_files = " -f ".join( input.star_gene_count_files )
         shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
         shell( "Rscript viper/modules/scripts/map_stats.R {output.csv} {output.png}" )
         shell( "perl viper/modules/scripts/raw_and_fpkm_count_matrix.pl -f {count_files} 1>{output.gene_counts}" )
-
 
 rule batch_effect_removal_star:
     input:
@@ -90,7 +108,9 @@ rule batch_effect_removal_star:
         batch_column="batch",
         datatype = "star"
     message: "Removing batch effect from STAR Gene Count matrix, if errors, check metasheet for batches, refer to README for specifics"
-    priority: 2
+    #priority: 2
+    benchmark:
+        "benchmarks/" + config["token"] + "/batch_effect_removal_star.txt"
     shell:
         "Rscript viper/modules/scripts/batch_effect_removal.R {input.starmat} {input.annotFile} "
         "{params.batch_column} {params.datatype} {output.starcsvoutput} {output.starpdfoutput} "
@@ -106,6 +126,8 @@ rule run_STAR_fusion:
     log:
         "analysis/STAR_Fusion/{sample}/{sample}.star_fusion.log"
     message: "Running STAR fusion on {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_STAR_fusion.txt"
     shell:
         "STAR-Fusion --chimeric_junction analysis/STAR/{wildcards.sample}/{wildcards.sample}.Chimeric.out.junction "
         "--genome_lib_dir {config[genome_lib_dir]} --output_dir analysis/STAR_Fusion/{wildcards.sample} >& {log}"
@@ -123,6 +145,8 @@ rule run_STAR_fusion_report:
         csv="analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.csv",
         png="analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.png"
     message: "Generating STAR fusion report"
+    benchmark:
+        "benchmarks/" + config["token"] + "/run_STAR_fusion_report.txt"
     shell:
         "python viper/modules/scripts/STAR_Fusion_report.py -f {input.sf_list} 1>{output.csv} "
         "&& Rscript viper/modules/scripts/STAR_Fusion_report.R {output.csv} {output.png}"
@@ -136,18 +160,35 @@ rule run_rRNA_STAR:
         log_file="analysis/STAR_rRNA/{sample}/{sample}.Log.final.out"
     params:
         stranded=rRNA_strand_command,
+        gz_support=gz_command,
         prefix=lambda wildcards: "analysis/STAR_rRNA/{sample}/{sample}".format(sample=wildcards.sample),
         readgroup=lambda wildcards: "ID:{sample} PL:illumina LB:{sample} SM:{sample}".format(sample=wildcards.sample)
     threads: 8
     message: "Running rRNA STAR for {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}/{sample}.run_rRNA_STAR.txt"
     shell:
-        "STAR --runMode alignReads --runThreadN {threads} --genomeDir {config[star_rRNA_index]}"
-        " --readFilesIn {input} --readFilesCommand zcat --outFileNamePrefix {params.prefix}."
-        "  --outSAMmode Full --outSAMattributes All {params.stranded} --outSAMattrRGline {params.readgroup} --outSAMtype BAM SortedByCoordinate"
-        "  --limitBAMsortRAM 45000000000"
+        "STAR --runMode alignReads --runThreadN {threads}"
+        " --genomeDir {config[star_rRNA_index]}"
+        " --readFilesIn {input} {params.gz_support}"
+        " --outFileNamePrefix {params.prefix}."
+        " --outSAMmode Full --outSAMattributes All {params.stranded}"
+        " --outSAMattrRGline {params.readgroup}"
+        " --outSAMtype BAM SortedByCoordinate"
+        " --limitBAMsortRAM 45000000000"
         " && mv {params.prefix}.Aligned.sortedByCoord.out.bam {output.bam}"
-        " && samtools index {output.bam}"
 
+rule index_STAR_rRNA_bam:
+    """INDEX the STAR_rRNA/{sample}.sorted.bam file"""
+    input:
+        "analysis/STAR_rRNA/{sample}/{sample}.sorted.bam"
+    output:
+        "analysis/STAR_rRNA/{sample}/{sample}.sorted.bam.bai"
+    message: "Indexing STAR_rRNA {wildcards.sample}.sorted.bam"
+    benchmark:
+        "benchmarks/{sample}/{sample}.index_STAR_rRNA_bam.txt"
+    shell:
+        "samtools index {input}"
 
 rule generate_rRNA_STAR_report:
     input:
@@ -158,6 +199,8 @@ rule generate_rRNA_STAR_report:
         csv="analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.csv",
         png="analysis/" + config["token"] + "/STAR_rRNA/STAR_rRNA_Align_Report.png"
     message: "Generating STAR rRNA report"
+    benchmark:
+        "benchmarks/" + config["token"] + "/run_rRNA_STAR_report.txt"
     run:
         log_files = " -l ".join( input.star_log_files )
         shell( "perl viper/modules/scripts/STAR_reports.pl -l {log_files} 1>{output.csv}" )
@@ -169,5 +212,7 @@ rule align_SJtab2JunctionsBed:
         "analysis/STAR/{sample}/{sample}.SJ.out.tab"
     output:
         "analysis/STAR/{sample}/{sample}.junctions.bed"
+    benchmark:
+        "benchmarks/{sample}/{sample}.align_SJtab2JunctionsBed.txt"
     shell:
         "viper/modules/scripts/STAR_SJtab2JunctionsBed.py -f {input} > {output}"

@@ -17,6 +17,8 @@ _HLA_regions = {'hg38':"chr6:28477797-33448354",
 rule call_snps_hla:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",
+        #TO insure we're indexed before this rule executes
+        bai="analysis/STAR/{sample}/{sample}.sorted.bam.bai",
         ref_fa=config["ref_fasta"],
     output:
         protected("analysis/snp/{sample}/{sample}.snp.hla.txt")
@@ -24,6 +26,8 @@ rule call_snps_hla:
         varscan_path = config["varscan_path"],
         region = _HLA_regions[config['reference']]
     message: "Running varscan for snp analysis for ch6 fingerprint region"
+    benchmark:
+        "benchmarks/{sample}/{sample}.call_snps_hla.txt"
     shell:
         "samtools mpileup -r \"{params.region}\" -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
         "{params.varscan_path} pileup2snp - --min-coverage 20 --min-reads2 4 > {output}"
@@ -39,6 +43,8 @@ rule sample_snps_corr_hla:
         snp_png="analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.png",
         snp_pdf="analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.hla.pdf"
     message: "Running snp correlations for HLA fingerprint region"
+    benchmark:
+        "benchmarks/" + config["token"] + "/sample_snps_corr_hla.txt"
     shell:
         "{config[python2]} viper/modules/scripts/sampleSNPcorr.py {input.snps}> {output.snp_matrix} && "
         "Rscript viper/modules/scripts/sampleSNPcorr_plot.R {output.snp_matrix} {input.metasheet} {output.snp_png} {output.snp_pdf}"
@@ -57,6 +63,8 @@ rule call_snps_genome:
     params:
         varscan_path=config["varscan_path"]
     message: "Running varscan for snp analysis genome wide"
+    benchmark:
+        "benchmarks/{sample}/{sample}.call_snps_genome.txt"
     shell:
         "samtools mpileup -f {input.ref_fa} {input.bam} | awk \'$4 != 0\' | "
         "{params.varscan_path} mpileup2snp - --min-coverage 20 --min-reads2 4 --output-vcf > {output}"
@@ -72,6 +80,8 @@ rule snpEff_annot:
         snpEff_conf=config["snpEff_conf"],
         snpEff_db=config['snpEff_db']
     message: "Running varscan for snpEff annotation analysis"
+    benchmark:
+        "benchmarks/{sample}/{sample}.snpEff_annot.txt"
     shell:
         "snpEff -Xmx4G -stats {output.vcf_stats} -c {params.snpEff_conf} {params.snpEff_db} {input.vcf} > {output.vcf_annot}"
 

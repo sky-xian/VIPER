@@ -22,6 +22,8 @@ rule generate_report:
     output:
         "analysis/" + config["token"] + "/" + config["token"] + ".html"
     message: "Generating VIPER report"
+    benchmark:
+        "benchmarks/" + config["token"] + "/generate_report.txt"
     run:
         sphinx_str = get_sphinx_report(config)
         report(sphinx_str, output[0], metadata="Molecular Biology Core Facilities, DFCI", **{'Copyrights:':"./viper/mbcf.jpg"})

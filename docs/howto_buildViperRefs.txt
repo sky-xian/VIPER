@@ -118,10 +118,11 @@ VIPER.  This how-to will show you the steps.
 9. star_fusion: ***NOTE: only relevant for HUMAN and MOUSE
    *ref: https://github.com/STAR-Fusion/STAR-Fusion/wiki
    a. GOTO: https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/
-   b. unzip the file
-   c. FIX the gtf using viper/modules/scripts/tools/fixSTAR-FusionGtf.py
+   b. download the "plug-n-play" tar.gz for your assembly
+   c. unzip the file
+   d. FIX the gtf using viper/modules/scripts/tools/fixSTAR-FusionGtf.py
       $ ./fixSTAR-FusionGtf.py -f ./ctat_genome_lib_build_dir/ref_annot.gtf > ref_annot.fixed.gtf
-   d. replace ctat_genome_lib_build_dir/ref_annot.gtf with ref_annot.fixed.gtf:
+   e. replace ctat_genome_lib_build_dir/ref_annot.gtf with ref_annot.fixed.gtf:
       ctat_genome_lib_build_dir$ cp ref_annot.gtf ref_annot.gtf.bak
       $ mv ref_annot.fixed.gtf ctat_genome_lib_build_dir/ref_annot.gtf
 

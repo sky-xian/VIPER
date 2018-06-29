@@ -338,8 +338,9 @@ CDR3 analysis (using trust v2.4.1)
 """
         report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot) +"\n"
 
-    report += "\n\nThis report is generated using ViPeR version [ `" + git_commit_string + "`_ ].\n"
+    report += "\n\n**This report is generated using VIPER version** [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"
+    report += "\n\n**To cite VIPER:\nCornwell M, Vangala M, Taing L, Herbert Z, Köster J, Li B, Sun H, Li T, Zhang J, Qiu X, Pun M, Jeselsohn R, Brown M, Liu XS, Long HW. VIPER: Visualization Pipeline for RNA-seq, a Snakemake workflow for efficient and complete RNA-seq analysis. BMC Bioinformatics. 2018 Apr 12; 19(1):135.**\n\n"
     return report + "\n"
 
 

@@ -63,6 +63,9 @@ def _addExecPaths(config):
 
     if not "trust_path" in config or not config["trust_path"]:
         config["trust_path"] = os.path.join(conda_root, 'envs', 'viper_py2', 'bin', 'trust')
-    
+
+    if not "optitype_path" in config or not config["optitype_path"]:
+        config["optitype_path"] = os.path.join(conda_root, 'envs', 'viper_py2', 'bin')
+
     return config
 

@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 
+def optitype_targets(wildcards):
+    """Generates the targets for this module"""
+    ls = []
+    for s in config["ordered_sample_list"]:
+        ls.append("analysis/optitype/%s/%s_result.tsv" % (s,s))
+        ls.append("analysis/optitype/%s/%s_coverage_plot.pdf" % (s,s))
+    return ls
+
+rule optitype_all:
+    input:
+        optitype_targets
+        
 rule optitype_get_chr6_reads:
     input:
         bam="analysis/STAR/{sample}/{sample}.sorted.bam",

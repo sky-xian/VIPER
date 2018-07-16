@@ -10,7 +10,7 @@ hg19:
 
   #Reference organism; possible value - hg19, mm9 etc.
   reference: hg19
-  gene_annotation: viper/static/humanhg19.annot.csv.bz2
+  gene_annotation: viper/static/annot/humanhg19.annot.csv.bz2
   #STAR-Fusion
   genome_lib_dir: ./ref_files/hg19/Hg19_CTAT_resource_lib
 
@@ -38,7 +38,7 @@ hg38:
 
   #Reference organism; possible value - hg19, mm9 etc.
   reference: hg38
-  gene_annotation: viper/static/hg38.annot.csv.bz2
+  gene_annotation: viper/static/annot/hg38.annot.csv.bz2
   #STAR-Fusion
   #This is required only for PE data.
   genome_lib_dir: ./ref_files/hg38/STAR_fusion/ctat_genome_lib_build_dir/
@@ -59,7 +59,7 @@ mm9:
 
   #Reference organism; possible value - hg19, mm9 etc.
   reference: mm9
-  gene_annotation: viper/static/mm9.annot.csv.bz2
+  gene_annotation: viper/static/annot/mm9.annot.csv.bz2
   #STAR-Fusion
   #This is required only for PE data.
   genome_lib_dir: ./ref_files/mm9/UCSC_mm9_build/
@@ -77,7 +77,7 @@ mm10:
 
   #Reference organism; possible value - hg19, mm9 etc.
   reference: mm10
-  gene_annotation: viper/static/mm10.annot.csv.bz2
+  gene_annotation: viper/static/annot/mm10.annot.csv.bz2
   #STAR-Fusion
   #This is required only for PE data.
   genome_lib_dir: ./ref_files/mm10/STAR_fusion/ctat_genome_lib_build_dir/

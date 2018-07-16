@@ -33,7 +33,8 @@ def getTargetInfo(config):
                         _CDR3(config),
                         _getGCTfile(config),
                         _gsea(config),
-                        _rsem(config)])
+                        _rsem(config),
+                        _optitype(config)])
     return targetFiles
 
 def _getSTARaligns(config):
@@ -212,3 +213,13 @@ def _rsem(config):
         rsem_targets.append("analysis/%s/rsem/rsem_gene_ct_matrix.filtered.csv" % config['token'])
         rsem_targets.append("analysis/%s/plots/gene_counts.tpm.png" % config['token'])
     return rsem_targets
+
+def _optitype(config):
+    optitype_targets = []
+    if ('HLA_analysis' in config and config['HLA_analysis']):
+        for sample in config['ordered_sample_list']:
+            optitype_targets.append("analysis/optitype/%s/%s_result.tsv" % (sample,sample))
+            optitype_targets.append("analysis/optitype/%s/%s_coverage_plot.pdf" % (sample,sample))
+        #TODO: AGGREGATE
+        #optitype_targets.append("analysis/optitype/optitype_all.tsv")
+    return optitype_targets

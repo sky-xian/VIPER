@@ -14,6 +14,9 @@ from snakemake.utils import report
 from modules.scripts.utils import getTargetInfo
 from modules.scripts.utils import _copyMetaFiles
 
+_branding=["Center for Functional Cancer Epigenetics, DFCI", "./viper/cfce.jpg"]
+#_branding=["Molecular Biology Core Facilities, DFCI", "./viper/mbcf.jpg"]
+
 rule generate_report:
     input:
         getTargetInfo(config),
@@ -26,7 +29,7 @@ rule generate_report:
         "benchmarks/" + config["token"] + "/generate_report.txt"
     run:
         sphinx_str = get_sphinx_report(config)
-        report(sphinx_str, output[0], metadata="Molecular Biology Core Facilities, DFCI", **{'Copyrights:':"./viper/mbcf.jpg"})
+        report(sphinx_str, output[0], metadata=_branding[0], **{'Copyrights:':_branding[1]})
 
 rule copy_meta_files:
     input:

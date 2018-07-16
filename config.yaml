@@ -59,6 +59,9 @@ cdr3_analysis: false
 rsem_analysis: false
 TPM_threshold: 1.0
 
+#Perform HLA typing analysis using optitype
+HLA_analysis: false
+
 samples:
   #FOR SINGLE-END samples
   SAMPLE1:

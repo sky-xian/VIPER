@@ -12,7 +12,7 @@ dependencies:
 
 #align.snakefile
 - star>=2.5.3a
-- star-fusion
+- star-fusion=0.5.4
 - bioconductor-sva
 
 #cdr3.snakefile-
@@ -80,3 +80,5 @@ dependencies:
 #BUG: missing libSM.so.6
 - xorg-libsm
 - cairo>=1.14.10
+#BUG missing libproj.so.12
+- proj4=4.9.3

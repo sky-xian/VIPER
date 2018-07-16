@@ -32,7 +32,7 @@ VIPER.  This how-to will show you the steps.
             and get the output
             SAVE as hg38.names.bed
       4. use the script viper/modules/scripts/tools/convertRefseq2Hugo_bed.py
-         ./convertRefSeq2Hugo.py -b hg38.bed -l hf38.names.bed >hg38.refseqGenes.bed
+         ./convertRefSeq2Hugo_bed.py -b hg38.bed -l hf38.names.bed >hg38.refseqGenes.bed
 
 3. Build hg38.refseq.gtf
    STEPS:
@@ -138,12 +138,38 @@ VIPER.  This how-to will show you the steps.
    e. compose a new gtf using the virusseq GTF (viper/static/virusseq/virusSeq.gtf)
       virusseq$ cat hg38.refseq.noChrM.gtf virusSeq.gtf > hg38virus.refseq.gtf
    f. USE the GTF built in the previous step to build a STAR index:
-      virusseq$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles hg38virus.fa --sjdbGTFfile hg38.refseq.noChrM.gtf &
+      virusseq$ nohup STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR/ --genomeFastaFiles hg38virus.fa --sjdbGTFfile hg38virus.refseq.gtf &
    g. make the hg38.virus.chrom.sizes file:
+      1. get the chrom lengths:
+      	 fetchChromSizes hg38 > hg38.chrom.sizes
       use the base hg38.chrom.sizes, but replace the chrM entry with:
       chrM    645825
       #where there is a tab to separate the columns
+      ALSO remove any rows which you do not have a chromosome fasta file for
+      e.g. chr_rand*
 
-TODO:
-11. update ref.yaml:
-    
+11. update viper/ref.yaml:
+    *Using one of the existing assemblies as a template, add a new entry for
+    your assembly, e.g. hg38:
+    *Suppose PWD is the path to the directory that you have worked in-
+    EXAMPLE:
+    hg38:
+      ref_fasta: PWD/assembly/hg38.fa
+      star_index: PWD/STAR/
+      rsem_ref: PWD/RSEM/hg38
+      gtf_file: PWD/hg38.refseq.gtf
+      bed_file: PWD/hg38.refseqGenes.bed
+      star_rRNA_index: PWD/STAR_rRNA
+
+      #Reference organism
+      reference: hg38
+      gene_annotation: PWD/hg38.annot.csv.bz2
+      #STAR-Fusion
+      genome_lib_dir: PWD/STAR_fusion/
+
+      snpEff_conf: PWD/snpEff.config
+      snpEff_db: GRCh38.82
+
+      virusseq_index: PWD/virusseq/STAR
+      virusseq_gtf_file: PWD/virusseq/hg38virus.refseq.gtf
+      virusseq_chrom_len: PWD/hg38virus.chrom.sizes

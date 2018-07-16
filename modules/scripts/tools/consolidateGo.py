@@ -30,11 +30,12 @@ def main():
         tmp = l.strip().split(",")
         if not tmp[0] in d:
             #STORE the first 3 cols, and the GO IDs and TERMS as list
-            d[tmp[0]] = [tmp[0], tmp[1], tmp[2], tmp[3], [tmp[4]], [tmp[5]]]
+            if len(tmp) > 5 and tmp[4] and tmp[5]:
+                d[tmp[0]] = [tmp[0], tmp[1], tmp[2], tmp[3], [tmp[4]], [tmp[5]]]
         else:
-            #EXISTING gene--add to the GO LISTS
-            d[tmp[0]][4].append(tmp[4])
-            d[tmp[0]][5].append(tmp[5])
+            if len(tmp) > 5 and tmp[4] and tmp[5]:
+                d[tmp[0]][4].append(tmp[4])
+                d[tmp[0]][5].append(tmp[5])
 
     #print out the genes as a csv
     for k in d.keys():

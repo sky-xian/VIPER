@@ -50,7 +50,7 @@ hg38:
   virusseq_gtf_file: ./ref_files/hg38/virusseq/hg38virus.refseq.gtf
   virusseq_chrom_len: ./ref_files/hg19/virusseq/hg38virus.chrom.sizes
 
-#NOTE: mm9 is no RSEM ready!
+#NOTE: mm9 is not RSEM ready!
 mm9:
   ref_fasta: ./ref_files/mm9/assembly/mm9.fasta
   gtf_file: ./ref_files/mm9/mm9.refseq.gtf
@@ -66,3 +66,26 @@ mm9:
 
   snpEff_conf: ./ref_files/mm9/snpEff/snpEff.config
   snpEff_db: NCBIm37.66
+
+mm10:
+  ref_fasta: ./ref_files/mm10/assembly/mm10.fa
+  star_index: ./ref_files/mm10/STAR/
+  rsem_ref: ./ref_files/mm10/RSEM/mm10
+  gtf_file: ./ref_files/mm10/mm10.refseq.gtf
+  bed_file: ./ref_files/mm10/mm10.refseqGenes.bed
+  star_rRNA_index: ./ref_files/mm10/STAR_rRNA
+
+  #Reference organism; possible value - hg19, mm9 etc.
+  reference: mm10
+  gene_annotation: viper/static/mm10.annot.csv.bz2
+  #STAR-Fusion
+  #This is required only for PE data.
+  genome_lib_dir: ./ref_files/mm10/STAR_fusion/ctat_genome_lib_build_dir/
+
+  snpEff_conf: ./ref_files/mm10/snpEff/snpEff.config
+  snpEff_db: Mus_musculus
+
+  virusseq_index: ./ref_files/mm10/virusseq/STAR
+  virusseq_gtf_file: ./ref_files/mm10/virusseq/mm10virus.refseq.gtf
+  virusseq_chrom_len: ./ref_files/mm10/virusseq/mm10virus.len
+      

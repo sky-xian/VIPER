@@ -12,6 +12,7 @@
 from modules.scripts.config_setup import updateConfig
 from modules.scripts.metasheet_setup import updateMeta
 from modules.scripts.utils import getTargetInfo
+from string import Template
 
 #---------  CONFIG set up  ---------------
 configfile: "config.yaml"   # This makes snakemake load up yaml into config 

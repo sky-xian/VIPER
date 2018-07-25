@@ -21,6 +21,7 @@ hg19:
   virusseq_gtf_file: ./ref_files/hg19/virusseq/hg19Virus_refGene_RIS.gtf
   virusseq_chrom_len: ./ref_files/hg19/virusseq/hg19Virus.len
 
+
   #ONLY DOCUMENTED once b/c viper's auto-path is pretty good
   #software source paths in case user needs to over-ride
   #python2: 
@@ -66,6 +67,7 @@ mm9:
 
   snpEff_conf: ./ref_files/mm9/snpEff/snpEff.config
   snpEff_db: NCBIm37.66
+  star_index: ./ref_files/mm9/STAR/mm9
 
 mm10:
   ref_fasta: ./ref_files/mm10/assembly/mm10.fa

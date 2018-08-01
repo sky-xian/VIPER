@@ -40,7 +40,7 @@ def get_sphinx_report(config):
         if not os.path.isfile(file_dict[file_token]):
             del copy_file_dict[file_token]
         else:
-            copy_file_dict[file_token] = data_uri(copy_file_dict[file_token])
+            copy_file_dict[file_token] = data_uri(copy_file_dict[file_token])[0]
     file_dict = copy_file_dict
     pca_png_list = []
     volcano_list = []
@@ -51,21 +51,21 @@ def get_sphinx_report(config):
 
     for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:
-            pca_png_list.append(data_uri(pca_plot))
+            pca_png_list.append(data_uri(pca_plot)[0])
 
     if(os.path.isfile("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png")):
-        pca_png_list.append(data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png"))    
+        pca_png_list.append(data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png")[0])
 
     for volcano_plot in glob.glob("./analysis/" + config["token"] + "/plots/images/*_volcano.png"):
-        volcano_list.append(data_uri(volcano_plot))
+        volcano_list.append(data_uri(volcano_plot)[0])
 
     for SF_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/heatmapSF_*_plot.png")):
-        SF_png_list.append(data_uri(SF_plot))
+        SF_png_list.append(data_uri(SF_plot)[0])
 
     for comp in comps:
         tmp_f = "./analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp)
         if (os.path.isfile(tmp_f)):
-            gsea_list.append(data_uri(tmp_f))
+            gsea_list.append(data_uri(tmp_f)[0])
 
     if pca_png_list:
         file_dict['pca_png_list'] = pca_png_list
@@ -288,7 +288,7 @@ Gene-Ontology Annotation
         report += "^" * len(comp) + "\n"
         go_png = "analysis/" + config["token"] + "/plots/images/" + comp + "_goterm.up.png"
         if os.path.isfile(go_png):
-            report += "\n\n\t.. image:: " + data_uri(go_png) + "\n"
+            report += "\n\n\t.. image:: " + data_uri(go_png)[0] + "\n"
         else:
             report += "\nInsufficient data\n"
 
@@ -304,7 +304,7 @@ KEGG-Pathway Analysis
         if not path_list:
             report += "\nInsufficient data\n"
         else:
-            report += "\n\n\t.. image:: " + data_uri(path_list[0]) + "\n"
+            report += "\n\n\t.. image:: " + data_uri(path_list[0])[0] + "\n"
             token = ",".join([os.path.basename(file_path) for file_path in path_list[1:]]).replace(".png","")
             if token:
                 report += "\n" + "More pathway plots such as, " + token + " - can be found at " + cur_path + ".\n"    
@@ -336,7 +336,7 @@ Virus-Seq Module Output
 CDR3 analysis (using trust v2.4.1)
 ==================================
 """
-        report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot) +"\n"
+        report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot)[0] +"\n"
 
     report += "\n\n**This report is generated using VIPER version** [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"

@@ -14,8 +14,11 @@ source('viper/modules/scripts/supp_fns.R')
 snp_corr_plot <- function(snpCorrMatrix, annotation, plot_out, isPNG) {
     cordata <- snpCorrMatrix
     ## We want to only work with the samples that are in the meta file, so we are only selecting the count columns that are in the meta file
-    cordata <- cordata[, rownames(annotation)]
-    cordata <- cordata[rownames(annotation),]
+    #CHECK if there are any annotation
+    if (!is.null(ncol(annotation))) {
+        cordata <- cordata[, rownames(annotation)]
+        cordata <- cordata[rownames(annotation),]
+    }
     #save the spearman correlation as txt; save plots
     if (isPNG) {
         png(file = plot_out)
@@ -113,13 +116,16 @@ for (col in colnames(tmp_ann)) {
     }
 }
 
-rowNames <- tmp_ann[,1]
-colNames <- colnames(tmp_ann)
-samples <- intersect(colnames(snpCorrMat), rowNames)
-rownames(tmp_ann) <- rowNames
-tmp_ann <- as.data.frame(tmp_ann[samples,-1])
-rownames(tmp_ann) <- samples
-colnames(tmp_ann) <- colNames[2:length(colNames)]
+#CHECK if there are any annotation
+if (!is.null(ncol(tmp_ann))) {
+    rowNames <- tmp_ann[,1]
+    colNames <- colnames(tmp_ann)
+    samples <- intersect(colnames(snpCorrMat), rowNames)
+    rownames(tmp_ann) <- rowNames
+    tmp_ann <- as.data.frame(tmp_ann[samples,-1])
+    rownames(tmp_ann) <- samples
+    colnames(tmp_ann) <- colNames[2:length(colNames)]
+}
 #print(str(tmp_ann))
 
 #GENERATE png

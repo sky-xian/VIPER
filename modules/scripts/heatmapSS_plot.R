@@ -58,21 +58,27 @@ heatmapSS_plot <- function(rpkmTable,annot, ss_out_dir) {
                      top_annotation=ha1,
                      )
     draw(mapplot)
-    for(an in colnames(annot[1:ncol(annot)])) {
-        decorate_annotation(an, {
-            grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
-            grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
-        })
+    #CHECK for empty annotations
+    if (ncol(annot) > 0) {
+        for(an in colnames(annot[1:ncol(annot)])) {
+            decorate_annotation(an, {
+                grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
+                grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
+            })
+        }
     }
     dev.off()
     
     png(file=paste(ss_out_dir, "images/heatmapSS_plot.png", sep=""), width = 8, height = 8, unit="in",res=300)
     draw(mapplot)
-    for(an in colnames(annot[1:ncol(annot)])) {
-        decorate_annotation(an, {
-            grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
-            grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
-        })
+    #CHECK for empty annotations
+    if (ncol(annot) > 0) {
+        for(an in colnames(annot[1:ncol(annot)])) {
+            decorate_annotation(an, {
+                grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
+                grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
+            })
+        }
     }
     dev.off()
 

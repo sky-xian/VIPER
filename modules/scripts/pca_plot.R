@@ -36,6 +36,7 @@ pca_plot <- function(rpkmTable, annot, pca_out_dir) {
   plot.var <- ggscreeplot(rpkm.pca)
   suppressMessages(ggsave(paste(pca_out_dir,"images/pca_plot_scree.png", sep="")))
   all_plots <- list()
+  if (ncol(annot) > 0) {
   for (ann in colnames(annot)){
     g <- ggbiplot(rpkm.pca, groups = as.character(annot[,ann]), scale = 1, var.scale = 1, obs.scale = 1,
                 labels=colnames(rpkmTable), choices = 1:2,
@@ -46,6 +47,7 @@ pca_plot <- function(rpkmTable, annot, pca_out_dir) {
                    legend.title = element_text(face="bold"))
     all_plots <- c(all_plots, list(g))
     suppressMessages(ggsave(paste(pca_out_dir, "images/pca_plot_", ann, ".png", sep="")))
+  }
   }
 
   pdf(paste(pca_out_dir, "pca_plot.pdf", sep=""))

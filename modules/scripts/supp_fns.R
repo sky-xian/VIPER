@@ -20,6 +20,11 @@ cmap <- function(x, colorstart=NULL, use_viridis=FALSE) {
 }
 
 make_complexHeatmap_annotation <- function(annotation){
+    #CHECK for empty annotations
+    if (ncol(annotation) < 1) {
+        return(NULL)
+    }
+    
     MIN_UNIQUE <- 6
     global_gp = gpar(fontsize = 8)
     title_gp = gpar(fontsize = 8, fontface = "bold")

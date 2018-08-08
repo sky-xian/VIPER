@@ -24,7 +24,8 @@ def get_sphinx_report(config):
         'read_distrib': "analysis/" + config["token"] + "/RSeQC/read_distrib/read_distrib.png",
         'gb_cov_heatmap': "analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.heatMap.png",
         'gb_cov_curves': "analysis/" + config["token"] + "/RSeQC/gene_body_cvg/geneBodyCoverage.curves.png",
-        'heatmapSF_plot': "analysis/" + config["token"] + "/plots/images/heatmapSF_plot.png",
+        #OBSOLETE
+        #'heatmapSF_plot': "analysis/" + config["token"] + "/plots/images/heatmapSF_plot.png",
         'heatmapSS_plot': "analysis/" + config["token"] + "/plots/images/heatmapSS_plot.png",
         'heatmapSS_cluster': "analysis/" + config["token"] + "/plots/images/heatmapSS_cluster.png",
         'DEsummary_plot': "analysis/" + config["token"] + "/diffexp/de_summary.png",
@@ -33,15 +34,13 @@ def get_sphinx_report(config):
         'SNP_genome' : "analysis/" + config["token"] + "/plots/sampleSNPcorr_plot.genome.png",
         'FUSION_OUT': "analysis/" + config["token"] + "/STAR_Fusion/STAR_Fusion_Report.png"
     }
+    #ENCODE images
     copy_file_dict = {}
-    for key in file_dict.keys():
-        copy_file_dict[key] = file_dict[key]
-    for file_token in file_dict.keys():
-        if not os.path.isfile(file_dict[file_token]):
-            del copy_file_dict[file_token]
-        else:
-            copy_file_dict[file_token] = data_uri(copy_file_dict[file_token])[0]
+    for (key, fpath) in file_dict.items():
+        if os.path.isfile(fpath):
+            copy_file_dict[key] = data_uri(fpath)
     file_dict = copy_file_dict
+    
     pca_png_list = []
     volcano_list = []
     SF_png_list = []
@@ -51,21 +50,21 @@ def get_sphinx_report(config):
 
     for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:
-            pca_png_list.append(data_uri(pca_plot)[0])
+            pca_png_list.append(data_uri(pca_plot))
 
     if(os.path.isfile("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png")):
-        pca_png_list.append(data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png")[0])
+        pca_png_list.append(data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png"))    
 
     for volcano_plot in glob.glob("./analysis/" + config["token"] + "/plots/images/*_volcano.png"):
-        volcano_list.append(data_uri(volcano_plot)[0])
+        volcano_list.append(data_uri(volcano_plot))
 
     for SF_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/heatmapSF_*_plot.png")):
-        SF_png_list.append(data_uri(SF_plot)[0])
+        SF_png_list.append(data_uri(SF_plot))
 
     for comp in comps:
         tmp_f = "./analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp)
         if (os.path.isfile(tmp_f)):
-            gsea_list.append(data_uri(tmp_f)[0])
+            gsea_list.append(data_uri(tmp_f))
 
     if pca_png_list:
         file_dict['pca_png_list'] = pca_png_list
@@ -172,8 +171,8 @@ Principle Component Analysis
             report += "\n\t.. image:: " + "\n\t.. image:: ".join(file_dict['pca_png_list'][:-1]) + "\n"
             report += "\n\t" + 'This plot indicates how much of the overall variance is described by the principle components in descending order.' + "\n\n\t.. image:: " + file_dict['pca_png_list'][-1] + "\n"
         else:
-            report += "\n\t.. image:: " + "\n\t.. image:: ".join(file_dict['pca_png_list'][0]) + "\n"
-
+            report += "\n\n\t.. image:: " + file_dict['pca_png_list'][0] + "\n"
+            report += "\n\t" + "This plot indicates how much of the overall variance is described by the principle components in descending order.\n"
     report += "\n"
     report += """
 Sample-to-Sample Correlation Heatmap
@@ -194,9 +193,9 @@ Sample-Feature Correlation Heatmap
     The top colomn color annotations are presented to help identify how sample types, groups, or treatments are clustering together \(or not\).
 
 """
-
-    if 'heatmapSF_plot' in file_dict:
-        report += "\n\n\t.. image:: " + file_dict['heatmapSF_plot'] + "\n";
+    #OBSOLETE?
+    #if 'heatmapSF_plot' in file_dict:
+    #    report += "\n\n\t.. image:: " + file_dict['heatmapSF_plot'] + "\n";
 
     if 'sf_png_list' in file_dict:
         report += "\n\t.. image:: " + "\n\t.. image:: ".join(file_dict['sf_png_list'][:]) + "\n"
@@ -288,7 +287,7 @@ Gene-Ontology Annotation
         report += "^" * len(comp) + "\n"
         go_png = "analysis/" + config["token"] + "/plots/images/" + comp + "_goterm.up.png"
         if os.path.isfile(go_png):
-            report += "\n\n\t.. image:: " + data_uri(go_png)[0] + "\n"
+            report += "\n\n\t.. image:: " + data_uri(go_png) + "\n"
         else:
             report += "\nInsufficient data\n"
 
@@ -304,7 +303,7 @@ KEGG-Pathway Analysis
         if not path_list:
             report += "\nInsufficient data\n"
         else:
-            report += "\n\n\t.. image:: " + data_uri(path_list[0])[0] + "\n"
+            report += "\n\n\t.. image:: " + data_uri(path_list[0]) + "\n"
             token = ",".join([os.path.basename(file_path) for file_path in path_list[1:]]).replace(".png","")
             if token:
                 report += "\n" + "More pathway plots such as, " + token + " - can be found at " + cur_path + ".\n"    
@@ -336,7 +335,7 @@ Virus-Seq Module Output
 CDR3 analysis (using trust v2.4.1)
 ==================================
 """
-        report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot)[0] +"\n"
+        report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot) +"\n"
 
     report += "\n\n**This report is generated using VIPER version** [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"

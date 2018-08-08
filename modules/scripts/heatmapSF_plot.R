@@ -91,21 +91,28 @@ heatmapSF_plot <- function(rpkmTable,annot, num_kmeans_clust, sf_out_dir) {
         png_count = png_count+1
         png(file=paste(sf_out_dir, "images/heatmapSF_",png_count,"_plot.png",sep=""), width = 8, height = 8, unit="in",res=300)
         draw(mapplot)
-        for(an in colnames(annot[1:ncol(annot)])) {
-            decorate_annotation(an,
-              {grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
-              grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
-              })
+        #DRAW annotations
+        #CHECK for empty annotations
+        if (ncol(annot) > 0) {
+            for(an in colnames(annot[1:ncol(annot)])) {
+                decorate_annotation(an,
+                {grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
+                    grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
+                })
+            }
         }
         junk <- dev.off()
 
         ## Repeated to get into the pdf
         draw(mapplot)
-        for(an in colnames(annot[1:ncol(annot)])) {
-            decorate_annotation(an,
-              {grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
-              grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
-              })
+        #CHECK for empty annotations
+        if (ncol(annot) > 0) {
+            for(an in colnames(annot[1:ncol(annot)])) {
+                decorate_annotation(an,
+                {grid.text(an, unit(1, "npc") + unit(2, "mm"), 0.5, default.units = "npc", just = "left", gp=gpar(fontsize=6), check=TRUE)
+                    grid.text(an, unit(0, "npc") - unit(2, "mm"), 0.5, default.units = "npc", just = "right", gp=gpar(fontsize=6), check=TRUE)
+                })
+            }
         }
         if (i == 1) {
             if (kmparam[1] == 0) {

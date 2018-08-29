@@ -14,6 +14,18 @@ import subprocess
 from scripts.csv_to_sphinx_table import get_sphinx_table 
 from snakemake.report import data_uri
 
+def viper_data_uri(path):
+    """Wrapper fn to help accomodate changes in data_uri starting in 
+    snakemake v5.1.1, where the return is a tuple (uri, mime) rather than 
+    just uri. 
+    This fn will return the URI
+    """
+    tmp=data_uri(path)
+    if type(tmp) is tuple:
+        return tmp[0]
+    else:
+        return tmp
+    
 def get_sphinx_report(config):
     comps = config["comparisons"]
     git_commit_string = subprocess.check_output('git --git-dir="viper/.git" rev-parse --short HEAD',shell=True).decode('utf-8').strip()
@@ -38,7 +50,7 @@ def get_sphinx_report(config):
     copy_file_dict = {}
     for (key, fpath) in file_dict.items():
         if os.path.isfile(fpath):
-            copy_file_dict[key] = data_uri(fpath)
+            copy_file_dict[key] = viper_data_uri(fpath)
     file_dict = copy_file_dict
     
     pca_png_list = []
@@ -50,21 +62,21 @@ def get_sphinx_report(config):
 
     for pca_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/pca_plot*.png")):
         if "pca_plot_scree.png" not in pca_plot:
-            pca_png_list.append(data_uri(pca_plot))
+            pca_png_list.append(viper_data_uri(pca_plot))
 
     if(os.path.isfile("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png")):
-        pca_png_list.append(data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png"))    
+        pca_png_list.append(viper_data_uri("./analysis/" + config["token"] + "/plots/images/pca_plot_scree.png"))    
 
     for volcano_plot in glob.glob("./analysis/" + config["token"] + "/plots/images/*_volcano.png"):
-        volcano_list.append(data_uri(volcano_plot))
+        volcano_list.append(viper_data_uri(volcano_plot))
 
     for SF_plot in sorted(glob.glob("./analysis/" + config["token"] + "/plots/images/heatmapSF_*_plot.png")):
-        SF_png_list.append(data_uri(SF_plot))
+        SF_png_list.append(viper_data_uri(SF_plot))
 
     for comp in comps:
         tmp_f = "./analysis/%s/gsea/%s/%s.gene_set.enrichment.dotplot.png" % (config["token"], comp, comp)
         if (os.path.isfile(tmp_f)):
-            gsea_list.append(data_uri(tmp_f))
+            gsea_list.append(viper_data_uri(tmp_f))
 
     if pca_png_list:
         file_dict['pca_png_list'] = pca_png_list
@@ -287,7 +299,7 @@ Gene-Ontology Annotation
         report += "^" * len(comp) + "\n"
         go_png = "analysis/" + config["token"] + "/plots/images/" + comp + "_goterm.up.png"
         if os.path.isfile(go_png):
-            report += "\n\n\t.. image:: " + data_uri(go_png) + "\n"
+            report += "\n\n\t.. image:: " + viper_data_uri(go_png) + "\n"
         else:
             report += "\nInsufficient data\n"
 
@@ -303,7 +315,7 @@ KEGG-Pathway Analysis
         if not path_list:
             report += "\nInsufficient data\n"
         else:
-            report += "\n\n\t.. image:: " + data_uri(path_list[0]) + "\n"
+            report += "\n\n\t.. image:: " + viper_data_uri(path_list[0]) + "\n"
             token = ",".join([os.path.basename(file_path) for file_path in path_list[1:]]).replace(".png","")
             if token:
                 report += "\n" + "More pathway plots such as, " + token + " - can be found at " + cur_path + ".\n"    
@@ -335,7 +347,7 @@ Virus-Seq Module Output
 CDR3 analysis (using trust v2.4.1)
 ==================================
 """
-        report += "\n\n\t.. image:: " + data_uri(cdr_cpk_plot) +"\n"
+        report += "\n\n\t.. image:: " + viper_data_uri(cdr_cpk_plot) +"\n"
 
     report += "\n\n**This report is generated using VIPER version** [ `" + git_commit_string + "`_ ].\n"
     report += "\t.. _" + git_commit_string + ': ' + git_link + "\n\n"

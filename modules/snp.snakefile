@@ -47,7 +47,7 @@ rule sample_snps_corr_hla:
     benchmark:
         "benchmarks/" + config["token"] + "/sample_snps_corr_hla.txt"
     shell:
-        "{config[python2]} viper/modules/scripts/sampleSNPcorr.py {input.snps}> {output.snp_matrix} && "
+        "viper/modules/scripts/sampleSNPcorr.py {input.snps}> {output.snp_matrix} && "
         "Rscript viper/modules/scripts/sampleSNPcorr_plot.R {output.snp_matrix} {input.metasheet} {output.snp_png} {output.snp_pdf}"
 
 

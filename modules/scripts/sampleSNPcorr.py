@@ -72,7 +72,8 @@ def main():
     #header:
     print("\t".join(["Samples"]+samplesLs))
     for (i,row) in enumerate(corrMat):
-        print("\t".join([samplesLs[i]]+map(str,row)))
+        tmp = list(map(str, row))
+        print("\t".join([samplesLs[i]]+tmp))
             
 
 if __name__=='__main__':
